@@ -433,7 +433,13 @@ fn main() {
         Ok(registry) => registry,
         Err(err) => fail("scan failed", err),
     };
-    let rust_path = match registry.write_rust(&jni, "zenoh_flat_jni.rs") {
+    
+    // Write generated Rust to src/generated_bindings.rs (absolute path for committing to git)
+    let crate_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let rust_dest = std::path::Path::new(&crate_dir)
+        .join("src")
+        .join("generated_bindings.rs");
+    let rust_path = match registry.write_rust(&jni, &rust_dest) {
         Ok(path) => path,
         Err(err) => fail("write_rust failed", err),
     };
