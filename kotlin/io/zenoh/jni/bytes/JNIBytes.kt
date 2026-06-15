@@ -16,17 +16,22 @@
 
 package io.zenoh.jni.bytes
 
-import io.zenoh.ZenohLoad
 import java.lang.reflect.Type
 
 // Forces the native library to load before the first JNI call. The standalone
 // (de)serialization path has no Session to trigger the load, and the facade
 // class <clinit> runs before either external fn below is invoked.
-private val ensureLoaded = ZenohLoad
+private val ensureLoaded = NativeLibraryLoad
+
+private object NativeLibraryLoad {
+    init {
+        System.loadLibrary("zenoh_flat_jni")
+    }
+}
 
 // `onError` mirrors the generated wrappers' error callback: on a serialization
 // failure the native side invokes it with the message (the binding-error `je`
 // arity), and the handler throws — no direct throw from native code.
-internal external fun serializeViaJNI(any: Any, type: Type, onError: io.zenoh.jni.JniErrorHandler<ByteArray>): ByteArray
+public external fun serializeViaJNI(any: Any, type: Type, onError: io.zenoh.jni.JniErrorHandler<ByteArray>): ByteArray
 
-internal external fun deserializeViaJNI(bytes: ByteArray, type: Type, onError: io.zenoh.jni.JniErrorHandler<Any>): Any
+public external fun deserializeViaJNI(bytes: ByteArray, type: Type, onError: io.zenoh.jni.JniErrorHandler<Any>): Any

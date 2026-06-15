@@ -13,12 +13,17 @@
 //
 
 plugins {
+    kotlin("jvm") version "1.9.0"
     `maven-publish`
     signing
 }
 
 group = "org.eclipse.zenoh"
 version = rootProject.version
+
+repositories {
+    mavenCentral()
+}
 
 // ============================================================================
 // Build Configuration
@@ -32,6 +37,15 @@ enum class BuildMode {
 }
 
 val buildMode = if (release) BuildMode.RELEASE else BuildMode.DEBUG
+
+kotlin {
+    jvmToolchain(11)
+    sourceSets {
+        main {
+            kotlin.srcDirs("kotlin", "generated-kotlin")
+        }
+    }
+}
 
 // ============================================================================
 // Rust Build Configuration
@@ -72,6 +86,13 @@ val dylibName = when {
     else -> "libzenoh_flat_jni.so"
 }
 
+tasks.named<Jar>("jar") {
+    dependsOn("buildZenohFlatJni")
+    from(jarTarget) {
+        include(dylibName)
+    }
+}
+
 tasks.register<Jar>("packageJar") {
     description = "Package zenoh-flat-jni library into JAR with native libraries and Kotlin sources"
     dependsOn("buildZenohFlatJni")
@@ -79,14 +100,7 @@ tasks.register<Jar>("packageJar") {
     archiveBaseName.set("zenoh-flat-jni")
     archiveVersion.set(project.version.toString())
     
-    // Include Kotlin sources
-    from("kotlin") {
-        into("io/zenoh/jni")
-    }
-    
-    from("generated-kotlin") {
-        into("io/zenoh/jni")
-    }
+    from(sourceSets["main"].output)
     
     // Include native library
     // Multi-platform JAR would include libs for all platforms
@@ -94,7 +108,6 @@ tasks.register<Jar>("packageJar") {
     val platformPath = "META-INF/lib"
     from(jarTarget) {
         include(dylibName)
-        into(platformPath)
     }
 }
 
@@ -125,10 +138,7 @@ publishing {
             artifactId = "zenoh-flat-jni"
             version = project.version.toString()
 
-            // Include the JAR artifact
-            artifact("build/libs/zenoh-flat-jni-${project.version}.jar") {
-                builtBy("packageJar")
-            }
+            from(components["java"])
 
             // Include sources JAR
             val sourcesJar = tasks.register<Jar>("sourcesJar") {

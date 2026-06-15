@@ -7,6 +7,6 @@ pluginManagement {
 
 rootProject.name = "zenoh-flat-jni"
 
-// Read version from gradle.properties
-val zfVersion: String by settings
-println("Zenoh Flat JNI version: $zfVersion")
+// Read version from gradle.properties.
+val versionName = providers.gradleProperty("version").get()
+println("Zenoh Flat JNI version: $versionName")
