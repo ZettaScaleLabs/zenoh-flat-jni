@@ -1,0 +1,29 @@
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Gradle
+.gradle/
+build/
+!gradle/
+*.gradle.kts.bak
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Generated files
+generated-kotlin/
+*.o
+*.so
+*.dylib
+*.dll
+
+# Local development
+*.local
