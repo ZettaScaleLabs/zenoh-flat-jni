@@ -1,0 +1,222 @@
+# Local Development
+
+This document describes how to set up zenoh-flat-jni for local development.
+
+## Prerequisites
+
+- Rust 1.70+ (install via [rustup](https://rustup.rs/))
+- JDK 11+ (for Gradle builds)
+- Gradle 7.0+
+
+## Standard Setup (Maven Central)
+
+For normal usage, simply add the Maven dependency to your `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    implementation("org.eclipse.zenoh:zenoh-flat-jni:1.9.0")
+}
+```
+
+## Local Development Setup
+
+If you're contributing to zenoh-flat-jni or need to test local changes, follow these steps:
+
+### Option 1: Direct Build (Recommended for Local Testing)
+
+```bash
+# Clone the repository
+git clone https://github.com/ZettaScaleLabs/zenoh-flat-jni.git
+cd zenoh-flat-jni
+
+# Build Rust library
+cargo build --release
+
+# Optional: Run tests
+cargo test --all
+
+# Optional: Build Kotlin JAR
+./gradlew build
+```
+
+### Option 2: Local Maven Publication
+
+If you need to test against zenoh-java or another project locally:
+
+```bash
+cd zenoh-flat-jni
+
+# Build and publish to local Maven repository
+./gradlew publishToMavenLocal
+
+# Verify publication
+ls ~/.m2/repository/org/eclipse/zenoh/zenoh-flat-jni/
+```
+
+Then in zenoh-java (or another consumer):
+
+```bash
+# The local version will be picked up automatically if versions match
+cd zenoh-java
+./gradlew build
+```
+
+### Option 3: Gradle Composite Build (For coordinated development)
+
+This is the best option for simultaneous development of zenoh-flat-jni and zenoh-java.
+
+**In zenoh-java's `settings.gradle.kts`, uncomment the composite build line:**
+
+```kotlin
+includeBuild("../zenoh-flat-jni")
+```
+
+Then in zenoh-java's `build.gradle.kts`, ensure the dependency version matches:
+
+```kotlin
+implementation("org.eclipse.zenoh:zenoh-flat-jni:1.9.0")
+```
+
+With this setup:
+- Gradle will automatically build zenoh-flat-jni locally instead of fetching from Maven Central
+- Changes to zenoh-flat-jni are immediately reflected in zenoh-java builds
+- No manual publishing to Maven Local is needed
+
+To use this setup:
+
+```bash
+# Create a workspace directory
+mkdir -p ~/zenoh-workspace
+cd ~/zenoh-workspace
+
+# Clone both repositories
+git clone https://github.com/ZettaScaleLabs/zenoh-flat-jni.git
+git clone https://github.com/eclipse-zenoh/zenoh-java.git
+
+# Edit zenoh-java/settings.gradle.kts to uncomment includeBuild
+cd zenoh-java
+sed -i 's|// includeBuild|includeBuild|' settings.gradle.kts
+
+# Build - Gradle will automatically build zenoh-flat-jni first
+./gradlew build
+```
+
+## Dependency Management
+
+### Path Dependencies (Internal Build Only)
+
+The `Cargo.toml` in zenoh-flat-jni uses path dependencies for zenoh-flat and prebindgen:
+
+```toml
+zenoh-flat = { version = "1.9.0", path = "../zenoh-flat", features = ["unstable"] }
+prebindgen = { path = "../prebindgen/prebindgen" }
+```
+
+To use these for local development:
+
+```bash
+# Ensure the PREBINDGEN workspace is checked out as a sibling
+cd ~/workspace
+git clone https://github.com/ZettaScaleLabs/prebindgen.git
+cd prebindgen/zenoh-flat
+# zenoh-flat is inside the prebindgen workspace
+
+# Or manually adjust Cargo.toml to point to your local zenoh-flat
+```
+
+### Published Versions (CI/Release)
+
+In the CI/CD pipeline (GitHub Actions), zenoh-flat and prebindgen are fetched via git, and eventually will be published to crates.io. The path dependencies are temporary for local development.
+
+## Testing
+
+```bash
+# Run all Rust tests
+cargo test --all
+
+# Run with verbose output
+cargo test --all --verbose
+
+# Run specific test
+cargo test test_name
+
+# Run Kotlin tests (requires built Rust library)
+./gradlew jvmTest
+
+# Run both Rust and Kotlin tests
+cargo test --all && ./gradlew jvmTest
+```
+
+## Linting & Formatting
+
+```bash
+# Format check
+cargo fmt --check
+
+# Format with fixes
+cargo fmt
+
+# Clippy lint
+cargo clippy --all-targets --all-features -- -D warnings
+```
+
+## Building for Android
+
+```bash
+# Build native library for Android
+./gradlew -Pandroid=true build
+
+# Run Android tests
+./gradlew -Pandroid=true androidTest
+```
+
+## CI/CD
+
+When you push commits or create pull requests, GitHub Actions will automatically:
+- Run format checks (`cargo fmt --check`)
+- Run linter (`cargo clippy`)
+- Run tests (`cargo test`)
+- Build on Linux, macOS, and Windows
+
+## Troubleshooting
+
+### "Cannot find zenoh-flat" or "Cannot find prebindgen"
+
+Make sure the path dependencies are correct in `Cargo.toml`. They should point to:
+- `../zenoh-flat` (or adjust to your actual path)
+- `../prebindgen/prebindgen`
+
+### Gradle says "Cannot resolve org.eclipse.zenoh:zenoh-flat-jni"
+
+This typically means:
+1. The package hasn't been published to Maven Central yet
+2. You're not using a local build (Option 2 or 3 above)
+3. The version number doesn't match
+
+Solution: Use `./gradlew publishToMavenLocal` first, then build.
+
+### Tests fail with "Cannot load library"
+
+This means the Rust library wasn't built or isn't found. Run:
+```bash
+cargo build --release
+```
+
+Then try tests again.
+
+## Publishing to Maven Central
+
+This is typically done via the GitHub Actions CI/CD pipeline on release tags. To publish manually:
+
+1. Ensure you have GPG keys configured
+2. Have OSSRH credentials
+3. Run: `./gradlew publish -DremotePublication=true`
+
+See the `.github/workflows/publish.yml` for details.
+
+## Documentation
+
+- [Zenoh](https://zenoh.io/)
+- [prebindgen](https://github.com/ZettaScaleLabs/prebindgen)
+- [zenoh-flat](https://github.com/ZettaScaleLabs/prebindgen/tree/main/zenoh-flat)
+- [zenoh-java](https://github.com/eclipse-zenoh/zenoh-java)
