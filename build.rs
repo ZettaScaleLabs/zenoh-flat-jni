@@ -443,18 +443,19 @@ fn main() {
     );
 
     // ── Write Kotlin output ───────────────────────────────────────────
-    // All generated Kotlin lives under `generated-kotlin/`; the runtime
+    // All generated Kotlin lives under `kotlin/generated/`; the runtime
     // module's Gradle source set picks it up via
-    // `kotlin.srcDir("$rootDir/zenoh-flat-jni/generated-kotlin")`.
-    let kotlin_root = std::path::Path::new("generated-kotlin");
+    // `kotlin.srcDir("$rootDir/zenoh-flat-jni/kotlin/generated")`.
+    let crate_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+    let kotlin_root = std::path::Path::new(&crate_dir).join("kotlin").join("generated");
     // Remove stale generated files so package moves don't leave old classes
     // behind (e.g. io/zenoh/jni/* and io/zenoh/jni/<subpackage>/* side-by-side).
-    if let Err(err) = std::fs::remove_dir_all(kotlin_root) {
+    if let Err(err) = std::fs::remove_dir_all(&kotlin_root) {
         if err.kind() != std::io::ErrorKind::NotFound {
-            fail("cleanup generated-kotlin failed", err);
+            fail("cleanup kotlin/generated failed", err);
         }
     }
-    for path in match jni.write_kotlin(&registry, kotlin_root) {
+    for path in match jni.write_kotlin(&registry, &kotlin_root) {
         Ok(paths) => paths,
         Err(err) => fail("write_kotlin failed", err),
     } {
