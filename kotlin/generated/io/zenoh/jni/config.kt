@@ -26,7 +26,21 @@ public enum class WhatAmI(public val value: Int) {
  * as its raw bytes; `@JvmInline`-erased to `ByteArray` at the JNI boundary).
  */
 @JvmInline
-public value class ZenohId(public val bytes: ByteArray)
+public value class ZenohId(public val bytes: ByteArray) {
+    public fun toBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = JNINative.zenohIdToBytes(this.bytes, __cap)
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun toStr(onError: JniErrorHandler<String>): String {
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = JNINative.zenohIdToString(this.bytes, __cap)
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+}
 
 /** Typed handle for a native Zenoh `Config`. */
 public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
@@ -44,6 +58,28 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         val p = ptr
         ptr = 0L
         return Config(p)
+    }
+
+    public fun getJson(key: String, onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.configGetJson(this_ptr, key, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun newClone(onError: JniErrorHandler<Config>): Config {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            Config(JNINative.configNewClone(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
     }
 
     public companion object {
@@ -87,17 +123,6 @@ public fun configNewFromYaml(s: String, onError: ErrorHandler<Config>): Config {
     return __ret
 }
 
-public fun configGetJson(c: Config, key: String, onError: JniErrorHandler<String>): String {
-    if (c.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(c) {
-        val c_ptr = c.ptr
-        JNINative.configGetJson(c_ptr, key, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
 public fun configInsertJson5(c: Config, key: String, value: String, onError: ErrorHandler<Unit>) {
     if (c.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     val __cap = ErrorHandlerCapture.acquire()
@@ -106,29 +131,4 @@ public fun configInsertJson5(c: Config, key: String, value: String, onError: Err
         JNINative.configInsertJson5(c_ptr, key, value, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun configNewClone(c: Config, onError: JniErrorHandler<Config>): Config {
-    if (c.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(c) {
-        val c_ptr = c.ptr
-        Config(JNINative.configNewClone(c_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun zenohIdToBytes(z: ZenohId, onError: JniErrorHandler<ByteArray>): ByteArray {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.zenohIdToBytes(z.bytes, __cap)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun zenohIdToString(z: ZenohId, onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.zenohIdToString(z.bytes, __cap)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

@@ -25,6 +25,61 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return Encoding(p)
     }
 
+    public fun id(onError: JniErrorHandler<Int>): Int {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.encodingGetId(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun getSchema(onError: JniErrorHandler<String?>): String? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.encodingGetSchema(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun toStr(onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.encodingToString(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun newClone(onError: JniErrorHandler<Encoding>): Encoding {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            Encoding(JNINative.encodingNewClone(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun withSchema(schema: String, onError: JniErrorHandler<Encoding>): Encoding {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            Encoding(JNINative.encodingNewWithSchema(this_ptr, schema, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -47,6 +102,39 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         val p = ptr
         ptr = 0L
         return ZBytes(p)
+    }
+
+    public fun asBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.zbytesAsBytes(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun toBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.zbytesToBytes(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun newClone(onError: JniErrorHandler<ZBytes>): ZBytes {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            ZBytes(JNINative.zbytesNewClone(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
     }
 
     public companion object {
@@ -73,86 +161,9 @@ public fun <R> EncodingBuilder<R>.asRaw(): EncodingBuilderRaw<R> =
         )
     }
 
-public fun zbytesAsBytes(z: ZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
-    if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(z) {
-        val z_ptr = z.ptr
-        JNINative.zbytesAsBytes(z_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun zbytesToBytes(z: ZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
-    if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(z) {
-        val z_ptr = z.ptr
-        JNINative.zbytesToBytes(z_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun zbytesNewClone(z: ZBytes, onError: JniErrorHandler<ZBytes>): ZBytes {
-    if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(z) {
-        val z_ptr = z.ptr
-        ZBytes(JNINative.zbytesNewClone(z_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
 public fun zbytesNewFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingGetId(e: Encoding, onError: JniErrorHandler<Int>): Int {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        JNINative.encodingGetId(e_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingGetSchema(e: Encoding, onError: JniErrorHandler<String?>): String? {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        JNINative.encodingGetSchema(e_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingToString(e: Encoding, onError: JniErrorHandler<String>): String {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        JNINative.encodingToString(e_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingNewClone(e: Encoding, onError: JniErrorHandler<Encoding>): Encoding {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        Encoding(JNINative.encodingNewClone(e_ptr, __cap))
-    }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
@@ -167,21 +178,6 @@ public fun encodingNewFromString(s: String, onError: JniErrorHandler<Encoding>):
 public fun encodingNewFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingNewWithSchema(
-    e: Encoding,
-    schema: String,
-    onError: JniErrorHandler<Encoding>,
-): Encoding {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        Encoding(JNINative.encodingNewWithSchema(e_ptr, schema, __cap))
-    }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }

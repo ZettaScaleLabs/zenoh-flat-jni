@@ -25,6 +25,17 @@ public class Error(initialPtr: Long) : NativeHandle(initialPtr) {
         return Error(p)
     }
 
+    public fun message(onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.errorGetMessage(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -48,15 +59,4 @@ internal class ErrorHandlerCapture : ErrorHandler<Unit> {
             return c
         }
     }
-}
-
-public fun errorGetMessage(e: Error, onError: JniErrorHandler<String>): String {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        JNINative.errorGetMessage(e_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

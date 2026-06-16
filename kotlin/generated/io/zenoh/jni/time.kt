@@ -25,30 +25,30 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
         return Timestamp(p)
     }
 
+    public fun ntp64(onError: JniErrorHandler<Long>): Long {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.timestampGetNtp64(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun getId(onError: JniErrorHandler<ByteArray>): ByteArray {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.timestampGetId(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
     }
-}
-
-public fun timestampGetNtp64(t: Timestamp, onError: JniErrorHandler<Long>): Long {
-    if (t.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(t) {
-        val t_ptr = t.ptr
-        JNINative.timestampGetNtp64(t_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun timestampGetId(t: Timestamp, onError: JniErrorHandler<ByteArray>): ByteArray {
-    if (t.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(t) {
-        val t_ptr = t.ptr
-        JNINative.timestampGetId(t_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

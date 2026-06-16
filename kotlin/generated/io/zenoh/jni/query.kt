@@ -93,6 +93,72 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return Query(p)
     }
 
+    public fun keyExpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            KeyExpr(JNINative.queryGetKeyexpr(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun parameters(onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.queryGetParameters(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun payload(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.queryGetPayload(this_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun encoding(onError: JniErrorHandler<Encoding?>): Encoding? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.queryGetEncoding(this_ptr, __cap).let { if (it == 0L) null else Encoding(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun attachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.queryGetAttachment(this_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun acceptsReplies(onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            ReplyKeyExpr.fromInt(JNINative.queryGetAcceptsReplies(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -141,6 +207,61 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
         return Reply(p)
     }
 
+    public fun replierZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.replyGetReplierZid(this_ptr, __cap)?.let { ZenohId(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun replierEid(onError: JniErrorHandler<Int>): Int {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.replyGetReplierEid(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun isOk(onError: JniErrorHandler<Boolean>): Boolean {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.replyIsOk(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun sample(onError: JniErrorHandler<Sample?>): Sample? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.replyGetSample(this_ptr, __cap).let { if (it == 0L) null else Sample(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun err(onError: JniErrorHandler<ReplyError?>): ReplyError? {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.replyGetErr(this_ptr, __cap).let { if (it == 0L) null else ReplyError(it) }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -163,6 +284,28 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
         val p = ptr
         ptr = 0L
         return ReplyError(p)
+    }
+
+    public fun payload(onError: JniErrorHandler<ZBytes>): ZBytes {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            ZBytes(JNINative.replyErrorGetPayload(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun encoding(onError: JniErrorHandler<Encoding>): Encoding {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            Encoding(JNINative.replyErrorGetEncoding(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
     }
 
     public companion object {
@@ -479,147 +622,4 @@ public fun queryReplySample(
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun queryGetKeyexpr(q: Query, onError: JniErrorHandler<KeyExpr>): KeyExpr {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        KeyExpr(JNINative.queryGetKeyexpr(q_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun queryGetParameters(q: Query, onError: JniErrorHandler<String>): String {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        JNINative.queryGetParameters(q_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun queryGetPayload(q: Query, onError: JniErrorHandler<ZBytes?>): ZBytes? {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        JNINative.queryGetPayload(q_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun queryGetEncoding(q: Query, onError: JniErrorHandler<Encoding?>): Encoding? {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        JNINative.queryGetEncoding(q_ptr, __cap).let { if (it == 0L) null else Encoding(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun queryGetAttachment(q: Query, onError: JniErrorHandler<ZBytes?>): ZBytes? {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        JNINative.queryGetAttachment(q_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun queryGetAcceptsReplies(q: Query, onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
-    if (q.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(q) {
-        val q_ptr = q.ptr
-        ReplyKeyExpr.fromInt(JNINative.queryGetAcceptsReplies(q_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyErrorGetPayload(e: ReplyError, onError: JniErrorHandler<ZBytes>): ZBytes {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        ZBytes(JNINative.replyErrorGetPayload(e_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyErrorGetEncoding(e: ReplyError, onError: JniErrorHandler<Encoding>): Encoding {
-    if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(e) {
-        val e_ptr = e.ptr
-        Encoding(JNINative.replyErrorGetEncoding(e_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyGetReplierZid(r: Reply, onError: JniErrorHandler<ZenohId?>): ZenohId? {
-    if (r.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(r) {
-        val r_ptr = r.ptr
-        JNINative.replyGetReplierZid(r_ptr, __cap)?.let { ZenohId(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyGetReplierEid(r: Reply, onError: JniErrorHandler<Int>): Int {
-    if (r.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(r) {
-        val r_ptr = r.ptr
-        JNINative.replyGetReplierEid(r_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyIsOk(r: Reply, onError: JniErrorHandler<Boolean>): Boolean {
-    if (r.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(r) {
-        val r_ptr = r.ptr
-        JNINative.replyIsOk(r_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyGetSample(r: Reply, onError: JniErrorHandler<Sample?>): Sample? {
-    if (r.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(r) {
-        val r_ptr = r.ptr
-        JNINative.replyGetSample(r_ptr, __cap).let { if (it == 0L) null else Sample(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun replyGetErr(r: Reply, onError: JniErrorHandler<ReplyError?>): ReplyError? {
-    if (r.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(r) {
-        val r_ptr = r.ptr
-        JNINative.replyGetErr(r_ptr, __cap).let { if (it == 0L) null else ReplyError(it) }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

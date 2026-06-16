@@ -40,6 +40,39 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return KeyExpr(p)
     }
 
+    public fun getStr(onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.keyexprGetStr(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun newClone(onError: JniErrorHandler<KeyExpr>): KeyExpr {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            KeyExpr(JNINative.keyexprNewClone(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun toStr(onError: JniErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.keyexprToString(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -177,39 +210,6 @@ public fun keyexprRelationTo(
                 JNINative.keyexprRelationTo(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap),
             )
         }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun keyexprGetStr(ke: KeyExpr, onError: JniErrorHandler<String>): String {
-    if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(ke) {
-        val ke_ptr = ke.ptr
-        JNINative.keyexprGetStr(ke_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun keyexprNewClone(ke: KeyExpr, onError: JniErrorHandler<KeyExpr>): KeyExpr {
-    if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(ke) {
-        val ke_ptr = ke.ptr
-        KeyExpr(JNINative.keyexprNewClone(ke_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun keyexprToString(ke: KeyExpr, onError: JniErrorHandler<String>): String {
-    if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(ke) {
-        val ke_ptr = ke.ptr
-        JNINative.keyexprToString(ke_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret

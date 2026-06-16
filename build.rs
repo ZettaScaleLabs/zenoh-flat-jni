@@ -16,7 +16,8 @@
 //! A type's CANONICAL representation — its input ([`JniGen::ptr_class_input`] /
 //! `..._direct`) and output ([`JniGen::ptr_class_output`] / `..._direct`) — is
 //! declared once on the `ptr_class` and AUTO-APPLIES to every matching param /
-//! return. `package_fun(..).accessor()` and the per-fn `input_direct` /
+//! return. Read accessors are declared with [`JniGen::class_accessor`] (emitted
+//! as instance methods of their class) and the per-fn `input_direct` /
 //! `output_direct` overrides opt out.
 //!
 //! Errors are delivered through the per-call `onError` callback (no Rust-side
@@ -53,20 +54,23 @@ fn main() {
         // `Result` and delivers the message via the error callback). Its
         // canonical output is the message string (1 leaf), auto-applied to the
         // `E` of every such `Result` — i.e. the `onError` callback's argument.
-        // `error_get_message` is that output's accessor and must be declared
-        // `.accessor()`.
+        // `error_get_message` is that output's accessor (a class method named
+        // `message`, referenced by `.ptr_class_output("message")`).
         .package("errors")
         .ptr_class(pq!(Error))
-        .ptr_class_output(pq!(error_get_message), "message")
-        .package_fun(pq!(error_get_message))
-        .accessor()
+        .class_accessor(pq!(error_get_message), "message")
+        .ptr_class_output("message")
         // ── Key expressions ──────────────────────────────────────────────
         // Canonical input: a key-expr param accepts EITHER a String (built via
         // `keyexpr_new_try_from`) OR an existing handle (identity), selector-
         // dispatched. Canonical output: the handle only (identity, 1 raw jlong);
-        // the string form stays an on-demand accessor (`keyexprGetStr`).
+        // the string form stays an on-demand accessor method (`getStr`).
         .package("keyexpr")
         .ptr_class(pq!(KeyExpr))
+        // Read accessors → instance methods on the KeyExpr class.
+        .class_accessor(pq!(keyexpr_get_str), "getStr")
+        .class_accessor(pq!(keyexpr_new_clone), "newClone")
+        .class_accessor(pq!(keyexpr_to_string), "toStr")
         .ptr_class_input(pq!(keyexpr_new_try_from))
         .ptr_class_input_direct()
         .ptr_class_output_direct()
@@ -79,52 +83,39 @@ fn main() {
         .package_fun(pq!(keyexpr_intersects))
         .package_fun(pq!(keyexpr_includes))
         .package_fun(pq!(keyexpr_relation_to))
-        // Read accessors — kept handle-only (the input/output composer skips accessors).
-        .package_fun(pq!(keyexpr_get_str))
-        .accessor()
-        .package_fun(pq!(keyexpr_new_clone))
-        .accessor()
-        .package_fun(pq!(keyexpr_to_string))
-        .accessor()
         .enum_class(pq!(SetIntersectionLevel))
         // ── Config + ZenohId ──────────────────────────────────────────────
         .package("config")
         .ptr_class(pq!(Config))
+        .class_accessor(pq!(config_get_json), "getJson")
+        .class_accessor(pq!(config_new_clone), "newClone")
         .package_fun(pq!(config_new_default))
         .package_fun(pq!(config_new_from_file))
         .package_fun(pq!(config_new_from_json))
         .package_fun(pq!(config_new_from_json5))
         .package_fun(pq!(config_new_from_yaml))
-        .package_fun(pq!(config_get_json))
-        .accessor()
         .package_fun(pq!(config_insert_json5))
-        .package_fun(pq!(config_new_clone))
-        .accessor()
         .enum_class(pq!(WhatAmI))
         // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
         // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
         // handle. `Vec<ZenohId>` (session peers/routers) folds each element WHOLE
-        // as the typed `ZenohId` value class.
+        // as the typed `ZenohId` value class. Its read accessors become methods
+        // on the value class (receiver = `this.bytes`).
         .value_class(pq!(ZenohId))
-        .package_fun(pq!(zenoh_id_to_bytes))
-        .accessor()
-        .package_fun(pq!(zenoh_id_to_string))
-        .accessor()
+        .class_accessor(pq!(zenoh_id_to_bytes), "toBytes")
+        .class_accessor(pq!(zenoh_id_to_string), "toStr")
         // ── Scouting ──────────────────────────────────────────────────────
         // Canonical output: the scout callback decomposes a `Hello` into its
         // three read fields in ONE crossing (no handle — read-only). Auto-applies
         // to `scout`'s `Fn(Hello)`.
         .package("scouting")
         .ptr_class(pq!(Hello))
-        .ptr_class_output(pq!(hello_get_whatami), "whatami") // WhatAmI enum -> Int
-        .ptr_class_output(pq!(hello_get_zid), "zid") // ZenohId value class -> ByteArray
-        .ptr_class_output(pq!(hello_get_locators), "locators") // Vec<String> -> List<String>
-        .package_fun(pq!(hello_get_whatami))
-        .accessor()
-        .package_fun(pq!(hello_get_zid))
-        .accessor()
-        .package_fun(pq!(hello_get_locators))
-        .accessor()
+        .class_accessor(pq!(hello_get_whatami), "whatami") // WhatAmI enum -> Int
+        .class_accessor(pq!(hello_get_zid), "zid") // ZenohId value class -> ByteArray
+        .class_accessor(pq!(hello_get_locators), "locators") // Vec<String> -> List<String>
+        .ptr_class_output("whatami")
+        .ptr_class_output("zid")
+        .ptr_class_output("locators")
         .ptr_class(pq!(Scout))
         .package_fun(pq!(scout))
         // ── Logger ────────────────────────────────────────────────────────
@@ -144,14 +135,11 @@ fn main() {
         // `zbytesAsBytes` (one borrow-copy).
         .package("bytes")
         .ptr_class(pq!(ZBytes))
+        .class_accessor(pq!(zbytes_as_bytes), "asBytes")
+        .class_accessor(pq!(zbytes_to_bytes), "toBytes")
+        .class_accessor(pq!(zbytes_new_clone), "newClone")
         .ptr_class_input(pq!(zbytes_new_from_vec))
         .ptr_class_output_direct()
-        .package_fun(pq!(zbytes_as_bytes))
-        .accessor()
-        .package_fun(pq!(zbytes_to_bytes))
-        .accessor()
-        .package_fun(pq!(zbytes_new_clone))
-        .accessor()
         // Keep the factory exported with a raw-handle return (`output_direct`
         // opts out of the canonical ByteArray decomposition).
         .package_fun(pq!(zbytes_new_from_vec))
@@ -163,24 +151,19 @@ fn main() {
         // Canonical output: the handle (identity) + id (raw jint), both free
         // jvalue slots; schema and the canonical string stay on-demand accessors.
         .ptr_class(pq!(Encoding))
+        .class_accessor(pq!(encoding_get_id), "id")
+        .class_accessor(pq!(encoding_get_schema), "getSchema")
+        .class_accessor(pq!(encoding_to_string), "toStr")
+        .class_accessor(pq!(encoding_new_clone), "newClone")
+        .class_accessor(pq!(encoding_new_with_schema), "withSchema")
         .ptr_class_input(pq!(encoding_new_from_id))
         .ptr_class_output_direct()
-        .ptr_class_output(pq!(encoding_get_id), "id")
-        .package_fun(pq!(encoding_get_id))
-        .accessor()
-        .package_fun(pq!(encoding_get_schema))
-        .accessor()
-        .package_fun(pq!(encoding_to_string))
-        .accessor()
-        .package_fun(pq!(encoding_new_clone))
-        .accessor()
+        .ptr_class_output("id")
         // Factories: keep the handle return (canonical output would decompose it).
         .package_fun(pq!(encoding_new_from_string))
         .output_direct()
         .package_fun(pq!(encoding_new_from_id))
-        .output_direct()
-        .package_fun(pq!(encoding_new_with_schema))
-        .accessor();
+        .output_direct();
 
     // Predefined encoding constants — each is a nullary `() -> &'static Encoding`
     // with no per-fn override, so they collapse into one loop instead of ~50
@@ -250,11 +233,9 @@ fn main() {
         // -> i64 -> Long, 1 leaf); nested in a `Sample` it contributes that Long.
         .package("time")
         .ptr_class(pq!(Timestamp))
-        .ptr_class_output(pq!(timestamp_get_ntp64), "ntp64")
-        .package_fun(pq!(timestamp_get_ntp64))
-        .accessor()
-        .package_fun(pq!(timestamp_get_id))
-        .accessor()
+        .class_accessor(pq!(timestamp_get_ntp64), "ntp64")
+        .class_accessor(pq!(timestamp_get_id), "getId")
+        .ptr_class_output("ntp64")
         // ── Sample ────────────────────────────────────────────────────────
         // Canonical INPUT: identity only — a `Sample` param takes the owned
         // handle directly. (The full-options constructors carry `Option<ptr_class>`
@@ -269,48 +250,35 @@ fn main() {
         .package("sample")
         .enum_class(pq!(SampleKind))
         .ptr_class(pq!(Sample))
+        // All sample getters are record sources AND instance methods on the
+        // Sample class; decomposition happens via the canonical output below.
+        .class_accessor(pq!(sample_get_key_expr), "keyExpr")
+        .class_accessor(pq!(sample_get_payload), "payload")
+        .class_accessor(pq!(sample_get_encoding), "encoding")
+        .class_accessor(pq!(sample_get_kind), "kind")
+        .class_accessor(pq!(sample_get_timestamp), "timestamp")
+        .class_accessor(pq!(sample_get_express), "express")
+        .class_accessor(pq!(sample_get_priority), "priority")
+        .class_accessor(pq!(sample_get_congestion_control), "congestionControl")
+        .class_accessor(pq!(sample_get_attachment), "attachment")
+        .class_accessor(pq!(sample_get_reliability), "reliability")
+        .class_accessor(pq!(sample_get_source_zid), "sourceZid")
+        .class_accessor(pq!(sample_get_source_eid), "sourceEid")
+        .class_accessor(pq!(sample_get_source_sn), "sourceSn")
         .ptr_class_input_direct()
-        .ptr_class_output(pq!(sample_get_key_expr), "keyExpr")
-        .ptr_class_output(pq!(sample_get_payload), "payload")
-        .ptr_class_output(pq!(sample_get_encoding), "encoding")
-        .ptr_class_output(pq!(sample_get_kind), "kind")
-        .ptr_class_output(pq!(sample_get_timestamp), "timestamp")
-        .ptr_class_output(pq!(sample_get_express), "express")
-        .ptr_class_output(pq!(sample_get_priority), "priority")
-        .ptr_class_output(pq!(sample_get_congestion_control), "congestionControl")
-        .ptr_class_output(pq!(sample_get_attachment), "attachment")
-        .ptr_class_output(pq!(sample_get_reliability), "reliability")
-        .ptr_class_output(pq!(sample_get_source_zid), "sourceZid")
-        .ptr_class_output(pq!(sample_get_source_eid), "sourceEid")
-        .ptr_class_output(pq!(sample_get_source_sn), "sourceSn")
-        // All sample getters are record sources (`.accessor()`): standalone they
-        // stay handle/raw; decomposition happens via the canonical output above.
-        .package_fun(pq!(sample_get_key_expr))
-        .accessor()
-        .package_fun(pq!(sample_get_payload))
-        .accessor()
-        .package_fun(pq!(sample_get_encoding))
-        .accessor()
-        .package_fun(pq!(sample_get_kind))
-        .accessor()
-        .package_fun(pq!(sample_get_timestamp))
-        .accessor()
-        .package_fun(pq!(sample_get_express))
-        .accessor()
-        .package_fun(pq!(sample_get_priority))
-        .accessor()
-        .package_fun(pq!(sample_get_congestion_control))
-        .accessor()
-        .package_fun(pq!(sample_get_attachment))
-        .accessor()
-        .package_fun(pq!(sample_get_reliability))
-        .accessor()
-        .package_fun(pq!(sample_get_source_zid))
-        .accessor()
-        .package_fun(pq!(sample_get_source_eid))
-        .accessor()
-        .package_fun(pq!(sample_get_source_sn))
-        .accessor()
+        .ptr_class_output("keyExpr")
+        .ptr_class_output("payload")
+        .ptr_class_output("encoding")
+        .ptr_class_output("kind")
+        .ptr_class_output("timestamp")
+        .ptr_class_output("express")
+        .ptr_class_output("priority")
+        .ptr_class_output("congestionControl")
+        .ptr_class_output("attachment")
+        .ptr_class_output("reliability")
+        .ptr_class_output("sourceZid")
+        .ptr_class_output("sourceEid")
+        .ptr_class_output("sourceSn")
         // Standalone sample constructors (callable from Kotlin); consumed by handle.
         .package_fun(pq!(sample_new_put))
         .package_fun(pq!(sample_new_delete))
@@ -342,12 +310,18 @@ fn main() {
         // leaves are emitted in declaration order, so the root move must follow
         // the nested borrow to avoid a "use of moved value" error.
         .ptr_class(pq!(Query))
-        .ptr_class_output(pq!(query_get_keyexpr), "keyExpr")
-        .ptr_class_output(pq!(query_get_parameters), "parameters")
-        .ptr_class_output(pq!(query_get_payload), "payload")
-        .ptr_class_output(pq!(query_get_encoding), "encoding")
-        .ptr_class_output(pq!(query_get_attachment), "attachment")
-        .ptr_class_output(pq!(query_get_accepts_replies), "acceptsReplies")
+        .class_accessor(pq!(query_get_keyexpr), "keyExpr")
+        .class_accessor(pq!(query_get_parameters), "parameters")
+        .class_accessor(pq!(query_get_payload), "payload")
+        .class_accessor(pq!(query_get_encoding), "encoding")
+        .class_accessor(pq!(query_get_attachment), "attachment")
+        .class_accessor(pq!(query_get_accepts_replies), "acceptsReplies")
+        .ptr_class_output("keyExpr")
+        .ptr_class_output("parameters")
+        .ptr_class_output("payload")
+        .ptr_class_output("encoding")
+        .ptr_class_output("attachment")
+        .ptr_class_output("acceptsReplies")
         .ptr_class_output_direct()
         // Reply ops on the owned/borrowed query handle.
         .package_fun(pq!(query_reply_success))
@@ -356,28 +330,14 @@ fn main() {
         // `query_reply_sample` takes the sample by owned handle (Sample's
         // canonical input is identity — see the sample package above).
         .package_fun(pq!(query_reply_sample))
-        .package_fun(pq!(query_get_keyexpr))
-        .accessor()
-        .package_fun(pq!(query_get_parameters))
-        .accessor()
-        .package_fun(pq!(query_get_payload))
-        .accessor()
-        .package_fun(pq!(query_get_encoding))
-        .accessor()
-        .package_fun(pq!(query_get_attachment))
-        .accessor()
-        .package_fun(pq!(query_get_accepts_replies))
-        .accessor()
         // ── Reply / ReplyError ────────────────────────────────────────────
         // ReplyError canonical output: a failed reply's error decomposed in one
         // crossing — payload -> ByteArray, encoding -> String.
         .ptr_class(pq!(ReplyError))
-        .ptr_class_output(pq!(reply_error_get_payload), "payload")
-        .ptr_class_output(pq!(reply_error_get_encoding), "encoding")
-        .package_fun(pq!(reply_error_get_payload))
-        .accessor()
-        .package_fun(pq!(reply_error_get_encoding))
-        .accessor()
+        .class_accessor(pq!(reply_error_get_payload), "payload")
+        .class_accessor(pq!(reply_error_get_encoding), "encoding")
+        .ptr_class_output("payload")
+        .ptr_class_output("encoding")
         // Reply canonical output: the whole reply decomposed in ONE crossing
         // (PRODUCT model — both arms' leaves always present, the not-taken arm's
         // are null). replier zid/eid + the is_ok discriminator, then the ok arm
@@ -386,23 +346,18 @@ fn main() {
         // `querier_get` / liveliness get; no identity record, so no `Reply`
         // handle crosses.
         .ptr_class(pq!(Reply))
-        .ptr_class_output(pq!(reply_get_replier_zid), "replierZid")
-        .ptr_class_output(pq!(reply_get_replier_eid), "replierEid")
-        .ptr_class_output(pq!(reply_is_ok), "isOk")
-        .ptr_class_output(pq!(reply_get_sample), "sample")
-        .ptr_class_output(pq!(reply_get_err), "err")
-        .package_fun(pq!(reply_get_replier_zid))
-        .accessor()
-        .package_fun(pq!(reply_get_replier_eid))
-        .accessor()
-        .package_fun(pq!(reply_is_ok))
-        .accessor()
-        // Record sources must be accessors — `reply_get_sample`'s standalone
+        // Record sources are class methods — `reply.sample()`'s standalone
         // export is therefore the cloned-handle form.
-        .package_fun(pq!(reply_get_sample))
-        .accessor()
-        .package_fun(pq!(reply_get_err))
-        .accessor()
+        .class_accessor(pq!(reply_get_replier_zid), "replierZid")
+        .class_accessor(pq!(reply_get_replier_eid), "replierEid")
+        .class_accessor(pq!(reply_is_ok), "isOk")
+        .class_accessor(pq!(reply_get_sample), "sample")
+        .class_accessor(pq!(reply_get_err), "err")
+        .ptr_class_output("replierZid")
+        .ptr_class_output("replierEid")
+        .ptr_class_output("isOk")
+        .ptr_class_output("sample")
+        .ptr_class_output("err")
         // ── Liveliness + Session ──────────────────────────────────────────
         // `LivelinessToken` is just an opaque handle; the liveliness operations
         // (`liveliness_*`) are declared under the active `session` package below,
@@ -411,6 +366,7 @@ fn main() {
         .ptr_class(pq!(LivelinessToken))
         .package("session")
         .ptr_class(pq!(Session))
+        .class_accessor(pq!(session_get_zid), "getZid")
         .package_fun(pq!(open))
         .package_fun(pq!(session_declare_publisher))
         .package_fun(pq!(session_put))
@@ -424,8 +380,6 @@ fn main() {
         .package_fun(pq!(session_undeclare_keyexpr))
         .input_direct(pq!(key_expr))
         .package_fun(pq!(session_get))
-        .package_fun(pq!(session_get_zid))
-        .accessor()
         // `Vec<ZenohId>`: ZenohId is a value class, so these return `List<ZenohId>`
         // via the normal Vec converter.
         .package_fun(pq!(session_get_peers_zid))

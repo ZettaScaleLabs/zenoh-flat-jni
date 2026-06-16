@@ -31,6 +31,39 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
         return Hello(p)
     }
 
+    public fun whatami(onError: JniErrorHandler<WhatAmI>): WhatAmI {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            WhatAmI.fromInt(JNINative.helloGetWhatami(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun zid(onError: JniErrorHandler<ZenohId>): ZenohId {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            ZenohId(JNINative.helloGetZid(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun locators(onError: JniErrorHandler<List<String>>): List<String> {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.helloGetLocators(this_ptr, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -80,39 +113,6 @@ public fun HelloCallback.asRaw(): HelloCallbackRaw =
             locators
         )
     }
-
-public fun helloGetWhatami(h: Hello, onError: JniErrorHandler<WhatAmI>): WhatAmI {
-    if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(h) {
-        val h_ptr = h.ptr
-        WhatAmI.fromInt(JNINative.helloGetWhatami(h_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun helloGetZid(h: Hello, onError: JniErrorHandler<ZenohId>): ZenohId {
-    if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(h) {
-        val h_ptr = h.ptr
-        ZenohId(JNINative.helloGetZid(h_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun helloGetLocators(h: Hello, onError: JniErrorHandler<List<String>>): List<String> {
-    if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(h) {
-        val h_ptr = h.ptr
-        JNINative.helloGetLocators(h_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
 
 public fun scout(
     whatami: Int,

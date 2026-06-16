@@ -47,6 +47,17 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         return Session(p)
     }
 
+    public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            ZenohId(JNINative.sessionGetZid(this_ptr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -436,17 +447,6 @@ public fun sessionGet(
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun sessionGetZid(session: Session, onError: JniErrorHandler<ZenohId>): ZenohId {
-    if (session.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(session) {
-        val session_ptr = session.ptr
-        ZenohId(JNINative.sessionGetZid(session_ptr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }
 
 public fun sessionGetPeersZid(
