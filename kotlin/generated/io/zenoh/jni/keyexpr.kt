@@ -5,8 +5,8 @@ import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
-import io.zenoh.jni.errors.ZErrorHandler
-import io.zenoh.jni.errors.ZErrorHandlerCapture
+import io.zenoh.jni.errors.ErrorHandler
+import io.zenoh.jni.errors.ErrorHandlerCapture
 import io.zenoh.jni.withSortedHandleLocks
 
 /** JVM-side surface for the native Rust `SetIntersectionLevel` enum. */
@@ -22,8 +22,8 @@ public enum class SetIntersectionLevel(public val value: Int) {
     }
 }
 
-/** Typed handle for a native Zenoh `ZKeyExpr`. */
-public class ZKeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `KeyExpr`. */
+public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -34,10 +34,10 @@ public class ZKeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZKeyExpr {
+    public fun take(): KeyExpr {
         val p = ptr
         ptr = 0L
-        return ZKeyExpr(p)
+        return KeyExpr(p)
     }
 
     public companion object {
@@ -46,38 +46,69 @@ public class ZKeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun zKeyexprAsStr(ke: ZKeyExpr, onError: JniErrorHandler<String>): String {
-    if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(ke) {
-        val ke_ptr = ke.ptr
-        JNINative.zKeyexprAsStr(ke_ptr, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun zKeyexprTryFrom(s: String, onError: ZErrorHandler<ZKeyExpr>): ZKeyExpr {
-    val __cap = ZErrorHandlerCapture.acquire()
-    val __ret = ZKeyExpr(JNINative.zKeyexprTryFrom(s, __cap))
+public fun keyexprNewTryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+    val __cap = ErrorHandlerCapture.acquire()
+    val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __cap))
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
 
-public fun zKeyexprAutocanonize(s: String, onError: ZErrorHandler<ZKeyExpr>): ZKeyExpr {
-    val __cap = ZErrorHandlerCapture.acquire()
-    val __ret = ZKeyExpr(JNINative.zKeyexprAutocanonize(s, __cap))
+public fun keyexprNewAutocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+    val __cap = ErrorHandlerCapture.acquire()
+    val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __cap))
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
 
-public fun zKeyexprIntersects(
+public fun keyexprNewJoin(
     aSel: Int,
     a0: String?,
-    a1: ZKeyExpr?,
+    a1: KeyExpr?,
+    b: String,
+    onError: ErrorHandler<KeyExpr>,
+): KeyExpr {
+    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
+    val __cap = ErrorHandlerCapture.acquire()
+    val __ret = run {
+        val __locks = ArrayList<NativeHandle>()
+        a1?.let { __locks.add(it) }
+        withSortedHandleLocks(__locks) {
+            val a1_ptr = a1?.ptr ?: 0L
+            KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __cap))
+        }
+    }
+    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    return __ret
+}
+
+public fun keyexprNewConcat(
+    aSel: Int,
+    a0: String?,
+    a1: KeyExpr?,
+    b: String,
+    onError: ErrorHandler<KeyExpr>,
+): KeyExpr {
+    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
+    val __cap = ErrorHandlerCapture.acquire()
+    val __ret = run {
+        val __locks = ArrayList<NativeHandle>()
+        a1?.let { __locks.add(it) }
+        withSortedHandleLocks(__locks) {
+            val a1_ptr = a1?.ptr ?: 0L
+            KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __cap))
+        }
+    }
+    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    return __ret
+}
+
+public fun keyexprIntersects(
+    aSel: Int,
+    a0: String?,
+    a1: KeyExpr?,
     bSel: Int,
     b0: String?,
-    b1: ZKeyExpr?,
+    b1: KeyExpr?,
     onError: JniErrorHandler<Boolean>,
 ): Boolean {
     if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
@@ -90,20 +121,20 @@ public fun zKeyexprIntersects(
         withSortedHandleLocks(__locks) {
             val a1_ptr = a1?.ptr ?: 0L
             val b1_ptr = b1?.ptr ?: 0L
-            JNINative.zKeyexprIntersects(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
+            JNINative.keyexprIntersects(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
         }
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zKeyexprIncludes(
+public fun keyexprIncludes(
     aSel: Int,
     a0: String?,
-    a1: ZKeyExpr?,
+    a1: KeyExpr?,
     bSel: Int,
     b0: String?,
-    b1: ZKeyExpr?,
+    b1: KeyExpr?,
     onError: JniErrorHandler<Boolean>,
 ): Boolean {
     if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
@@ -116,20 +147,20 @@ public fun zKeyexprIncludes(
         withSortedHandleLocks(__locks) {
             val a1_ptr = a1?.ptr ?: 0L
             val b1_ptr = b1?.ptr ?: 0L
-            JNINative.zKeyexprIncludes(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
+            JNINative.keyexprIncludes(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
         }
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zKeyexprRelationTo(
+public fun keyexprRelationTo(
     aSel: Int,
     a0: String?,
-    a1: ZKeyExpr?,
+    a1: KeyExpr?,
     bSel: Int,
     b0: String?,
-    b1: ZKeyExpr?,
+    b1: KeyExpr?,
     onError: JniErrorHandler<SetIntersectionLevel>,
 ): SetIntersectionLevel {
     if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
@@ -143,7 +174,7 @@ public fun zKeyexprRelationTo(
             val a1_ptr = a1?.ptr ?: 0L
             val b1_ptr = b1?.ptr ?: 0L
             SetIntersectionLevel.fromInt(
-                JNINative.zKeyexprRelationTo(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap),
+                JNINative.keyexprRelationTo(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap),
             )
         }
     }
@@ -151,65 +182,34 @@ public fun zKeyexprRelationTo(
     return __ret
 }
 
-public fun zKeyexprJoin(
-    aSel: Int,
-    a0: String?,
-    a1: ZKeyExpr?,
-    b: String,
-    onError: ZErrorHandler<ZKeyExpr>,
-): ZKeyExpr {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ZErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            ZKeyExpr(JNINative.zKeyexprJoin(aSel, a0, a1_ptr, b, __cap))
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun zKeyexprConcat(
-    aSel: Int,
-    a0: String?,
-    a1: ZKeyExpr?,
-    b: String,
-    onError: ZErrorHandler<ZKeyExpr>,
-): ZKeyExpr {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ZErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            ZKeyExpr(JNINative.zKeyexprConcat(aSel, a0, a1_ptr, b, __cap))
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun zKeyexprClone(ke: ZKeyExpr, onError: JniErrorHandler<ZKeyExpr>): ZKeyExpr {
+public fun keyexprGetStr(ke: KeyExpr, onError: JniErrorHandler<String>): String {
     if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(ke) {
         val ke_ptr = ke.ptr
-        ZKeyExpr(JNINative.zKeyexprClone(ke_ptr, __cap))
+        JNINative.keyexprGetStr(ke_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zKeyexprToString(ke: ZKeyExpr, onError: JniErrorHandler<String>): String {
+public fun keyexprNewClone(ke: KeyExpr, onError: JniErrorHandler<KeyExpr>): KeyExpr {
     if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(ke) {
         val ke_ptr = ke.ptr
-        JNINative.zKeyexprToString(ke_ptr, __cap)
+        KeyExpr(JNINative.keyexprNewClone(ke_ptr, __cap))
+    }
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+public fun keyexprToString(ke: KeyExpr, onError: JniErrorHandler<String>): String {
+    if (ke.ptr == 0L) return onError.run("Operation on a closed native handle.")
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = withSortedHandleLocks(ke) {
+        val ke_ptr = ke.ptr
+        JNINative.keyexprToString(ke_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret

@@ -6,31 +6,31 @@ import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
-import io.zenoh.jni.config.ZConfig
-import io.zenoh.jni.config.ZZenohId
-import io.zenoh.jni.errors.ZErrorHandler
-import io.zenoh.jni.errors.ZErrorHandlerCapture
-import io.zenoh.jni.keyexpr.ZKeyExpr
-import io.zenoh.jni.liveliness.ZLivelinessToken
-import io.zenoh.jni.pubsub.ZPublisher
-import io.zenoh.jni.pubsub.ZSubscriber
+import io.zenoh.jni.config.Config
+import io.zenoh.jni.config.ZenohId
+import io.zenoh.jni.errors.ErrorHandler
+import io.zenoh.jni.errors.ErrorHandlerCapture
+import io.zenoh.jni.keyexpr.KeyExpr
+import io.zenoh.jni.liveliness.LivelinessToken
+import io.zenoh.jni.pubsub.Publisher
+import io.zenoh.jni.pubsub.Subscriber
 import io.zenoh.jni.qos.CongestionControl
 import io.zenoh.jni.qos.Priority
 import io.zenoh.jni.qos.Reliability
 import io.zenoh.jni.query.ConsolidationMode
+import io.zenoh.jni.query.Querier
+import io.zenoh.jni.query.QueryCallback
 import io.zenoh.jni.query.QueryTarget
+import io.zenoh.jni.query.Queryable
+import io.zenoh.jni.query.ReplyCallback
 import io.zenoh.jni.query.ReplyKeyExpr
-import io.zenoh.jni.query.ZQuerier
-import io.zenoh.jni.query.ZQueryCallback
-import io.zenoh.jni.query.ZQueryable
-import io.zenoh.jni.query.ZReplyCallback
 import io.zenoh.jni.query.asRaw
-import io.zenoh.jni.sample.ZSampleCallback
+import io.zenoh.jni.sample.SampleCallback
 import io.zenoh.jni.sample.asRaw
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZSession`. */
-public class ZSession(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Session`. */
+public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -41,10 +41,10 @@ public class ZSession(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZSession {
+    public fun take(): Session {
         val p = ptr
         ptr = 0L
-        return ZSession(p)
+        return Session(p)
     }
 
     public companion object {
@@ -53,13 +53,13 @@ public class ZSession(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun zOpen(config: ZConfig, onError: ZErrorHandler<ZSession>): ZSession {
+public fun open(config: Config, onError: ErrorHandler<Session>): Session {
     if (config.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(config) {
         val config_ptr = config.ptr
         try {
-            ZSession(JNINative.zOpen(config_ptr, __cap))
+            Session(JNINative.open(config_ptr, __cap))
         } finally {
             config.ptr = 0L
         }
@@ -68,23 +68,23 @@ public fun zOpen(config: ZConfig, onError: ZErrorHandler<ZSession>): ZSession {
     return __ret
 }
 
-public fun zSessionDeclarePublisher(
-    session: ZSession,
+public fun sessionDeclarePublisher(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     congestionControl: CongestionControl?,
     priority: Priority?,
     express: Boolean?,
     reliability: Reliability?,
-    onError: ZErrorHandler<ZPublisher>,
-): ZPublisher {
+    onError: ErrorHandler<Publisher>,
+): Publisher {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -93,8 +93,8 @@ public fun zSessionDeclarePublisher(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZPublisher(
-                    JNINative.zSessionDeclarePublisher(
+                Publisher(
+                    JNINative.sessionDeclarePublisher(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,
@@ -115,11 +115,11 @@ public fun zSessionDeclarePublisher(
     return __ret
 }
 
-public fun zSessionPut(
-    session: ZSession,
+public fun sessionPut(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     payload: ByteArray,
     encodingPresent: Boolean,
     encodingId: Int,
@@ -129,13 +129,13 @@ public fun zSessionPut(
     express: Boolean?,
     attachment: ByteArray?,
     reliability: Reliability?,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (session.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr1 != null && keyExpr1.ptr == 0L) {
         onError.run("Operation on a closed native handle.", ""); return
     }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -143,7 +143,7 @@ public fun zSessionPut(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.zSessionPut(
+            JNINative.sessionPut(
                 session_ptr,
                 keyExprSel,
                 keyExpr0,
@@ -164,23 +164,23 @@ public fun zSessionPut(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zSessionDelete(
-    session: ZSession,
+public fun sessionDelete(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     congestionControl: CongestionControl?,
     priority: Priority?,
     express: Boolean?,
     attachment: ByteArray?,
     reliability: Reliability?,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (session.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr1 != null && keyExpr1.ptr == 0L) {
         onError.run("Operation on a closed native handle.", ""); return
     }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -188,7 +188,7 @@ public fun zSessionDelete(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.zSessionDelete(
+            JNINative.sessionDelete(
                 session_ptr,
                 keyExprSel,
                 keyExpr0,
@@ -205,21 +205,21 @@ public fun zSessionDelete(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zSessionDeclareSubscriber(
-    session: ZSession,
+public fun sessionDeclareSubscriber(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
-    callback: ZSampleCallback,
+    keyExpr1: KeyExpr?,
+    callback: SampleCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<ZSubscriber>,
-): ZSubscriber {
+    onError: ErrorHandler<Subscriber>,
+): Subscriber {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -228,8 +228,8 @@ public fun zSessionDeclareSubscriber(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZSubscriber(
-                    JNINative.zSessionDeclareSubscriber(
+                Subscriber(
+                    JNINative.sessionDeclareSubscriber(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,
@@ -248,11 +248,11 @@ public fun zSessionDeclareSubscriber(
     return __ret
 }
 
-public fun zSessionDeclareQuerier(
-    session: ZSession,
+public fun sessionDeclareQuerier(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     target: QueryTarget?,
     consolidation: ConsolidationMode?,
     congestionControl: CongestionControl?,
@@ -260,14 +260,14 @@ public fun zSessionDeclareQuerier(
     express: Boolean?,
     timeoutMs: Long?,
     acceptReplies: ReplyKeyExpr?,
-    onError: ZErrorHandler<ZQuerier>,
-): ZQuerier {
+    onError: ErrorHandler<Querier>,
+): Querier {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -276,8 +276,8 @@ public fun zSessionDeclareQuerier(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZQuerier(
-                    JNINative.zSessionDeclareQuerier(
+                Querier(
+                    JNINative.sessionDeclareQuerier(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,
@@ -301,22 +301,22 @@ public fun zSessionDeclareQuerier(
     return __ret
 }
 
-public fun zSessionDeclareQueryable(
-    session: ZSession,
+public fun sessionDeclareQueryable(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     complete: Boolean?,
-    callback: ZQueryCallback,
+    callback: QueryCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<ZQueryable>,
-): ZQueryable {
+    onError: ErrorHandler<Queryable>,
+): Queryable {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -325,8 +325,8 @@ public fun zSessionDeclareQueryable(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZQueryable(
-                    JNINative.zSessionDeclareQueryable(
+                Queryable(
+                    JNINative.sessionDeclareQueryable(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,
@@ -346,34 +346,30 @@ public fun zSessionDeclareQueryable(
     return __ret
 }
 
-public fun zSessionDeclareKeyexpr(
-    session: ZSession,
+public fun sessionDeclareKeyexpr(
+    session: Session,
     keyExpr: String,
-    onError: ZErrorHandler<ZKeyExpr>,
-): ZKeyExpr {
+    onError: ErrorHandler<KeyExpr>,
+): KeyExpr {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        ZKeyExpr(JNINative.zSessionDeclareKeyexpr(session_ptr, keyExpr, __cap))
+        KeyExpr(JNINative.sessionDeclareKeyexpr(session_ptr, keyExpr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
 
-public fun zSessionUndeclareKeyexpr(
-    session: ZSession,
-    keyExpr: ZKeyExpr,
-    onError: ZErrorHandler<Unit>,
-) {
+public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: ErrorHandler<Unit>) {
     if (session.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     withSortedHandleLocks(session, keyExpr) {
         val session_ptr = session.ptr
         val keyExpr_ptr = keyExpr.ptr
         try {
-            JNINative.zSessionUndeclareKeyexpr(session_ptr, keyExpr_ptr, __cap)
+            JNINative.sessionUndeclareKeyexpr(session_ptr, keyExpr_ptr, __cap)
         } finally {
             keyExpr.ptr = 0L
         }
@@ -381,11 +377,11 @@ public fun zSessionUndeclareKeyexpr(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zSessionGet(
-    session: ZSession,
+public fun sessionGet(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     parameters: String?,
     timeoutMs: Long?,
     target: QueryTarget?,
@@ -399,15 +395,15 @@ public fun zSessionGet(
     encodingId: Int,
     encodingSchema: String?,
     attachment: ByteArray?,
-    callback: ZReplyCallback,
+    callback: ReplyCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (session.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr1 != null && keyExpr1.ptr == 0L) {
         onError.run("Operation on a closed native handle.", ""); return
     }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -415,7 +411,7 @@ public fun zSessionGet(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.zSessionGet(
+            JNINative.sessionGet(
                 session_ptr,
                 keyExprSel,
                 keyExpr0,
@@ -442,58 +438,58 @@ public fun zSessionGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zSessionZid(session: ZSession, onError: JniErrorHandler<ZZenohId>): ZZenohId {
+public fun sessionGetZid(session: Session, onError: JniErrorHandler<ZenohId>): ZenohId {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        ZZenohId(JNINative.zSessionZid(session_ptr, __cap))
+        ZenohId(JNINative.sessionGetZid(session_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zSessionPeersZid(
-    session: ZSession,
-    onError: JniErrorHandler<List<ZZenohId>>,
-): List<ZZenohId> {
+public fun sessionGetPeersZid(
+    session: Session,
+    onError: JniErrorHandler<List<ZenohId>>,
+): List<ZenohId> {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        JNINative.zSessionPeersZid(session_ptr, __cap).map { ZZenohId(it) }
+        JNINative.sessionGetPeersZid(session_ptr, __cap).map { ZenohId(it) }
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zSessionRoutersZid(
-    session: ZSession,
-    onError: JniErrorHandler<List<ZZenohId>>,
-): List<ZZenohId> {
+public fun sessionGetRoutersZid(
+    session: Session,
+    onError: JniErrorHandler<List<ZenohId>>,
+): List<ZenohId> {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        JNINative.zSessionRoutersZid(session_ptr, __cap).map { ZZenohId(it) }
+        JNINative.sessionGetRoutersZid(session_ptr, __cap).map { ZenohId(it) }
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zLivelinessDeclareToken(
-    session: ZSession,
+public fun livelinessDeclareToken(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
-    onError: ZErrorHandler<ZLivelinessToken>,
-): ZLivelinessToken {
+    keyExpr1: KeyExpr?,
+    onError: ErrorHandler<LivelinessToken>,
+): LivelinessToken {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -502,8 +498,8 @@ public fun zLivelinessDeclareToken(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZLivelinessToken(
-                    JNINative.zLivelinessDeclareToken(
+                LivelinessToken(
+                    JNINative.livelinessDeclareToken(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,
@@ -520,21 +516,21 @@ public fun zLivelinessDeclareToken(
     return __ret
 }
 
-public fun zLivelinessGet(
-    session: ZSession,
+public fun livelinessGet(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     timeoutMs: Long,
-    callback: ZReplyCallback,
+    callback: ReplyCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (session.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr1 != null && keyExpr1.ptr == 0L) {
         onError.run("Operation on a closed native handle.", ""); return
     }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -542,7 +538,7 @@ public fun zLivelinessGet(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.zLivelinessGet(
+            JNINative.livelinessGet(
                 session_ptr,
                 keyExprSel,
                 keyExpr0,
@@ -557,22 +553,22 @@ public fun zLivelinessGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zLivelinessDeclareSubscriber(
-    session: ZSession,
+public fun livelinessDeclareSubscriber(
+    session: Session,
     keyExprSel: Int,
     keyExpr0: String?,
-    keyExpr1: ZKeyExpr?,
+    keyExpr1: KeyExpr?,
     history: Boolean,
-    callback: ZSampleCallback,
+    callback: SampleCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<ZSubscriber>,
-): ZSubscriber {
+    onError: ErrorHandler<Subscriber>,
+): Subscriber {
     if (session.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
     if (keyExpr1 != null && keyExpr1.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         __locks.add(session)
@@ -581,8 +577,8 @@ public fun zLivelinessDeclareSubscriber(
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                ZSubscriber(
-                    JNINative.zLivelinessDeclareSubscriber(
+                Subscriber(
+                    JNINative.livelinessDeclareSubscriber(
                         session_ptr,
                         keyExprSel,
                         keyExpr0,

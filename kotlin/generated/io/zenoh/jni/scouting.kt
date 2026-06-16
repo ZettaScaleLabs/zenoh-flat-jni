@@ -6,15 +6,15 @@ import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
+import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.WhatAmI
-import io.zenoh.jni.config.ZConfig
-import io.zenoh.jni.config.ZZenohId
-import io.zenoh.jni.errors.ZErrorHandler
-import io.zenoh.jni.errors.ZErrorHandlerCapture
+import io.zenoh.jni.config.ZenohId
+import io.zenoh.jni.errors.ErrorHandler
+import io.zenoh.jni.errors.ErrorHandlerCapture
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZHello`. */
-public class ZHello(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Hello`. */
+public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -25,10 +25,10 @@ public class ZHello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZHello {
+    public fun take(): Hello {
         val p = ptr
         ptr = 0L
-        return ZHello(p)
+        return Hello(p)
     }
 
     public companion object {
@@ -37,8 +37,8 @@ public class ZHello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-/** Typed handle for a native Zenoh `ZScout`. */
-public class ZScout(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Scout`. */
+public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -49,10 +49,10 @@ public class ZScout(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZScout {
+    public fun take(): Scout {
         val p = ptr
         ptr = 0L
-        return ZScout(p)
+        return Scout(p)
     }
 
     public companion object {
@@ -61,67 +61,67 @@ public class ZScout(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun interface ZHelloCallback {
-    public fun run(whatami: Int, zid: ZZenohId, locators: List<String>)
+public fun interface HelloCallback {
+    public fun run(getWhatami: Int, getZid: ZenohId, getLocators: List<String>)
 }
 
-public fun interface ZHelloCallbackRaw {
-    public fun run(whatami: Int, zid: ByteArray, locators: List<String>)
+public fun interface HelloCallbackRaw {
+    public fun run(getWhatami: Int, getZid: ByteArray, getLocators: List<String>)
 }
 
-public fun ZHelloCallback.asRaw(): ZHelloCallbackRaw = ZHelloCallbackRaw { whatami, zid, locators -> run(whatami, ZZenohId(zid), locators) }
+public fun HelloCallback.asRaw(): HelloCallbackRaw = HelloCallbackRaw { getWhatami, getZid, getLocators -> run(getWhatami, ZenohId(getZid), getLocators) }
 
-public fun zHelloWhatami(h: ZHello, onError: JniErrorHandler<WhatAmI>): WhatAmI {
+public fun helloGetWhatami(h: Hello, onError: JniErrorHandler<WhatAmI>): WhatAmI {
     if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(h) {
         val h_ptr = h.ptr
-        WhatAmI.fromInt(JNINative.zHelloWhatami(h_ptr, __cap))
+        WhatAmI.fromInt(JNINative.helloGetWhatami(h_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zHelloZid(h: ZHello, onError: JniErrorHandler<ZZenohId>): ZZenohId {
+public fun helloGetZid(h: Hello, onError: JniErrorHandler<ZenohId>): ZenohId {
     if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(h) {
         val h_ptr = h.ptr
-        ZZenohId(JNINative.zHelloZid(h_ptr, __cap))
+        ZenohId(JNINative.helloGetZid(h_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zHelloLocators(h: ZHello, onError: JniErrorHandler<List<String>>): List<String> {
+public fun helloGetLocators(h: Hello, onError: JniErrorHandler<List<String>>): List<String> {
     if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(h) {
         val h_ptr = h.ptr
-        JNINative.zHelloLocators(h_ptr, __cap)
+        JNINative.helloGetLocators(h_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zScout(
+public fun scout(
     whatami: Int,
-    config: ZConfig?,
-    callback: ZHelloCallback,
+    config: Config?,
+    callback: HelloCallback,
     onClose: VoidCallback,
-    onError: ZErrorHandler<ZScout>,
-): ZScout {
+    onError: ErrorHandler<Scout>,
+): Scout {
     if (config != null && config.ptr == 0L) return onError.run(
         "Operation on a closed native handle.",
         "",
     )
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         config?.let { __locks.add(it) }
         withSortedHandleLocks(__locks) {
             val config_ptr = config?.ptr ?: 0L
-            ZScout(JNINative.zScout(whatami, config_ptr, callback.asRaw(), onClose, __cap))
+            Scout(JNINative.scout(whatami, config_ptr, callback.asRaw(), onClose, __cap))
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)

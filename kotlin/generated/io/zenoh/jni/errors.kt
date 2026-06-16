@@ -7,8 +7,8 @@ import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZError`. */
-public class ZError(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Error`. */
+public class Error(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -19,10 +19,10 @@ public class ZError(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZError {
+    public fun take(): Error {
         val p = ptr
         ptr = 0L
-        return ZError(p)
+        return Error(p)
     }
 
     public companion object {
@@ -31,18 +31,18 @@ public class ZError(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun interface ZErrorHandler<out R> {
-    public fun run(je: String?, message: String): R
+public fun interface ErrorHandler<out R> {
+    public fun run(je: String?, getMessage: String): R
 }
 
-internal class ZErrorHandlerCapture : ZErrorHandler<Unit> {
+internal class ErrorHandlerCapture : ErrorHandler<Unit> {
     @JvmField var failed: Boolean = false
     @JvmField var je: String? = null
     @JvmField var ze0: String? = null
-    override fun run(je: String?, message: String) { failed = true; this.je = je; this.ze0 = message }
+    override fun run(je: String?, getMessage: String) { failed = true; this.je = je; this.ze0 = getMessage }
     companion object {
-        private val TL: ThreadLocal<ZErrorHandlerCapture> = ThreadLocal.withInitial { ZErrorHandlerCapture() }
-        @JvmStatic fun acquire(): ZErrorHandlerCapture {
+        private val TL: ThreadLocal<ErrorHandlerCapture> = ThreadLocal.withInitial { ErrorHandlerCapture() }
+        @JvmStatic fun acquire(): ErrorHandlerCapture {
             val c = TL.get()
             c.failed = false; c.je = null; c.ze0 = null
             return c
@@ -50,12 +50,12 @@ internal class ZErrorHandlerCapture : ZErrorHandler<Unit> {
     }
 }
 
-public fun zErrorMessage(e: ZError, onError: JniErrorHandler<String>): String {
+public fun errorGetMessage(e: Error, onError: JniErrorHandler<String>): String {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        JNINative.zErrorMessage(e_ptr, __cap)
+        JNINative.errorGetMessage(e_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret

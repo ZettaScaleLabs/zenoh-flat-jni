@@ -7,8 +7,8 @@ import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZTimestamp`. */
-public class ZTimestamp(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Timestamp`. */
+public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -19,10 +19,10 @@ public class ZTimestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZTimestamp {
+    public fun take(): Timestamp {
         val p = ptr
         ptr = 0L
-        return ZTimestamp(p)
+        return Timestamp(p)
     }
 
     public companion object {
@@ -31,23 +31,23 @@ public class ZTimestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun zTimestampNtp64(t: ZTimestamp, onError: JniErrorHandler<Long>): Long {
+public fun timestampGetNtp64(t: Timestamp, onError: JniErrorHandler<Long>): Long {
     if (t.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(t) {
         val t_ptr = t.ptr
-        JNINative.zTimestampNtp64(t_ptr, __cap)
+        JNINative.timestampGetNtp64(t_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zTimestampId(t: ZTimestamp, onError: JniErrorHandler<ByteArray>): ByteArray {
+public fun timestampGetId(t: Timestamp, onError: JniErrorHandler<ByteArray>): ByteArray {
     if (t.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(t) {
         val t_ptr = t.ptr
-        JNINative.zTimestampId(t_ptr, __cap)
+        JNINative.timestampGetId(t_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret

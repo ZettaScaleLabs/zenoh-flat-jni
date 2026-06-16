@@ -3,12 +3,12 @@ package io.zenoh.jni.pubsub
 
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.NativeHandle
-import io.zenoh.jni.errors.ZErrorHandler
-import io.zenoh.jni.errors.ZErrorHandlerCapture
+import io.zenoh.jni.errors.ErrorHandler
+import io.zenoh.jni.errors.ErrorHandlerCapture
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZPublisher`. */
-public class ZPublisher(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Publisher`. */
+public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -19,10 +19,10 @@ public class ZPublisher(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZPublisher {
+    public fun take(): Publisher {
         val p = ptr
         ptr = 0L
-        return ZPublisher(p)
+        return Publisher(p)
     }
 
     public companion object {
@@ -31,8 +31,8 @@ public class ZPublisher(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-/** Typed handle for a native Zenoh `ZSubscriber`. */
-public class ZSubscriber(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Subscriber`. */
+public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -43,10 +43,10 @@ public class ZSubscriber(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZSubscriber {
+    public fun take(): Subscriber {
         val p = ptr
         ptr = 0L
-        return ZSubscriber(p)
+        return Subscriber(p)
     }
 
     public companion object {
@@ -55,20 +55,20 @@ public class ZSubscriber(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun zPublisherPut(
-    publisher: ZPublisher,
+public fun publisherPut(
+    publisher: Publisher,
     payload: ByteArray,
     encodingPresent: Boolean,
     encodingId: Int,
     encodingSchema: String?,
     attachment: ByteArray?,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (publisher.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     withSortedHandleLocks(publisher) {
         val publisher_ptr = publisher.ptr
-        JNINative.zPublisherPut(
+        JNINative.publisherPut(
             publisher_ptr,
             payload,
             encodingPresent,
@@ -81,16 +81,16 @@ public fun zPublisherPut(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun zPublisherDelete(
-    publisher: ZPublisher,
+public fun publisherDelete(
+    publisher: Publisher,
     attachment: ByteArray?,
-    onError: ZErrorHandler<Unit>,
+    onError: ErrorHandler<Unit>,
 ) {
     if (publisher.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ZErrorHandlerCapture.acquire()
+    val __cap = ErrorHandlerCapture.acquire()
     withSortedHandleLocks(publisher) {
         val publisher_ptr = publisher.ptr
-        JNINative.zPublisherDelete(publisher_ptr, attachment, __cap)
+        JNINative.publisherDelete(publisher_ptr, attachment, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }

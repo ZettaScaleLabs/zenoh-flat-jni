@@ -3,8 +3,8 @@ package io.zenoh.jni.liveliness
 
 import io.zenoh.jni.NativeHandle
 
-/** Typed handle for a native Zenoh `ZLivelinessToken`. */
-public class ZLivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `LivelinessToken`. */
+public class LivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -15,10 +15,10 @@ public class ZLivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZLivelinessToken {
+    public fun take(): LivelinessToken {
         val p = ptr
         ptr = 0L
-        return ZLivelinessToken(p)
+        return LivelinessToken(p)
     }
 
     public companion object {

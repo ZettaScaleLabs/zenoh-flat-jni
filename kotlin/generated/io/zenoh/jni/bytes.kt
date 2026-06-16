@@ -7,8 +7,8 @@ import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `ZEncoding`. */
-public class ZEncoding(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `Encoding`. */
+public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -19,10 +19,10 @@ public class ZEncoding(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZEncoding {
+    public fun take(): Encoding {
         val p = ptr
         ptr = 0L
-        return ZEncoding(p)
+        return Encoding(p)
     }
 
     public companion object {
@@ -31,8 +31,8 @@ public class ZEncoding(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-/** Typed handle for a native Zenoh `ZZBytes`. */
-public class ZZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
+/** Typed handle for a native Zenoh `ZBytes`. */
+public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
@@ -43,10 +43,10 @@ public class ZZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     @Synchronized
-    public fun take(): ZZBytes {
+    public fun take(): ZBytes {
         val p = ptr
         ptr = 0L
-        return ZZBytes(p)
+        return ZBytes(p)
     }
 
     public companion object {
@@ -55,582 +55,615 @@ public class ZZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun interface ZEncodingBuilder<out R> {
-    public fun run(handle: ZEncoding, id: Int): R
+public fun interface EncodingBuilder<out R> {
+    public fun run(handle: Encoding, getId: Int): R
 }
 
-public fun interface ZEncodingBuilderRaw<out R> {
-    public fun run(handle: Long, id: Int): R
+public fun interface EncodingBuilderRaw<out R> {
+    public fun run(handle: Long, getId: Int): R
 }
 
-public fun <R> ZEncodingBuilder<R>.asRaw(): ZEncodingBuilderRaw<R> = ZEncodingBuilderRaw<R> { handle, id -> run(ZEncoding(handle), id) }
+public fun <R> EncodingBuilder<R>.asRaw(): EncodingBuilderRaw<R> = EncodingBuilderRaw<R> { handle, getId -> run(Encoding(handle), getId) }
 
-public fun zZbytesAsBytes(z: ZZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
+public fun zbytesAsBytes(z: ZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
     if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(z) {
         val z_ptr = z.ptr
-        JNINative.zZbytesAsBytes(z_ptr, __cap)
+        JNINative.zbytesAsBytes(z_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zZbytesToBytes(z: ZZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
+public fun zbytesToBytes(z: ZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
     if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(z) {
         val z_ptr = z.ptr
-        JNINative.zZbytesToBytes(z_ptr, __cap)
+        JNINative.zbytesToBytes(z_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zZbytesClone(z: ZZBytes, onError: JniErrorHandler<ZZBytes>): ZZBytes {
+public fun zbytesNewClone(z: ZBytes, onError: JniErrorHandler<ZBytes>): ZBytes {
     if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(z) {
         val z_ptr = z.ptr
-        ZZBytes(JNINative.zZbytesClone(z_ptr, __cap))
+        ZBytes(JNINative.zbytesNewClone(z_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zZbytesFromVec(bytes: ByteArray, onError: JniErrorHandler<ZZBytes>): ZZBytes {
+public fun zbytesNewFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = ZZBytes(JNINative.zZbytesFromVec(bytes, __cap))
+    val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingId(e: ZEncoding, onError: JniErrorHandler<Int>): Int {
+public fun encodingGetId(e: Encoding, onError: JniErrorHandler<Int>): Int {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        JNINative.zEncodingId(e_ptr, __cap)
+        JNINative.encodingGetId(e_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingSchema(e: ZEncoding, onError: JniErrorHandler<String?>): String? {
+public fun encodingGetSchema(e: Encoding, onError: JniErrorHandler<String?>): String? {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        JNINative.zEncodingSchema(e_ptr, __cap)
+        JNINative.encodingGetSchema(e_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingToString(e: ZEncoding, onError: JniErrorHandler<String>): String {
+public fun encodingToString(e: Encoding, onError: JniErrorHandler<String>): String {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        JNINative.zEncodingToString(e_ptr, __cap)
+        JNINative.encodingToString(e_ptr, __cap)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingClone(e: ZEncoding, onError: JniErrorHandler<ZEncoding>): ZEncoding {
+public fun encodingNewClone(e: Encoding, onError: JniErrorHandler<Encoding>): Encoding {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        ZEncoding(JNINative.zEncodingClone(e_ptr, __cap))
+        Encoding(JNINative.encodingNewClone(e_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingFromString(s: String, onError: JniErrorHandler<ZEncoding>): ZEncoding {
+public fun encodingNewFromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = ZEncoding(JNINative.zEncodingFromString(s, __cap))
+    val __ret = Encoding(JNINative.encodingNewFromString(s, __cap))
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingFromId(id: Int, schema: String?, onError: JniErrorHandler<ZEncoding>): ZEncoding {
+public fun encodingNewFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = ZEncoding(JNINative.zEncodingFromId(id, schema, __cap))
+    val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-public fun zEncodingWithSchema(
-    e: ZEncoding,
+public fun encodingNewWithSchema(
+    e: Encoding,
     schema: String,
-    onError: JniErrorHandler<ZEncoding>,
-): ZEncoding {
+    onError: JniErrorHandler<Encoding>,
+): Encoding {
     if (e.ptr == 0L) return onError.run("Operation on a closed native handle.")
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(e) {
         val e_ptr = e.ptr
-        ZEncoding(JNINative.zEncodingWithSchema(e_ptr, schema, __cap))
+        Encoding(JNINative.encodingNewWithSchema(e_ptr, schema, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingZenohBytes(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstZenohBytes(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingZenohBytes(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstZenohBytes(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingZenohString(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstZenohString(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingZenohString(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstZenohString(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingZenohSerialized(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingZenohSerialized(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationOctetStream(
+public fun <R> encodingConstZenohSerialized(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationOctetStream(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstZenohSerialized(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextPlain(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextPlain(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJson(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJson(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextJson(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextJson(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationCdr(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationCdr(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationCbor(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationCbor(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationYaml(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationYaml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextYaml(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextYaml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextJson5(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextJson5(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationPythonSerializedObject(
+public fun <R> encodingConstApplicationOctetStream(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationPythonSerializedObject(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationOctetStream(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationProtobuf(
+public fun <R> encodingConstTextPlain(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstTextPlain(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstApplicationJson(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationProtobuf(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJson(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJavaSerializedObject(
+public fun <R> encodingConstTextJson(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstTextJson(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstApplicationCdr(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJavaSerializedObject(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationCdr(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationOpenmetricsText(
+public fun <R> encodingConstApplicationCbor(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationOpenmetricsText(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationCbor(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingImagePng(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingImagePng(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingImageJpeg(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingImageJpeg(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingImageGif(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingImageGif(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingImageBmp(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingImageBmp(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingImageWebp(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingImageWebp(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationXml(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationXml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationXWwwFormUrlencoded(
+public fun <R> encodingConstApplicationYaml(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationXWwwFormUrlencoded(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationYaml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextHtml(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextYaml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextHtml(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextYaml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextXml(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextJson5(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextXml(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextJson5(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextCss(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextCss(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextJavascript(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextJavascript(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextMarkdown(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextMarkdown(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingTextCsv(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingTextCsv(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationSql(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationSql(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationCoapPayload(
+public fun <R> encodingConstApplicationPythonSerializedObject(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationCoapPayload(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationPythonSerializedObject(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJsonPatchJson(
+public fun <R> encodingConstApplicationProtobuf(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJsonPatchJson(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationProtobuf(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJsonSeq(
+public fun <R> encodingConstApplicationJavaSerializedObject(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJsonSeq(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJavaSerializedObject(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJsonpath(
+public fun <R> encodingConstApplicationOpenmetricsText(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJsonpath(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationOpenmetricsText(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationJwt(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstImagePng(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationJwt(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstImagePng(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationMp4(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstImageJpeg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationMp4(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstImageJpeg(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationSoapXml(
+public fun <R> encodingConstImageGif(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstImageGif(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstImageBmp(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstImageBmp(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstImageWebp(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstImageWebp(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstApplicationXml(
     onError: JniErrorHandler<R>,
-    build: ZEncodingBuilder<R>,
+    build: EncodingBuilder<R>,
 ): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationSoapXml(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationXml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingApplicationYang(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationXWwwFormUrlencoded(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingApplicationYang(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationXWwwFormUrlencoded(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingAudioAac(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextHtml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingAudioAac(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextHtml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingAudioFlac(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextXml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingAudioFlac(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextXml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingAudioMp4(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextCss(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingAudioMp4(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextCss(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingAudioOgg(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextJavascript(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingAudioOgg(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextJavascript(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingAudioVorbis(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextMarkdown(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingAudioVorbis(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextMarkdown(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoH261(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstTextCsv(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoH261(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstTextCsv(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoH263(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationSql(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoH263(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationSql(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoH264(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationCoapPayload(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoH264(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationCoapPayload(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoH265(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationJsonPatchJson(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoH265(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJsonPatchJson(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoH266(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationJsonSeq(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoH266(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJsonSeq(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoMp4(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationJsonpath(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoMp4(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJsonpath(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoOgg(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationJwt(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoOgg(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationJwt(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoRaw(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationMp4(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoRaw(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationMp4(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoVp8(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationSoapXml(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoVp8(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationSoapXml(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
 @Suppress("UNCHECKED_CAST")
-public fun <R> zEncodingVideoVp9(onError: JniErrorHandler<R>, build: ZEncodingBuilder<R>): R {
+public fun <R> encodingConstApplicationYang(
+    onError: JniErrorHandler<R>,
+    build: EncodingBuilder<R>,
+): R {
     val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.zEncodingVideoVp9(build.asRaw(), __cap) as R)
+    val __ret = (JNINative.encodingConstApplicationYang(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstAudioAac(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstAudioAac(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstAudioFlac(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstAudioFlac(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstAudioMp4(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstAudioMp4(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstAudioOgg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstAudioOgg(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstAudioVorbis(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstAudioVorbis(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoH261(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoH261(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoH263(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoH263(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoH264(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoH264(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoH265(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoH265(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoH266(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoH266(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoMp4(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoMp4(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoOgg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoOgg(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoRaw(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoRaw(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoVp8(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoVp8(build.asRaw(), __cap) as R)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+@Suppress("UNCHECKED_CAST")
+public fun <R> encodingConstVideoVp9(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.encodingConstVideoVp9(build.asRaw(), __cap) as R)
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
