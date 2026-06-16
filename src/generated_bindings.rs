@@ -16025,56 +16025,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewFromVec<'a>(
 }
 #[no_mangle]
 #[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
-pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesToBytes<'a>(
-    mut env: jni::JNIEnv<'a>,
-    _class: jni::objects::JClass<'a>,
-    z: jni::sys::jlong,
-    __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
-    #[allow(non_upper_case_globals)]
-    static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let z = match jlong_to_ZBytes_141dc9e1(&mut env, &z) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
-    };
-    let __out = zenoh_flat::zbytes_to_bytes(&z);
-    match Vec_u8_to_JByteArray_7936d5de(&mut env, __out) {
-        ::core::result::Result::Ok(__w) => __w,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            jni::objects::JObject::null().into()
-        }
-    }
-}
-#[no_mangle]
-#[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToBytes<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,

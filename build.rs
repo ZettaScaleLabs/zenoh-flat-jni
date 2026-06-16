@@ -84,7 +84,8 @@ fn main() {
         .package("errors")
         .ptr_class(pq!(Error))
         .accessor(pq!(error_get_message), "message")
-        .flatten_output().field("message")
+        .flatten_output()
+        .field("message")
         // ── Key expressions ──────────────────────────────────────────────
         // Canonical input: a key-expr param accepts EITHER a String (built via
         // `keyexpr_new_try_from`) OR an existing handle (identity), selector-
@@ -105,8 +106,11 @@ fn main() {
         // Input flatten: a key-expr param accepts EITHER a String (built via
         // `tryFrom`) OR an existing handle (self). Output flatten: the handle
         // only (the string form stays the `getStr` accessor method).
-        .flatten_input().variant("tryFrom").variant_self()
-        .flatten_output().field_self()
+        .flatten_input()
+        .variant("tryFrom")
+        .variant_self()
+        .flatten_output()
+        .field_self()
         // Consumer methods: the receiver key-expr is `this`; the other param
         // accepts a String (built via the input flatten above).
         .method(pq!(keyexpr_intersects), "intersects")
@@ -143,9 +147,12 @@ fn main() {
         .accessor(pq!(hello_get_whatami), "whatami") // WhatAmI enum -> Int
         .accessor(pq!(hello_get_zid), "zid") // ZenohId value class -> ByteArray
         .accessor(pq!(hello_get_locators), "locators") // Vec<String> -> List<String>
-        .flatten_output().field("whatami")
-        .flatten_output().field("zid")
-        .flatten_output().field("locators")
+        .flatten_output()
+        .field("whatami")
+        .flatten_output()
+        .field("zid")
+        .flatten_output()
+        .field("locators")
         .ptr_class(pq!(Scout))
         .fun(pq!(scout))
         // ── Logger ────────────────────────────────────────────────────────
@@ -166,14 +173,15 @@ fn main() {
         .package("bytes")
         .ptr_class(pq!(ZBytes))
         .accessor(pq!(zbytes_as_bytes), "asBytes")
-        .accessor(pq!(zbytes_to_bytes), "toBytes")
         .accessor(pq!(zbytes_new_clone), "newClone")
         // `fromVec` builds a ZBytes from a `ByteArray` — both the input-flatten
         // build variant AND a companion factory (a constructor never
         // output-flattens, so the factory keeps its raw-handle return).
         .constructor(pq!(zbytes_new_from_vec), "fromVec")
-        .flatten_input().variant("fromVec")
-        .flatten_output().field_self()
+        .flatten_input()
+        .variant("fromVec")
+        .flatten_output()
+        .field_self()
         // ── Bytes: Encoding ───────────────────────────────────────────────
         // Canonical input: encoding params cross as their decomposed value
         // `(id: i32, schema: Option<String>)` (built via `encoding_new_from_id`)
@@ -196,8 +204,11 @@ fn main() {
         // Input flatten: encoding params cross as the decomposed value
         // `(id, schema?)` (built via `fromId`). Output flatten: the handle +
         // its id (both free jvalue slots); schema/string stay accessors.
-        .flatten_input().variant("fromId")
-        .flatten_output().field_self().field("id");
+        .flatten_input()
+        .variant("fromId")
+        .flatten_output()
+        .field_self()
+        .field("id");
 
     // Predefined encoding constants — each is a nullary `() -> &'static Encoding`
     // factory, declared as a companion `.constructor` of `Encoding` so they
@@ -272,7 +283,8 @@ fn main() {
         .ptr_class(pq!(Timestamp))
         .accessor(pq!(timestamp_get_ntp64), "ntp64")
         .accessor(pq!(timestamp_get_id), "getId")
-        .flatten_output().field("ntp64")
+        .flatten_output()
+        .field("ntp64")
         // ── Sample ────────────────────────────────────────────────────────
         // Canonical INPUT: identity only — a `Sample` param takes the owned
         // handle directly. (The full-options constructors carry `Option<ptr_class>`
@@ -302,20 +314,34 @@ fn main() {
         .accessor(pq!(sample_get_source_zid), "sourceZid")
         .accessor(pq!(sample_get_source_eid), "sourceEid")
         .accessor(pq!(sample_get_source_sn), "sourceSn")
-        .flatten_input().variant_self()
-        .flatten_output().field("keyExpr")
-        .flatten_output().field("payload")
-        .flatten_output().field("encoding")
-        .flatten_output().field("kind")
-        .flatten_output().field("timestamp")
-        .flatten_output().field("express")
-        .flatten_output().field("priority")
-        .flatten_output().field("congestionControl")
-        .flatten_output().field("attachment")
-        .flatten_output().field("reliability")
-        .flatten_output().field("sourceZid")
-        .flatten_output().field("sourceEid")
-        .flatten_output().field("sourceSn")
+        .flatten_input()
+        .variant_self()
+        .flatten_output()
+        .field("keyExpr")
+        .flatten_output()
+        .field("payload")
+        .flatten_output()
+        .field("encoding")
+        .flatten_output()
+        .field("kind")
+        .flatten_output()
+        .field("timestamp")
+        .flatten_output()
+        .field("express")
+        .flatten_output()
+        .field("priority")
+        .flatten_output()
+        .field("congestionControl")
+        .flatten_output()
+        .field("attachment")
+        .flatten_output()
+        .field("reliability")
+        .flatten_output()
+        .field("sourceZid")
+        .flatten_output()
+        .field("sourceEid")
+        .flatten_output()
+        .field("sourceSn")
         // Standalone sample constructors (callable from Kotlin); consumed by handle.
         .fun(pq!(sample_new_put))
         .fun(pq!(sample_new_delete))
@@ -353,13 +379,20 @@ fn main() {
         .accessor(pq!(query_get_encoding), "encoding")
         .accessor(pq!(query_get_attachment), "attachment")
         .accessor(pq!(query_get_accepts_replies), "acceptsReplies")
-        .flatten_output().field("keyExpr")
-        .flatten_output().field("parameters")
-        .flatten_output().field("payload")
-        .flatten_output().field("encoding")
-        .flatten_output().field("attachment")
-        .flatten_output().field("acceptsReplies")
-        .flatten_output().field_self()
+        .flatten_output()
+        .field("keyExpr")
+        .flatten_output()
+        .field("parameters")
+        .flatten_output()
+        .field("payload")
+        .flatten_output()
+        .field("encoding")
+        .flatten_output()
+        .field("attachment")
+        .flatten_output()
+        .field("acceptsReplies")
+        .flatten_output()
+        .field_self()
         // Reply ops on the owned/borrowed query handle.
         .fun(pq!(query_reply_success))
         .fun(pq!(query_reply_error))
@@ -373,8 +406,10 @@ fn main() {
         .ptr_class(pq!(ReplyError))
         .accessor(pq!(reply_error_get_payload), "payload")
         .accessor(pq!(reply_error_get_encoding), "encoding")
-        .flatten_output().field("payload")
-        .flatten_output().field("encoding")
+        .flatten_output()
+        .field("payload")
+        .flatten_output()
+        .field("encoding")
         // Reply canonical output: the whole reply decomposed in ONE crossing
         // (PRODUCT model — both arms' leaves always present, the not-taken arm's
         // are null). replier zid/eid + the is_ok discriminator, then the ok arm
@@ -390,11 +425,16 @@ fn main() {
         .accessor(pq!(reply_is_ok), "isOk")
         .accessor(pq!(reply_get_sample), "sample")
         .accessor(pq!(reply_get_err), "err")
-        .flatten_output().field("replierZid")
-        .flatten_output().field("replierEid")
-        .flatten_output().field("isOk")
-        .flatten_output().field("sample")
-        .flatten_output().field("err")
+        .flatten_output()
+        .field("replierZid")
+        .flatten_output()
+        .field("replierEid")
+        .flatten_output()
+        .field("isOk")
+        .flatten_output()
+        .field("sample")
+        .flatten_output()
+        .field("err")
         // ── Liveliness + Session ──────────────────────────────────────────
         // `LivelinessToken` is just an opaque handle; the liveliness operations
         // (`liveliness_*`) are declared under the active `session` package below,
@@ -445,7 +485,10 @@ fn main() {
         Ok(path) => path,
         Err(err) => fail("write_rust failed", err),
     };
-    println!("cargo:warning=Generated bindings at: {}", rust_path.display());
+    println!(
+        "cargo:warning=Generated bindings at: {}",
+        rust_path.display()
+    );
 
     // ── Kotlin bindings → kotlin/generated/ ─────────────────────────────
     // The runtime module's Gradle source set picks these up via

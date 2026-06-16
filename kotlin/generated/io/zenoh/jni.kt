@@ -449,7 +449,6 @@ internal object JNINative {
     external fun zbytesAsBytes(z: Long, errorSink: Any): ByteArray
     external fun zbytesNewClone(z: Long, errorSink: Any): Long
     external fun zbytesNewFromVec(bytes: ByteArray, errorSink: Any): Long
-    external fun zbytesToBytes(z: Long, errorSink: Any): ByteArray
     external fun zenohIdToBytes(z: ByteArray, errorSink: Any): ByteArray
     external fun zenohIdToString(z: ByteArray, errorSink: Any): String
 }
