@@ -99,6 +99,10 @@ internal class JniErrorHandlerCapture : JniErrorHandler<Unit> {
 }
 
 internal object JNINative {
+    init {
+        io.zenoh.jni.NativeLibrary.ensureLoaded()
+    }
+
     external fun configGetJson(c: Long, key: String, errorSink: Any): String
     external fun configInsertJson5(c: Long, key: String, value: String, errorSink: Any)
     external fun configNewClone(c: Long, errorSink: Any): Long

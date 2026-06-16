@@ -68,6 +68,10 @@ fn main() {
     let mut jni = JniGen::new()
         .source_module(pq!(zenoh_flat)) // module prefix for prebindgen-marked items
         .package_prefix("io.zenoh.jni") // base package of the generated JNI bindings
+        // Every generated native call routes through `JNINative`; trigger our own
+        // loader from its static initializer so the native library is loaded
+        // transparently before any extern resolves (consumers never load it).
+        .jni_native_init("io.zenoh.jni.NativeLibrary.ensureLoaded()")
         // ── Errors ────────────────────────────────────────────────────────
         // `Error` is the `E` of every fallible `Result<_, Error>`. Declaring it
         // as a `ptr_class` lets the `Result<T, Error>` resolver find its
