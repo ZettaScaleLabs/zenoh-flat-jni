@@ -32,14 +32,14 @@ public class Error(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 public fun interface ErrorHandler<out R> {
-    public fun run(je: String?, getMessage: String): R
+    public fun run(je: String?, message: String): R
 }
 
 internal class ErrorHandlerCapture : ErrorHandler<Unit> {
     @JvmField var failed: Boolean = false
     @JvmField var je: String? = null
     @JvmField var ze0: String? = null
-    override fun run(je: String?, getMessage: String) { failed = true; this.je = je; this.ze0 = getMessage }
+    override fun run(je: String?, message: String) { failed = true; this.je = je; this.ze0 = message }
     companion object {
         private val TL: ThreadLocal<ErrorHandlerCapture> = ThreadLocal.withInitial { ErrorHandlerCapture() }
         @JvmStatic fun acquire(): ErrorHandlerCapture {

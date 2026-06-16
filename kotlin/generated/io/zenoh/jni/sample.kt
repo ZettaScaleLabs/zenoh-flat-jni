@@ -52,83 +52,83 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
 
 public fun interface SampleCallback {
     public fun run(
-        getKeyExpr: KeyExpr,
-        getPayload: ZBytes,
-        getEncoding: Encoding,
-        getEncodingGetId: Int,
-        getKind: Int,
-        getTimestampGetNtp64: Long?,
-        getExpress: Boolean,
-        getPriority: Int,
-        getCongestionControl: Int,
-        getAttachment: ZBytes?,
-        getReliability: Int,
-        getSourceZid: ZenohId?,
-        getSourceEid: Int,
-        getSourceSn: Long,
+        keyExpr: KeyExpr,
+        payload: ZBytes,
+        encoding: Encoding,
+        encoding__id: Int,
+        kind: Int,
+        timestamp__ntp64: Long?,
+        express: Boolean,
+        priority: Int,
+        congestionControl: Int,
+        attachment: ZBytes?,
+        reliability: Int,
+        sourceZid: ZenohId?,
+        sourceEid: Int,
+        sourceSn: Long,
     )
 }
 
 public fun interface SampleCallbackRaw {
     public fun run(
-        getKeyExpr: Long,
-        getPayload: Long,
-        getEncoding: Long,
-        getEncodingGetId: Int,
-        getKind: Int,
-        getTimestampGetNtp64: Long?,
-        getExpress: Boolean,
-        getPriority: Int,
-        getCongestionControl: Int,
-        getAttachment: Long?,
-        getReliability: Int,
-        getSourceZid: ByteArray?,
-        getSourceEid: Int,
-        getSourceSn: Long,
+        keyExpr: Long,
+        payload: Long,
+        encoding: Long,
+        encoding__id: Int,
+        kind: Int,
+        timestamp__ntp64: Long?,
+        express: Boolean,
+        priority: Int,
+        congestionControl: Int,
+        attachment: Long?,
+        reliability: Int,
+        sourceZid: ByteArray?,
+        sourceEid: Int,
+        sourceSn: Long,
     )
 }
 
-public fun SampleCallback.asRaw(): SampleCallbackRaw = SampleCallbackRaw { getKeyExpr, getPayload, getEncoding, getEncodingGetId, getKind, getTimestampGetNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn -> run(KeyExpr(getKeyExpr), ZBytes(getPayload), Encoding(getEncoding), getEncodingGetId, getKind, getTimestampGetNtp64, getExpress, getPriority, getCongestionControl, getAttachment?.let { ZBytes(it) }, getReliability, getSourceZid?.let { ZenohId(it) }, getSourceEid, getSourceSn) }
+public fun SampleCallback.asRaw(): SampleCallbackRaw = SampleCallbackRaw { keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn -> run(KeyExpr(keyExpr), ZBytes(payload), Encoding(encoding), encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment?.let { ZBytes(it) }, reliability, sourceZid?.let { ZenohId(it) }, sourceEid, sourceSn) }
 
 public fun interface SampleBuilder<out R> {
     public fun run(
-        getKeyExpr: KeyExpr,
-        getPayload: ZBytes,
-        getEncoding: Encoding,
-        getEncodingGetId: Int,
-        getKind: Int,
-        getTimestampGetNtp64: Long?,
-        getExpress: Boolean,
-        getPriority: Int,
-        getCongestionControl: Int,
-        getAttachment: ZBytes?,
-        getReliability: Int,
-        getSourceZid: ZenohId?,
-        getSourceEid: Int,
-        getSourceSn: Long,
+        keyExpr: KeyExpr,
+        payload: ZBytes,
+        encoding: Encoding,
+        encoding__id: Int,
+        kind: Int,
+        timestamp__ntp64: Long?,
+        express: Boolean,
+        priority: Int,
+        congestionControl: Int,
+        attachment: ZBytes?,
+        reliability: Int,
+        sourceZid: ZenohId?,
+        sourceEid: Int,
+        sourceSn: Long,
     ): R
 }
 
 public fun interface SampleBuilderRaw<out R> {
     public fun run(
-        getKeyExpr: Long,
-        getPayload: Long,
-        getEncoding: Long,
-        getEncodingGetId: Int,
-        getKind: Int,
-        getTimestampGetNtp64: Long?,
-        getExpress: Boolean,
-        getPriority: Int,
-        getCongestionControl: Int,
-        getAttachment: Long?,
-        getReliability: Int,
-        getSourceZid: ByteArray?,
-        getSourceEid: Int,
-        getSourceSn: Long,
+        keyExpr: Long,
+        payload: Long,
+        encoding: Long,
+        encoding__id: Int,
+        kind: Int,
+        timestamp__ntp64: Long?,
+        express: Boolean,
+        priority: Int,
+        congestionControl: Int,
+        attachment: Long?,
+        reliability: Int,
+        sourceZid: ByteArray?,
+        sourceEid: Int,
+        sourceSn: Long,
     ): R
 }
 
-public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> = SampleBuilderRaw<R> { getKeyExpr, getPayload, getEncoding, getEncodingGetId, getKind, getTimestampGetNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn -> run(KeyExpr(getKeyExpr), ZBytes(getPayload), Encoding(getEncoding), getEncodingGetId, getKind, getTimestampGetNtp64, getExpress, getPriority, getCongestionControl, getAttachment?.let { ZBytes(it) }, getReliability, getSourceZid?.let { ZenohId(it) }, getSourceEid, getSourceSn) }
+public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> = SampleBuilderRaw<R> { keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn -> run(KeyExpr(keyExpr), ZBytes(payload), Encoding(encoding), encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment?.let { ZBytes(it) }, reliability, sourceZid?.let { ZenohId(it) }, sourceEid, sourceSn) }
 
 public fun sampleGetKeyExpr(s: Sample, onError: JniErrorHandler<KeyExpr>): KeyExpr {
     if (s.ptr == 0L) return onError.run("Operation on a closed native handle.")

@@ -62,14 +62,14 @@ public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 public fun interface HelloCallback {
-    public fun run(getWhatami: Int, getZid: ZenohId, getLocators: List<String>)
+    public fun run(whatami: Int, zid: ZenohId, locators: List<String>)
 }
 
 public fun interface HelloCallbackRaw {
-    public fun run(getWhatami: Int, getZid: ByteArray, getLocators: List<String>)
+    public fun run(whatami: Int, zid: ByteArray, locators: List<String>)
 }
 
-public fun HelloCallback.asRaw(): HelloCallbackRaw = HelloCallbackRaw { getWhatami, getZid, getLocators -> run(getWhatami, ZenohId(getZid), getLocators) }
+public fun HelloCallback.asRaw(): HelloCallbackRaw = HelloCallbackRaw { whatami, zid, locators -> run(whatami, ZenohId(zid), locators) }
 
 public fun helloGetWhatami(h: Hello, onError: JniErrorHandler<WhatAmI>): WhatAmI {
     if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")

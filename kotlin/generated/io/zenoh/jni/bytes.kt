@@ -56,14 +56,14 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 public fun interface EncodingBuilder<out R> {
-    public fun run(handle: Encoding, getId: Int): R
+    public fun run(handle: Encoding, id: Int): R
 }
 
 public fun interface EncodingBuilderRaw<out R> {
-    public fun run(handle: Long, getId: Int): R
+    public fun run(handle: Long, id: Int): R
 }
 
-public fun <R> EncodingBuilder<R>.asRaw(): EncodingBuilderRaw<R> = EncodingBuilderRaw<R> { handle, getId -> run(Encoding(handle), getId) }
+public fun <R> EncodingBuilder<R>.asRaw(): EncodingBuilderRaw<R> = EncodingBuilderRaw<R> { handle, id -> run(Encoding(handle), id) }
 
 public fun zbytesAsBytes(z: ZBytes, onError: JniErrorHandler<ByteArray>): ByteArray {
     if (z.ptr == 0L) return onError.run("Operation on a closed native handle.")

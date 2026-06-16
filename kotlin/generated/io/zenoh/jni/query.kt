@@ -173,83 +173,83 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
 
 public fun interface QueryCallback {
     public fun run(
-        getKeyexpr: KeyExpr,
-        getParameters: String,
-        getPayload: ZBytes?,
-        getEncoding: Encoding?,
-        getEncodingGetId: Int?,
-        getAttachment: ZBytes?,
-        getAcceptsReplies: Int,
+        keyExpr: KeyExpr,
+        parameters: String,
+        payload: ZBytes?,
+        encoding: Encoding?,
+        encoding__id: Int?,
+        attachment: ZBytes?,
+        acceptsReplies: Int,
         handle: Query,
     )
 }
 
 public fun interface QueryCallbackRaw {
     public fun run(
-        getKeyexpr: Long,
-        getParameters: String,
-        getPayload: Long?,
-        getEncoding: Long?,
-        getEncodingGetId: Int?,
-        getAttachment: Long?,
-        getAcceptsReplies: Int,
+        keyExpr: Long,
+        parameters: String,
+        payload: Long?,
+        encoding: Long?,
+        encoding__id: Int?,
+        attachment: Long?,
+        acceptsReplies: Int,
         handle: Long,
     )
 }
 
-public fun QueryCallback.asRaw(): QueryCallbackRaw = QueryCallbackRaw { getKeyexpr, getParameters, getPayload, getEncoding, getEncodingGetId, getAttachment, getAcceptsReplies, handle -> run(KeyExpr(getKeyexpr), getParameters, getPayload?.let { ZBytes(it) }, getEncoding?.let { Encoding(it) }, getEncodingGetId, getAttachment?.let { ZBytes(it) }, getAcceptsReplies, Query(handle)) }
+public fun QueryCallback.asRaw(): QueryCallbackRaw = QueryCallbackRaw { keyExpr, parameters, payload, encoding, encoding__id, attachment, acceptsReplies, handle -> run(KeyExpr(keyExpr), parameters, payload?.let { ZBytes(it) }, encoding?.let { Encoding(it) }, encoding__id, attachment?.let { ZBytes(it) }, acceptsReplies, Query(handle)) }
 
 public fun interface ReplyCallback {
     public fun run(
-        getReplierZid: ZenohId?,
-        getReplierEid: Int,
+        replierZid: ZenohId?,
+        replierEid: Int,
         isOk: Boolean,
-        getSampleGetKeyExpr: KeyExpr?,
-        getSampleGetPayload: ZBytes?,
-        getSampleGetEncoding: Encoding?,
-        getSampleGetEncodingGetId: Int?,
-        getSampleGetKind: Int?,
-        getSampleGetTimestampGetNtp64: Long?,
-        getSampleGetExpress: Boolean?,
-        getSampleGetPriority: Int?,
-        getSampleGetCongestionControl: Int?,
-        getSampleGetAttachment: ZBytes?,
-        getSampleGetReliability: Int?,
-        getSampleGetSourceZid: ZenohId?,
-        getSampleGetSourceEid: Int?,
-        getSampleGetSourceSn: Long?,
-        getErrGetPayload: ZBytes?,
-        getErrGetEncoding: Encoding?,
-        getErrGetEncodingGetId: Int?,
+        sample__keyExpr: KeyExpr?,
+        sample__payload: ZBytes?,
+        sample__encoding: Encoding?,
+        sample__encoding__id: Int?,
+        sample__kind: Int?,
+        sample__timestamp__ntp64: Long?,
+        sample__express: Boolean?,
+        sample__priority: Int?,
+        sample__congestionControl: Int?,
+        sample__attachment: ZBytes?,
+        sample__reliability: Int?,
+        sample__sourceZid: ZenohId?,
+        sample__sourceEid: Int?,
+        sample__sourceSn: Long?,
+        err__payload: ZBytes?,
+        err__encoding: Encoding?,
+        err__encoding__id: Int?,
     )
 }
 
 public fun interface ReplyCallbackRaw {
     public fun run(
-        getReplierZid: ByteArray?,
-        getReplierEid: Int,
+        replierZid: ByteArray?,
+        replierEid: Int,
         isOk: Boolean,
-        getSampleGetKeyExpr: Long?,
-        getSampleGetPayload: Long?,
-        getSampleGetEncoding: Long?,
-        getSampleGetEncodingGetId: Int?,
-        getSampleGetKind: Int?,
-        getSampleGetTimestampGetNtp64: Long?,
-        getSampleGetExpress: Boolean?,
-        getSampleGetPriority: Int?,
-        getSampleGetCongestionControl: Int?,
-        getSampleGetAttachment: Long?,
-        getSampleGetReliability: Int?,
-        getSampleGetSourceZid: ByteArray?,
-        getSampleGetSourceEid: Int?,
-        getSampleGetSourceSn: Long?,
-        getErrGetPayload: Long?,
-        getErrGetEncoding: Long?,
-        getErrGetEncodingGetId: Int?,
+        sample__keyExpr: Long?,
+        sample__payload: Long?,
+        sample__encoding: Long?,
+        sample__encoding__id: Int?,
+        sample__kind: Int?,
+        sample__timestamp__ntp64: Long?,
+        sample__express: Boolean?,
+        sample__priority: Int?,
+        sample__congestionControl: Int?,
+        sample__attachment: Long?,
+        sample__reliability: Int?,
+        sample__sourceZid: ByteArray?,
+        sample__sourceEid: Int?,
+        sample__sourceSn: Long?,
+        err__payload: Long?,
+        err__encoding: Long?,
+        err__encoding__id: Int?,
     )
 }
 
-public fun ReplyCallback.asRaw(): ReplyCallbackRaw = ReplyCallbackRaw { getReplierZid, getReplierEid, isOk, getSampleGetKeyExpr, getSampleGetPayload, getSampleGetEncoding, getSampleGetEncodingGetId, getSampleGetKind, getSampleGetTimestampGetNtp64, getSampleGetExpress, getSampleGetPriority, getSampleGetCongestionControl, getSampleGetAttachment, getSampleGetReliability, getSampleGetSourceZid, getSampleGetSourceEid, getSampleGetSourceSn, getErrGetPayload, getErrGetEncoding, getErrGetEncodingGetId -> run(getReplierZid?.let { ZenohId(it) }, getReplierEid, isOk, getSampleGetKeyExpr?.let { KeyExpr(it) }, getSampleGetPayload?.let { ZBytes(it) }, getSampleGetEncoding?.let { Encoding(it) }, getSampleGetEncodingGetId, getSampleGetKind, getSampleGetTimestampGetNtp64, getSampleGetExpress, getSampleGetPriority, getSampleGetCongestionControl, getSampleGetAttachment?.let { ZBytes(it) }, getSampleGetReliability, getSampleGetSourceZid?.let { ZenohId(it) }, getSampleGetSourceEid, getSampleGetSourceSn, getErrGetPayload?.let { ZBytes(it) }, getErrGetEncoding?.let { Encoding(it) }, getErrGetEncodingGetId) }
+public fun ReplyCallback.asRaw(): ReplyCallbackRaw = ReplyCallbackRaw { replierZid, replierEid, isOk, sample__keyExpr, sample__payload, sample__encoding, sample__encoding__id, sample__kind, sample__timestamp__ntp64, sample__express, sample__priority, sample__congestionControl, sample__attachment, sample__reliability, sample__sourceZid, sample__sourceEid, sample__sourceSn, err__payload, err__encoding, err__encoding__id -> run(replierZid?.let { ZenohId(it) }, replierEid, isOk, sample__keyExpr?.let { KeyExpr(it) }, sample__payload?.let { ZBytes(it) }, sample__encoding?.let { Encoding(it) }, sample__encoding__id, sample__kind, sample__timestamp__ntp64, sample__express, sample__priority, sample__congestionControl, sample__attachment?.let { ZBytes(it) }, sample__reliability, sample__sourceZid?.let { ZenohId(it) }, sample__sourceEid, sample__sourceSn, err__payload?.let { ZBytes(it) }, err__encoding?.let { Encoding(it) }, err__encoding__id) }
 
 public fun querierGet(
     querier: Querier,

@@ -57,7 +57,7 @@ fn main() {
         // `.accessor()`.
         .package("errors")
         .ptr_class(pq!(Error))
-        .ptr_class_output(pq!(error_get_message))
+        .ptr_class_output(pq!(error_get_message), "message")
         .package_fun(pq!(error_get_message))
         .accessor()
         // ── Key expressions ──────────────────────────────────────────────
@@ -116,9 +116,9 @@ fn main() {
         // to `scout`'s `Fn(Hello)`.
         .package("scouting")
         .ptr_class(pq!(Hello))
-        .ptr_class_output(pq!(hello_get_whatami)) // WhatAmI enum -> Int
-        .ptr_class_output(pq!(hello_get_zid)) // ZenohId value class -> ByteArray
-        .ptr_class_output(pq!(hello_get_locators)) // Vec<String> -> List<String>
+        .ptr_class_output(pq!(hello_get_whatami), "whatami") // WhatAmI enum -> Int
+        .ptr_class_output(pq!(hello_get_zid), "zid") // ZenohId value class -> ByteArray
+        .ptr_class_output(pq!(hello_get_locators), "locators") // Vec<String> -> List<String>
         .package_fun(pq!(hello_get_whatami))
         .accessor()
         .package_fun(pq!(hello_get_zid))
@@ -165,7 +165,7 @@ fn main() {
         .ptr_class(pq!(Encoding))
         .ptr_class_input(pq!(encoding_new_from_id))
         .ptr_class_output_direct()
-        .ptr_class_output(pq!(encoding_get_id))
+        .ptr_class_output(pq!(encoding_get_id), "id")
         .package_fun(pq!(encoding_get_id))
         .accessor()
         .package_fun(pq!(encoding_get_schema))
@@ -250,7 +250,7 @@ fn main() {
         // -> i64 -> Long, 1 leaf); nested in a `Sample` it contributes that Long.
         .package("time")
         .ptr_class(pq!(Timestamp))
-        .ptr_class_output(pq!(timestamp_get_ntp64))
+        .ptr_class_output(pq!(timestamp_get_ntp64), "ntp64")
         .package_fun(pq!(timestamp_get_ntp64))
         .accessor()
         .package_fun(pq!(timestamp_get_id))
@@ -270,19 +270,19 @@ fn main() {
         .enum_class(pq!(SampleKind))
         .ptr_class(pq!(Sample))
         .ptr_class_input_direct()
-        .ptr_class_output(pq!(sample_get_key_expr))
-        .ptr_class_output(pq!(sample_get_payload))
-        .ptr_class_output(pq!(sample_get_encoding))
-        .ptr_class_output(pq!(sample_get_kind))
-        .ptr_class_output(pq!(sample_get_timestamp))
-        .ptr_class_output(pq!(sample_get_express))
-        .ptr_class_output(pq!(sample_get_priority))
-        .ptr_class_output(pq!(sample_get_congestion_control))
-        .ptr_class_output(pq!(sample_get_attachment))
-        .ptr_class_output(pq!(sample_get_reliability))
-        .ptr_class_output(pq!(sample_get_source_zid))
-        .ptr_class_output(pq!(sample_get_source_eid))
-        .ptr_class_output(pq!(sample_get_source_sn))
+        .ptr_class_output(pq!(sample_get_key_expr), "keyExpr")
+        .ptr_class_output(pq!(sample_get_payload), "payload")
+        .ptr_class_output(pq!(sample_get_encoding), "encoding")
+        .ptr_class_output(pq!(sample_get_kind), "kind")
+        .ptr_class_output(pq!(sample_get_timestamp), "timestamp")
+        .ptr_class_output(pq!(sample_get_express), "express")
+        .ptr_class_output(pq!(sample_get_priority), "priority")
+        .ptr_class_output(pq!(sample_get_congestion_control), "congestionControl")
+        .ptr_class_output(pq!(sample_get_attachment), "attachment")
+        .ptr_class_output(pq!(sample_get_reliability), "reliability")
+        .ptr_class_output(pq!(sample_get_source_zid), "sourceZid")
+        .ptr_class_output(pq!(sample_get_source_eid), "sourceEid")
+        .ptr_class_output(pq!(sample_get_source_sn), "sourceSn")
         // All sample getters are record sources (`.accessor()`): standalone they
         // stay handle/raw; decomposition happens via the canonical output above.
         .package_fun(pq!(sample_get_key_expr))
@@ -342,12 +342,12 @@ fn main() {
         // leaves are emitted in declaration order, so the root move must follow
         // the nested borrow to avoid a "use of moved value" error.
         .ptr_class(pq!(Query))
-        .ptr_class_output(pq!(query_get_keyexpr))
-        .ptr_class_output(pq!(query_get_parameters))
-        .ptr_class_output(pq!(query_get_payload))
-        .ptr_class_output(pq!(query_get_encoding))
-        .ptr_class_output(pq!(query_get_attachment))
-        .ptr_class_output(pq!(query_get_accepts_replies))
+        .ptr_class_output(pq!(query_get_keyexpr), "keyExpr")
+        .ptr_class_output(pq!(query_get_parameters), "parameters")
+        .ptr_class_output(pq!(query_get_payload), "payload")
+        .ptr_class_output(pq!(query_get_encoding), "encoding")
+        .ptr_class_output(pq!(query_get_attachment), "attachment")
+        .ptr_class_output(pq!(query_get_accepts_replies), "acceptsReplies")
         .ptr_class_output_direct()
         // Reply ops on the owned/borrowed query handle.
         .package_fun(pq!(query_reply_success))
@@ -372,8 +372,8 @@ fn main() {
         // ReplyError canonical output: a failed reply's error decomposed in one
         // crossing — payload -> ByteArray, encoding -> String.
         .ptr_class(pq!(ReplyError))
-        .ptr_class_output(pq!(reply_error_get_payload))
-        .ptr_class_output(pq!(reply_error_get_encoding))
+        .ptr_class_output(pq!(reply_error_get_payload), "payload")
+        .ptr_class_output(pq!(reply_error_get_encoding), "encoding")
         .package_fun(pq!(reply_error_get_payload))
         .accessor()
         .package_fun(pq!(reply_error_get_encoding))
@@ -386,11 +386,11 @@ fn main() {
         // `querier_get` / liveliness get; no identity record, so no `Reply`
         // handle crosses.
         .ptr_class(pq!(Reply))
-        .ptr_class_output(pq!(reply_get_replier_zid))
-        .ptr_class_output(pq!(reply_get_replier_eid))
-        .ptr_class_output(pq!(reply_is_ok))
-        .ptr_class_output(pq!(reply_get_sample))
-        .ptr_class_output(pq!(reply_get_err))
+        .ptr_class_output(pq!(reply_get_replier_zid), "replierZid")
+        .ptr_class_output(pq!(reply_get_replier_eid), "replierEid")
+        .ptr_class_output(pq!(reply_is_ok), "isOk")
+        .ptr_class_output(pq!(reply_get_sample), "sample")
+        .ptr_class_output(pq!(reply_get_err), "err")
         .package_fun(pq!(reply_get_replier_zid))
         .accessor()
         .package_fun(pq!(reply_get_replier_eid))
