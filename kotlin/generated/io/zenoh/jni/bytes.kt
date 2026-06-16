@@ -69,20 +69,406 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    public fun withSchema(schema: String, onError: JniErrorHandler<Encoding>): Encoding {
-        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
-        val __ret = withSortedHandleLocks(this) {
-            val this_ptr = this.ptr
-            Encoding(JNINative.encodingNewWithSchema(this_ptr, schema, __cap))
-        }
-        if (__cap.failed) return onError.run(__cap.je)
-        return __ret
-    }
-
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
+
+        public fun withSchema(
+            eId: Int,
+            eSchema: String?,
+            schema: String,
+            onError: JniErrorHandler<Encoding>,
+        ): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingNewWithSchema(eId, eSchema, schema, __cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun fromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun fromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingNewFromString(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun zenohBytes(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstZenohBytes(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun zenohString(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstZenohString(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun zenohSerialized(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstZenohSerialized(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationOctetStream(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationOctetStream(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textPlain(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextPlain(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJson(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJson(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textJson(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextJson(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationCdr(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationCdr(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationCbor(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationCbor(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationYaml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationYaml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textYaml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextYaml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textJson5(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextJson5(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationPythonSerializedObject(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationPythonSerializedObject(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationProtobuf(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationProtobuf(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJavaSerializedObject(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJavaSerializedObject(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationOpenmetricsText(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationOpenmetricsText(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun imagePng(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstImagePng(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun imageJpeg(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstImageJpeg(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun imageGif(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstImageGif(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun imageBmp(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstImageBmp(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun imageWebp(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstImageWebp(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationXml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationXml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationXWwwFormUrlencoded(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationXWwwFormUrlencoded(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textHtml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextHtml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textXml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextXml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textCss(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextCss(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textJavascript(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextJavascript(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textMarkdown(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextMarkdown(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun textCsv(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstTextCsv(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationSql(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationSql(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationCoapPayload(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationCoapPayload(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJsonPatchJson(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJsonPatchJson(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJsonSeq(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJsonSeq(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJsonpath(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJsonpath(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationJwt(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationJwt(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationMp4(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationMp4(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationSoapXml(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationSoapXml(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun applicationYang(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstApplicationYang(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun audioAac(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstAudioAac(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun audioFlac(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstAudioFlac(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun audioMp4(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstAudioMp4(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun audioOgg(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstAudioOgg(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun audioVorbis(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstAudioVorbis(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoH261(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoH261(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoH263(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoH263(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoH264(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoH264(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoH265(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoH265(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoH266(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoH266(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoMp4(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoMp4(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoOgg(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoOgg(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoRaw(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoRaw(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoVp8(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoVp8(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun videoVp9(onError: JniErrorHandler<Encoding>): Encoding {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingConstVideoVp9(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
     }
 }
 
@@ -140,534 +526,12 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
+
+        public fun fromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
     }
-}
-
-public fun interface EncodingBuilder<out R> {
-    public fun run(handle: Encoding, id: Int): R
-}
-
-public fun interface EncodingBuilderRaw<out R> {
-    public fun run(handle: Long, id: Int): R
-}
-
-public fun <R> EncodingBuilder<R>.asRaw(): EncodingBuilderRaw<R> =
-    EncodingBuilderRaw<R> {
-        handle,
-        id ->
-        run(
-            Encoding(handle),
-            id
-        )
-    }
-
-public fun zbytesNewFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingNewFromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = Encoding(JNINative.encodingNewFromString(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun encodingNewFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstZenohBytes(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstZenohBytes(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstZenohString(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstZenohString(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstZenohSerialized(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstZenohSerialized(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationOctetStream(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationOctetStream(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextPlain(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextPlain(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJson(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJson(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextJson(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextJson(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationCdr(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationCdr(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationCbor(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationCbor(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationYaml(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationYaml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextYaml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextYaml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextJson5(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextJson5(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationPythonSerializedObject(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationPythonSerializedObject(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationProtobuf(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationProtobuf(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJavaSerializedObject(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJavaSerializedObject(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationOpenmetricsText(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationOpenmetricsText(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstImagePng(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstImagePng(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstImageJpeg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstImageJpeg(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstImageGif(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstImageGif(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstImageBmp(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstImageBmp(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstImageWebp(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstImageWebp(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationXml(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationXml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationXWwwFormUrlencoded(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationXWwwFormUrlencoded(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextHtml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextHtml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextXml(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextXml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextCss(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextCss(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextJavascript(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextJavascript(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextMarkdown(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextMarkdown(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstTextCsv(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstTextCsv(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationSql(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationSql(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationCoapPayload(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationCoapPayload(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJsonPatchJson(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJsonPatchJson(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJsonSeq(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJsonSeq(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJsonpath(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJsonpath(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationJwt(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationJwt(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationMp4(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationMp4(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationSoapXml(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationSoapXml(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstApplicationYang(
-    onError: JniErrorHandler<R>,
-    build: EncodingBuilder<R>,
-): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstApplicationYang(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstAudioAac(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstAudioAac(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstAudioFlac(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstAudioFlac(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstAudioMp4(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstAudioMp4(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstAudioOgg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstAudioOgg(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstAudioVorbis(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstAudioVorbis(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoH261(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoH261(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoH263(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoH263(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoH264(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoH264(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoH265(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoH265(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoH266(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoH266(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoMp4(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoMp4(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoOgg(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoOgg(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoRaw(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoRaw(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoVp8(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoVp8(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-@Suppress("UNCHECKED_CAST")
-public fun <R> encodingConstVideoVp9(onError: JniErrorHandler<R>, build: EncodingBuilder<R>): R {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.encodingConstVideoVp9(build.asRaw(), __cap) as R)
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

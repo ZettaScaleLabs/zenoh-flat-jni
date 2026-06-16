@@ -3639,9 +3639,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromYaml<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCbor<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -3650,68 +3649,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCbo
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_cbor();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -3719,10 +3660,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCbo
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -3731,9 +3672,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCbo
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCdr<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -3742,68 +3682,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCdr
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_cdr();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -3811,10 +3693,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCdr
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -3825,9 +3707,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCoa
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -3836,68 +3717,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCoa
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_coap_payload();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -3905,10 +3728,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationCoa
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -3919,9 +3742,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJav
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -3930,68 +3752,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJav
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_java_serialized_object();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -3999,10 +3763,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJav
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4011,9 +3775,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJav
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJson<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4022,68 +3785,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_json();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4091,10 +3796,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4105,9 +3810,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4116,68 +3820,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_json_patch_json();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4185,10 +3831,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4197,9 +3843,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJsonSeq<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4208,68 +3853,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_json_seq();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4277,10 +3864,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4291,9 +3878,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4302,68 +3888,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_jsonpath();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4371,10 +3899,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4383,9 +3911,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJso
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJwt<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4394,68 +3921,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJwt
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_jwt();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4463,10 +3932,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJwt
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4475,9 +3944,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationJwt
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationMp4<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4486,68 +3954,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationMp4
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_mp4();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4555,10 +3965,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationMp4
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4569,9 +3979,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOct
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4580,68 +3989,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOct
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_octet_stream();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4649,10 +4000,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOct
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4663,9 +4014,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOpe
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4674,68 +4024,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOpe
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_openmetrics_text();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4743,10 +4035,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationOpe
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4757,9 +4049,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPro
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4768,68 +4059,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPro
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_protobuf();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4837,10 +4070,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPro
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4851,9 +4084,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPyt
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4862,68 +4094,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPyt
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_python_serialized_object();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -4931,10 +4105,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPyt
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -4943,9 +4117,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationPyt
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSoapXml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -4954,68 +4127,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSoa
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_soap_xml();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5023,10 +4138,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSoa
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5035,9 +4150,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSoa
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSql<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5046,68 +4160,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSql
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_sql();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5115,10 +4171,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationSql
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5129,9 +4185,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXWw
 >(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5140,68 +4195,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXWw
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_x_www_form_urlencoded();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5209,10 +4206,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXWw
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5221,9 +4218,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXWw
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5232,68 +4228,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXml
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_xml();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5301,10 +4239,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXml
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5313,9 +4251,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationXml
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYaml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5324,68 +4261,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYam
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_yaml();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5393,10 +4272,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYam
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5405,9 +4284,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYam
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYang<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5416,68 +4294,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYan
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_application_yang();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5485,10 +4305,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYan
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5497,9 +4317,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstApplicationYan
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioAac<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5508,68 +4327,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioAac<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_audio_aac();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5577,10 +4338,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioAac<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5589,9 +4350,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioAac<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioFlac<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5600,68 +4360,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioFlac<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_audio_flac();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5669,10 +4371,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioFlac<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5681,9 +4383,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioFlac<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioMp4<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5692,68 +4393,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioMp4<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_audio_mp4();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5761,10 +4404,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioMp4<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5773,9 +4416,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioMp4<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioOgg<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5784,68 +4426,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioOgg<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_audio_ogg();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5853,10 +4437,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioOgg<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5865,9 +4449,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioOgg<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioVorbis<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5876,68 +4459,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioVorbis<'a
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_audio_vorbis();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -5945,10 +4470,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioVorbis<'a
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -5957,9 +4482,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstAudioVorbis<'a
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageBmp<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -5968,68 +4492,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageBmp<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_image_bmp();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6037,10 +4503,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageBmp<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6049,9 +4515,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageBmp<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageGif<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6060,68 +4525,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageGif<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_image_gif();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6129,10 +4536,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageGif<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6141,9 +4548,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageGif<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageJpeg<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6152,68 +4558,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageJpeg<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_image_jpeg();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6221,10 +4569,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageJpeg<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6233,9 +4581,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageJpeg<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImagePng<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6244,68 +4591,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImagePng<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_image_png();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6313,10 +4602,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImagePng<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6325,9 +4614,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImagePng<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageWebp<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6336,68 +4624,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageWebp<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_image_webp();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6405,10 +4635,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageWebp<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6417,9 +4647,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstImageWebp<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCss<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6428,68 +4657,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCss<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_css();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6497,10 +4668,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCss<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6509,9 +4680,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCss<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCsv<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6520,68 +4690,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCsv<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_csv();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6589,10 +4701,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCsv<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6601,9 +4713,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextCsv<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextHtml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6612,68 +4723,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextHtml<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_html();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6681,10 +4734,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextHtml<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6693,9 +4746,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextHtml<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJavascript<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6704,68 +4756,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJavascript
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_javascript();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6773,10 +4767,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJavascript
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6785,9 +4779,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJavascript
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6796,68 +4789,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_json();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6865,10 +4800,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6877,9 +4812,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson5<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6888,68 +4822,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson5<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_json5();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -6957,10 +4833,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson5<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -6969,9 +4845,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextJson5<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextMarkdown<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -6980,68 +4855,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextMarkdown<'
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_markdown();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7049,10 +4866,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextMarkdown<'
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7061,9 +4878,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextMarkdown<'
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextPlain<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7072,68 +4888,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextPlain<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_plain();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7141,10 +4899,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextPlain<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7153,9 +4911,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextPlain<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextXml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7164,68 +4921,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextXml<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_xml();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7233,10 +4932,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextXml<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7245,9 +4944,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextXml<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextYaml<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7256,68 +4954,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextYaml<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_text_yaml();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7325,10 +4965,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextYaml<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7337,9 +4977,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstTextYaml<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH261<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7348,68 +4987,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH261<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_h261();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7417,10 +4998,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH261<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7429,9 +5010,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH261<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH263<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7440,68 +5020,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH263<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_h263();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7509,10 +5031,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH263<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7521,9 +5043,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH263<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH264<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7532,68 +5053,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH264<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_h264();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7601,10 +5064,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH264<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7613,9 +5076,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH264<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH265<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7624,68 +5086,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH265<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_h265();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7693,10 +5097,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH265<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7705,9 +5109,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH265<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH266<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7716,68 +5119,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH266<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_h266();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7785,10 +5130,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH266<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7797,9 +5142,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoH266<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoMp4<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7808,68 +5152,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoMp4<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_mp4();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7877,10 +5163,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoMp4<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7889,9 +5175,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoMp4<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoOgg<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7900,68 +5185,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoOgg<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_ogg();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -7969,10 +5196,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoOgg<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -7981,9 +5208,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoOgg<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoRaw<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -7992,68 +5218,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoRaw<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_raw();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8061,10 +5229,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoRaw<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8073,9 +5241,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoRaw<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp8<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -8084,68 +5251,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp8<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_vp8();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8153,10 +5262,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp8<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8165,9 +5274,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp8<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp9<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -8176,68 +5284,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp9<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_video_vp9();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8245,10 +5295,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp9<'a>(
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8257,9 +5307,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstVideoVp9<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohBytes<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -8268,68 +5317,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohBytes<'a>
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_zenoh_bytes();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8337,10 +5328,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohBytes<'a>
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8349,9 +5340,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohBytes<'a>
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohSerialized<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -8360,68 +5350,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohSerialize
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_zenoh_serialized();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8429,10 +5361,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohSerialize
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8441,9 +5373,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohSerialize
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohString<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JObject<'a> {
+) -> jni::sys::jlong {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
         ::std::vec![]
@@ -8452,68 +5383,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohString<'a
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    #[allow(non_upper_case_globals)]
-    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __CB_FQN: &str = "io/zenoh/jni/bytes/EncodingBuilderRaw";
-    const __CB_DESCR: &str = "(JI)Ljava/lang/Object;";
     let __out = zenoh_flat::encoding_const_zenoh_string();
-    let __obj1: jni::sys::jvalue = {
-        let __enc1 = match i32_to_jint_a3e3b6ef(
-            &mut env,
-            zenoh_flat::encoding_get_id(__out),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { i: __enc1 }
-    };
-    let __obj0: jni::sys::jvalue = {
-        let __h0: jni::sys::jlong = match Encoding_to_jlong_072adb3b(&mut env, __out) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __h0 }
-    };
-    match __CB_MID
-        .call_object(
-            &mut env,
-            __CB_FQN,
-            "run",
-            __CB_DESCR,
-            &__builder,
-            &[__obj0, __obj1],
-        )
-    {
-        ::core::result::Result::Ok(__o) => __o,
+    match static_Encoding_to_jlong_a909d874(&mut env, __out) {
+        ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let _ = env.exception_describe();
-            let __e2 = <__JniErr as ::core::convert::From<
-                String,
-            >>::from(__e.to_string());
             let __zd = __ze_defaults(&mut env);
             signal_error(
                 &mut env,
@@ -8521,10 +5394,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingConstZenohString<'a
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
+                ::core::option::Option::Some(&__e.to_string()),
                 &__zd,
             );
-            jni::objects::JObject::null().into()
+            0 as jni::sys::jlong
         }
     }
 }
@@ -8800,7 +5673,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromString<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    e: jni::sys::jlong,
+    e_id: jni::sys::jint,
+    e_schema: jni::objects::JString<'a>,
     schema: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
@@ -8812,7 +5686,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let e = match jlong_to_Encoding_e0e31e0d(&mut env, &e) {
+    let __exp_e_id = match jint_to_i32_a3e3b6ef(&mut env, &e_id) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -8823,6 +5697,43 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
                 __SINK_FQN,
                 __SINK_DESCR,
                 ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return 0 as jni::sys::jlong;
+        }
+    };
+    let __exp_e_schema = match JString_to_Option_String_56d5e304(&mut env, &e_schema) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return 0 as jni::sys::jlong;
+        }
+    };
+    let __folded_e = match ::core::result::Result::Ok(
+        zenoh_flat::encoding_new_from_id(__exp_e_id, __exp_e_schema),
+    ) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __je = <__JniErr as ::core::convert::From<
+                ::std::string::String,
+            >>::from(__e);
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__je.to_string()),
                 &__zd,
             );
             return 0 as jni::sys::jlong;
@@ -8844,7 +5755,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __out = zenoh_flat::encoding_new_with_schema(&e, schema);
+    let __out = zenoh_flat::encoding_new_with_schema(&__folded_e, schema);
     match Encoding_to_jlong_e0e31e0d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
@@ -9267,9 +6178,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprGetStr<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    a_sel: jni::sys::jint,
-    a_0: jni::objects::JString<'a>,
-    a_1: jni::sys::jlong,
+    a: jni::sys::jlong,
     b_sel: jni::sys::jint,
     b_0: jni::objects::JString<'a>,
     b_1: jni::sys::jlong,
@@ -9283,7 +6192,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
+    let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -9294,92 +6203,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
                 __SINK_FQN,
                 __SINK_DESCR,
                 ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __exp_a_0 = match JString_to_Option_String_56d5e304(&mut env, &a_0) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __exp_a_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &a_1) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __folded_a = match {
-        match __exp_a_sel {
-            0i32 => {
-                match __exp_a_0 {
-                    ::core::option::Option::Some(__p0) => {
-                        zenoh_flat::keyexpr_new_try_from(__p0)
-                            .map_err(|__e| ::std::format!("{}", __e))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from(
-                                "constructor variant input missing",
-                            ),
-                        )
-                    }
-                }
-            }
-            1i32 => {
-                match __exp_a_1 {
-                    ::core::option::Option::Some(__v) => {
-                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from("identity variant value missing"),
-                        )
-                    }
-                }
-            }
-            __sel => {
-                ::core::result::Result::Err(
-                    ::std::format!("invalid constructor selector: {}", __sel),
-                )
-            }
-        }
-    } {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __je = <__JniErr as ::core::convert::From<
-                ::std::string::String,
-            >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
                 &__zd,
             );
             return 0 as jni::sys::jboolean;
@@ -9487,7 +6310,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
             return 0 as jni::sys::jboolean;
         }
     };
-    let __out = zenoh_flat::keyexpr_includes(&__folded_a, &__folded_b);
+    let __out = zenoh_flat::keyexpr_includes(&a, &__folded_b);
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
@@ -9510,9 +6333,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    a_sel: jni::sys::jint,
-    a_0: jni::objects::JString<'a>,
-    a_1: jni::sys::jlong,
+    a: jni::sys::jlong,
     b_sel: jni::sys::jint,
     b_0: jni::objects::JString<'a>,
     b_1: jni::sys::jlong,
@@ -9526,7 +6347,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
+    let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -9537,92 +6358,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
                 __SINK_FQN,
                 __SINK_DESCR,
                 ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __exp_a_0 = match JString_to_Option_String_56d5e304(&mut env, &a_0) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __exp_a_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &a_1) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jboolean;
-        }
-    };
-    let __folded_a = match {
-        match __exp_a_sel {
-            0i32 => {
-                match __exp_a_0 {
-                    ::core::option::Option::Some(__p0) => {
-                        zenoh_flat::keyexpr_new_try_from(__p0)
-                            .map_err(|__e| ::std::format!("{}", __e))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from(
-                                "constructor variant input missing",
-                            ),
-                        )
-                    }
-                }
-            }
-            1i32 => {
-                match __exp_a_1 {
-                    ::core::option::Option::Some(__v) => {
-                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from("identity variant value missing"),
-                        )
-                    }
-                }
-            }
-            __sel => {
-                ::core::result::Result::Err(
-                    ::std::format!("invalid constructor selector: {}", __sel),
-                )
-            }
-        }
-    } {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __je = <__JniErr as ::core::convert::From<
-                ::std::string::String,
-            >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
                 &__zd,
             );
             return 0 as jni::sys::jboolean;
@@ -9730,7 +6465,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
             return 0 as jni::sys::jboolean;
         }
     };
-    let __out = zenoh_flat::keyexpr_intersects(&__folded_a, &__folded_b);
+    let __out = zenoh_flat::keyexpr_intersects(&a, &__folded_b);
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
@@ -10385,9 +7120,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewTryFrom<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    a_sel: jni::sys::jint,
-    a_0: jni::objects::JString<'a>,
-    a_1: jni::sys::jlong,
+    a: jni::sys::jlong,
     b_sel: jni::sys::jint,
     b_0: jni::objects::JString<'a>,
     b_1: jni::sys::jlong,
@@ -10401,7 +7134,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
+    let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -10412,92 +7145,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
                 __SINK_FQN,
                 __SINK_DESCR,
                 ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jint;
-        }
-    };
-    let __exp_a_0 = match JString_to_Option_String_56d5e304(&mut env, &a_0) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jint;
-        }
-    };
-    let __exp_a_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &a_1) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jint;
-        }
-    };
-    let __folded_a = match {
-        match __exp_a_sel {
-            0i32 => {
-                match __exp_a_0 {
-                    ::core::option::Option::Some(__p0) => {
-                        zenoh_flat::keyexpr_new_try_from(__p0)
-                            .map_err(|__e| ::std::format!("{}", __e))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from(
-                                "constructor variant input missing",
-                            ),
-                        )
-                    }
-                }
-            }
-            1i32 => {
-                match __exp_a_1 {
-                    ::core::option::Option::Some(__v) => {
-                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from("identity variant value missing"),
-                        )
-                    }
-                }
-            }
-            __sel => {
-                ::core::result::Result::Err(
-                    ::std::format!("invalid constructor selector: {}", __sel),
-                )
-            }
-        }
-    } {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __je = <__JniErr as ::core::convert::From<
-                ::std::string::String,
-            >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
                 &__zd,
             );
             return 0 as jni::sys::jint;
@@ -10605,7 +7252,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
             return 0 as jni::sys::jint;
         }
     };
-    let __out = zenoh_flat::keyexpr_relation_to(&__folded_a, &__folded_b);
+    let __out = zenoh_flat::keyexpr_relation_to(&a, &__folded_b);
     match SetIntersectionLevel_to_jint_0e49fc84(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {

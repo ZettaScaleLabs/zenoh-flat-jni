@@ -73,144 +73,133 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun intersects(
+        bSel: Int,
+        b0: String?,
+        b1: KeyExpr?,
+        onError: JniErrorHandler<Boolean>,
+    ): Boolean {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            b1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val b1_ptr = b1?.ptr ?: 0L
+                JNINative.keyexprIntersects(this_ptr, bSel, b0, b1_ptr, __cap)
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun includes(
+        bSel: Int,
+        b0: String?,
+        b1: KeyExpr?,
+        onError: JniErrorHandler<Boolean>,
+    ): Boolean {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            b1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val b1_ptr = b1?.ptr ?: 0L
+                JNINative.keyexprIncludes(this_ptr, bSel, b0, b1_ptr, __cap)
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun relationTo(
+        bSel: Int,
+        b0: String?,
+        b1: KeyExpr?,
+        onError: JniErrorHandler<SetIntersectionLevel>,
+    ): SetIntersectionLevel {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            b1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val b1_ptr = b1?.ptr ?: 0L
+                SetIntersectionLevel.fromInt(JNINative.keyexprRelationTo(this_ptr, bSel, b0, b1_ptr, __cap))
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
-    }
-}
 
-public fun keyexprNewTryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
+        public fun tryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
 
-public fun keyexprNewAutocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
+        public fun autocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
 
-public fun keyexprNewJoin(
-    aSel: Int,
-    a0: String?,
-    a1: KeyExpr?,
-    b: String,
-    onError: ErrorHandler<KeyExpr>,
-): KeyExpr {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __cap))
+        public fun join(
+            aSel: Int,
+            a0: String?,
+            a1: KeyExpr?,
+            b: String,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr {
+            if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = run {
+                val __locks = ArrayList<NativeHandle>()
+                a1?.let { __locks.add(it) }
+                withSortedHandleLocks(__locks) {
+                    val a1_ptr = a1?.ptr ?: 0L
+                    KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __cap))
+                }
+            }
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
+
+        public fun concat(
+            aSel: Int,
+            a0: String?,
+            a1: KeyExpr?,
+            b: String,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr {
+            if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = run {
+                val __locks = ArrayList<NativeHandle>()
+                a1?.let { __locks.add(it) }
+                withSortedHandleLocks(__locks) {
+                    val a1_ptr = a1?.ptr ?: 0L
+                    KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __cap))
+                }
+            }
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
         }
     }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun keyexprNewConcat(
-    aSel: Int,
-    a0: String?,
-    a1: KeyExpr?,
-    b: String,
-    onError: ErrorHandler<KeyExpr>,
-): KeyExpr {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __cap))
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun keyexprIntersects(
-    aSel: Int,
-    a0: String?,
-    a1: KeyExpr?,
-    bSel: Int,
-    b0: String?,
-    b1: KeyExpr?,
-    onError: JniErrorHandler<Boolean>,
-): Boolean {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        b1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            val b1_ptr = b1?.ptr ?: 0L
-            JNINative.keyexprIntersects(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun keyexprIncludes(
-    aSel: Int,
-    a0: String?,
-    a1: KeyExpr?,
-    bSel: Int,
-    b0: String?,
-    b1: KeyExpr?,
-    onError: JniErrorHandler<Boolean>,
-): Boolean {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        b1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            val b1_ptr = b1?.ptr ?: 0L
-            JNINative.keyexprIncludes(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap)
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun keyexprRelationTo(
-    aSel: Int,
-    a0: String?,
-    a1: KeyExpr?,
-    bSel: Int,
-    b0: String?,
-    b1: KeyExpr?,
-    onError: JniErrorHandler<SetIntersectionLevel>,
-): SetIntersectionLevel {
-    if (a1 != null && a1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    if (b1 != null && b1.ptr == 0L) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        a1?.let { __locks.add(it) }
-        b1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val a1_ptr = a1?.ptr ?: 0L
-            val b1_ptr = b1?.ptr ?: 0L
-            SetIntersectionLevel.fromInt(
-                JNINative.keyexprRelationTo(aSel, a0, a1_ptr, bSel, b0, b1_ptr, __cap),
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
 }

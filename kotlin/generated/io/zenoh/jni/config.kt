@@ -85,42 +85,42 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
+
+        public fun newDefault(onError: JniErrorHandler<Config>): Config {
+            val __cap = JniErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewDefault(__cap))
+            if (__cap.failed) return onError.run(__cap.je)
+            return __ret
+        }
+
+        public fun fromFile(path: String, onError: ErrorHandler<Config>): Config {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromFile(path, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
+
+        public fun fromJson(s: String, onError: ErrorHandler<Config>): Config {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromJson(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
+
+        public fun fromJson5(s: String, onError: ErrorHandler<Config>): Config {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromJson5(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
+
+        public fun fromYaml(s: String, onError: ErrorHandler<Config>): Config {
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromYaml(s, __cap))
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
+        }
     }
-}
-
-public fun configNewDefault(onError: JniErrorHandler<Config>): Config {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = Config(JNINative.configNewDefault(__cap))
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun configNewFromFile(path: String, onError: ErrorHandler<Config>): Config {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = Config(JNINative.configNewFromFile(path, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun configNewFromJson(s: String, onError: ErrorHandler<Config>): Config {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = Config(JNINative.configNewFromJson(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun configNewFromJson5(s: String, onError: ErrorHandler<Config>): Config {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = Config(JNINative.configNewFromJson5(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun configNewFromYaml(s: String, onError: ErrorHandler<Config>): Config {
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = Config(JNINative.configNewFromYaml(s, __cap))
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
 }
 
 public fun configInsertJson5(c: Config, key: String, value: String, onError: ErrorHandler<Unit>) {

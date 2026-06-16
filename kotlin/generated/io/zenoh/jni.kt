@@ -107,65 +107,70 @@ internal object JNINative {
     external fun configNewFromJson(s: String, errorSink: Any): Long
     external fun configNewFromJson5(s: String, errorSink: Any): Long
     external fun configNewFromYaml(s: String, errorSink: Any): Long
-    external fun encodingConstApplicationCbor(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationCdr(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationCoapPayload(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJavaSerializedObject(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJson(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJsonPatchJson(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJsonSeq(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJsonpath(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationJwt(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationMp4(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationOctetStream(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationOpenmetricsText(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationProtobuf(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationPythonSerializedObject(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationSoapXml(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationSql(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationXWwwFormUrlencoded(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationXml(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationYaml(build: Any, errorSink: Any): Any?
-    external fun encodingConstApplicationYang(build: Any, errorSink: Any): Any?
-    external fun encodingConstAudioAac(build: Any, errorSink: Any): Any?
-    external fun encodingConstAudioFlac(build: Any, errorSink: Any): Any?
-    external fun encodingConstAudioMp4(build: Any, errorSink: Any): Any?
-    external fun encodingConstAudioOgg(build: Any, errorSink: Any): Any?
-    external fun encodingConstAudioVorbis(build: Any, errorSink: Any): Any?
-    external fun encodingConstImageBmp(build: Any, errorSink: Any): Any?
-    external fun encodingConstImageGif(build: Any, errorSink: Any): Any?
-    external fun encodingConstImageJpeg(build: Any, errorSink: Any): Any?
-    external fun encodingConstImagePng(build: Any, errorSink: Any): Any?
-    external fun encodingConstImageWebp(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextCss(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextCsv(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextHtml(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextJavascript(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextJson(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextJson5(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextMarkdown(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextPlain(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextXml(build: Any, errorSink: Any): Any?
-    external fun encodingConstTextYaml(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoH261(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoH263(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoH264(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoH265(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoH266(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoMp4(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoOgg(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoRaw(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoVp8(build: Any, errorSink: Any): Any?
-    external fun encodingConstVideoVp9(build: Any, errorSink: Any): Any?
-    external fun encodingConstZenohBytes(build: Any, errorSink: Any): Any?
-    external fun encodingConstZenohSerialized(build: Any, errorSink: Any): Any?
-    external fun encodingConstZenohString(build: Any, errorSink: Any): Any?
+    external fun encodingConstApplicationCbor(errorSink: Any): Long
+    external fun encodingConstApplicationCdr(errorSink: Any): Long
+    external fun encodingConstApplicationCoapPayload(errorSink: Any): Long
+    external fun encodingConstApplicationJavaSerializedObject(errorSink: Any): Long
+    external fun encodingConstApplicationJson(errorSink: Any): Long
+    external fun encodingConstApplicationJsonPatchJson(errorSink: Any): Long
+    external fun encodingConstApplicationJsonSeq(errorSink: Any): Long
+    external fun encodingConstApplicationJsonpath(errorSink: Any): Long
+    external fun encodingConstApplicationJwt(errorSink: Any): Long
+    external fun encodingConstApplicationMp4(errorSink: Any): Long
+    external fun encodingConstApplicationOctetStream(errorSink: Any): Long
+    external fun encodingConstApplicationOpenmetricsText(errorSink: Any): Long
+    external fun encodingConstApplicationProtobuf(errorSink: Any): Long
+    external fun encodingConstApplicationPythonSerializedObject(errorSink: Any): Long
+    external fun encodingConstApplicationSoapXml(errorSink: Any): Long
+    external fun encodingConstApplicationSql(errorSink: Any): Long
+    external fun encodingConstApplicationXWwwFormUrlencoded(errorSink: Any): Long
+    external fun encodingConstApplicationXml(errorSink: Any): Long
+    external fun encodingConstApplicationYaml(errorSink: Any): Long
+    external fun encodingConstApplicationYang(errorSink: Any): Long
+    external fun encodingConstAudioAac(errorSink: Any): Long
+    external fun encodingConstAudioFlac(errorSink: Any): Long
+    external fun encodingConstAudioMp4(errorSink: Any): Long
+    external fun encodingConstAudioOgg(errorSink: Any): Long
+    external fun encodingConstAudioVorbis(errorSink: Any): Long
+    external fun encodingConstImageBmp(errorSink: Any): Long
+    external fun encodingConstImageGif(errorSink: Any): Long
+    external fun encodingConstImageJpeg(errorSink: Any): Long
+    external fun encodingConstImagePng(errorSink: Any): Long
+    external fun encodingConstImageWebp(errorSink: Any): Long
+    external fun encodingConstTextCss(errorSink: Any): Long
+    external fun encodingConstTextCsv(errorSink: Any): Long
+    external fun encodingConstTextHtml(errorSink: Any): Long
+    external fun encodingConstTextJavascript(errorSink: Any): Long
+    external fun encodingConstTextJson(errorSink: Any): Long
+    external fun encodingConstTextJson5(errorSink: Any): Long
+    external fun encodingConstTextMarkdown(errorSink: Any): Long
+    external fun encodingConstTextPlain(errorSink: Any): Long
+    external fun encodingConstTextXml(errorSink: Any): Long
+    external fun encodingConstTextYaml(errorSink: Any): Long
+    external fun encodingConstVideoH261(errorSink: Any): Long
+    external fun encodingConstVideoH263(errorSink: Any): Long
+    external fun encodingConstVideoH264(errorSink: Any): Long
+    external fun encodingConstVideoH265(errorSink: Any): Long
+    external fun encodingConstVideoH266(errorSink: Any): Long
+    external fun encodingConstVideoMp4(errorSink: Any): Long
+    external fun encodingConstVideoOgg(errorSink: Any): Long
+    external fun encodingConstVideoRaw(errorSink: Any): Long
+    external fun encodingConstVideoVp8(errorSink: Any): Long
+    external fun encodingConstVideoVp9(errorSink: Any): Long
+    external fun encodingConstZenohBytes(errorSink: Any): Long
+    external fun encodingConstZenohSerialized(errorSink: Any): Long
+    external fun encodingConstZenohString(errorSink: Any): Long
     external fun encodingGetId(e: Long, errorSink: Any): Int
     external fun encodingGetSchema(e: Long, errorSink: Any): String?
     external fun encodingNewClone(e: Long, errorSink: Any): Long
     external fun encodingNewFromId(id: Int, schema: String?, errorSink: Any): Long
     external fun encodingNewFromString(s: String, errorSink: Any): Long
-    external fun encodingNewWithSchema(e: Long, schema: String, errorSink: Any): Long
+    external fun encodingNewWithSchema(
+        eId: Int,
+        eSchema: String?,
+        schema: String,
+        errorSink: Any,
+    ): Long
     external fun encodingToString(e: Long, errorSink: Any): String
     external fun errorGetMessage(e: Long, errorSink: Any): String
     external fun helloGetLocators(h: Long, errorSink: Any): List<String>
@@ -174,19 +179,9 @@ internal object JNINative {
     external fun initAndroidLogs(filter: String, errorSink: Any)
     external fun initZenohLogsFromEnvOr(fallbackFilter: String, errorSink: Any)
     external fun keyexprGetStr(ke: Long, errorSink: Any): String
-    external fun keyexprIncludes(
-        aSel: Int,
-        a0: String?,
-        a1: Long,
-        bSel: Int,
-        b0: String?,
-        b1: Long,
-        errorSink: Any,
-    ): Boolean
+    external fun keyexprIncludes(a: Long, bSel: Int, b0: String?, b1: Long, errorSink: Any): Boolean
     external fun keyexprIntersects(
-        aSel: Int,
-        a0: String?,
-        a1: Long,
+        a: Long,
         bSel: Int,
         b0: String?,
         b1: Long,
@@ -197,15 +192,7 @@ internal object JNINative {
     external fun keyexprNewConcat(aSel: Int, a0: String?, a1: Long, b: String, errorSink: Any): Long
     external fun keyexprNewJoin(aSel: Int, a0: String?, a1: Long, b: String, errorSink: Any): Long
     external fun keyexprNewTryFrom(s: String, errorSink: Any): Long
-    external fun keyexprRelationTo(
-        aSel: Int,
-        a0: String?,
-        a1: Long,
-        bSel: Int,
-        b0: String?,
-        b1: Long,
-        errorSink: Any,
-    ): Int
+    external fun keyexprRelationTo(a: Long, bSel: Int, b0: String?, b1: Long, errorSink: Any): Int
     external fun keyexprToString(ke: Long, errorSink: Any): String
     external fun livelinessDeclareSubscriber(
         session: Long,
