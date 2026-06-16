@@ -69,7 +69,17 @@ public fun interface HelloCallbackRaw {
     public fun run(whatami: Int, zid: ByteArray, locators: List<String>)
 }
 
-public fun HelloCallback.asRaw(): HelloCallbackRaw = HelloCallbackRaw { whatami, zid, locators -> run(whatami, ZenohId(zid), locators) }
+public fun HelloCallback.asRaw(): HelloCallbackRaw =
+    HelloCallbackRaw {
+        whatami,
+        zid,
+        locators ->
+        run(
+            whatami,
+            ZenohId(zid),
+            locators
+        )
+    }
 
 public fun helloGetWhatami(h: Hello, onError: JniErrorHandler<WhatAmI>): WhatAmI {
     if (h.ptr == 0L) return onError.run("Operation on a closed native handle.")

@@ -197,7 +197,27 @@ public fun interface QueryCallbackRaw {
     )
 }
 
-public fun QueryCallback.asRaw(): QueryCallbackRaw = QueryCallbackRaw { keyExpr, parameters, payload, encoding, encoding__id, attachment, acceptsReplies, handle -> run(KeyExpr(keyExpr), parameters, payload?.let { ZBytes(it) }, encoding?.let { Encoding(it) }, encoding__id, attachment?.let { ZBytes(it) }, acceptsReplies, Query(handle)) }
+public fun QueryCallback.asRaw(): QueryCallbackRaw =
+    QueryCallbackRaw {
+        keyExpr,
+        parameters,
+        payload,
+        encoding,
+        encoding__id,
+        attachment,
+        acceptsReplies,
+        handle ->
+        run(
+            KeyExpr(keyExpr),
+            parameters,
+            payload?.let { ZBytes(it) },
+            encoding?.let { Encoding(it) },
+            encoding__id,
+            attachment?.let { ZBytes(it) },
+            acceptsReplies,
+            Query(handle)
+        )
+    }
 
 public fun interface ReplyCallback {
     public fun run(
@@ -249,7 +269,51 @@ public fun interface ReplyCallbackRaw {
     )
 }
 
-public fun ReplyCallback.asRaw(): ReplyCallbackRaw = ReplyCallbackRaw { replierZid, replierEid, isOk, sample__keyExpr, sample__payload, sample__encoding, sample__encoding__id, sample__kind, sample__timestamp__ntp64, sample__express, sample__priority, sample__congestionControl, sample__attachment, sample__reliability, sample__sourceZid, sample__sourceEid, sample__sourceSn, err__payload, err__encoding, err__encoding__id -> run(replierZid?.let { ZenohId(it) }, replierEid, isOk, sample__keyExpr?.let { KeyExpr(it) }, sample__payload?.let { ZBytes(it) }, sample__encoding?.let { Encoding(it) }, sample__encoding__id, sample__kind, sample__timestamp__ntp64, sample__express, sample__priority, sample__congestionControl, sample__attachment?.let { ZBytes(it) }, sample__reliability, sample__sourceZid?.let { ZenohId(it) }, sample__sourceEid, sample__sourceSn, err__payload?.let { ZBytes(it) }, err__encoding?.let { Encoding(it) }, err__encoding__id) }
+public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
+    ReplyCallbackRaw {
+        replierZid,
+        replierEid,
+        isOk,
+        sample__keyExpr,
+        sample__payload,
+        sample__encoding,
+        sample__encoding__id,
+        sample__kind,
+        sample__timestamp__ntp64,
+        sample__express,
+        sample__priority,
+        sample__congestionControl,
+        sample__attachment,
+        sample__reliability,
+        sample__sourceZid,
+        sample__sourceEid,
+        sample__sourceSn,
+        err__payload,
+        err__encoding,
+        err__encoding__id ->
+        run(
+            replierZid?.let { ZenohId(it) },
+            replierEid,
+            isOk,
+            sample__keyExpr?.let { KeyExpr(it) },
+            sample__payload?.let { ZBytes(it) },
+            sample__encoding?.let { Encoding(it) },
+            sample__encoding__id,
+            sample__kind,
+            sample__timestamp__ntp64,
+            sample__express,
+            sample__priority,
+            sample__congestionControl,
+            sample__attachment?.let { ZBytes(it) },
+            sample__reliability,
+            sample__sourceZid?.let { ZenohId(it) },
+            sample__sourceEid,
+            sample__sourceSn,
+            err__payload?.let { ZBytes(it) },
+            err__encoding?.let { Encoding(it) },
+            err__encoding__id
+        )
+    }
 
 public fun querierGet(
     querier: Querier,

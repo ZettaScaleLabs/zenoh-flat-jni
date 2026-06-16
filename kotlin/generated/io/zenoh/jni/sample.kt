@@ -88,7 +88,39 @@ public fun interface SampleCallbackRaw {
     )
 }
 
-public fun SampleCallback.asRaw(): SampleCallbackRaw = SampleCallbackRaw { keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn -> run(KeyExpr(keyExpr), ZBytes(payload), Encoding(encoding), encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment?.let { ZBytes(it) }, reliability, sourceZid?.let { ZenohId(it) }, sourceEid, sourceSn) }
+public fun SampleCallback.asRaw(): SampleCallbackRaw =
+    SampleCallbackRaw {
+        keyExpr,
+        payload,
+        encoding,
+        encoding__id,
+        kind,
+        timestamp__ntp64,
+        express,
+        priority,
+        congestionControl,
+        attachment,
+        reliability,
+        sourceZid,
+        sourceEid,
+        sourceSn ->
+        run(
+            KeyExpr(keyExpr),
+            ZBytes(payload),
+            Encoding(encoding),
+            encoding__id,
+            kind,
+            timestamp__ntp64,
+            express,
+            priority,
+            congestionControl,
+            attachment?.let { ZBytes(it) },
+            reliability,
+            sourceZid?.let { ZenohId(it) },
+            sourceEid,
+            sourceSn
+        )
+    }
 
 public fun interface SampleBuilder<out R> {
     public fun run(
@@ -128,7 +160,39 @@ public fun interface SampleBuilderRaw<out R> {
     ): R
 }
 
-public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> = SampleBuilderRaw<R> { keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn -> run(KeyExpr(keyExpr), ZBytes(payload), Encoding(encoding), encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment?.let { ZBytes(it) }, reliability, sourceZid?.let { ZenohId(it) }, sourceEid, sourceSn) }
+public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
+    SampleBuilderRaw<R> {
+        keyExpr,
+        payload,
+        encoding,
+        encoding__id,
+        kind,
+        timestamp__ntp64,
+        express,
+        priority,
+        congestionControl,
+        attachment,
+        reliability,
+        sourceZid,
+        sourceEid,
+        sourceSn ->
+        run(
+            KeyExpr(keyExpr),
+            ZBytes(payload),
+            Encoding(encoding),
+            encoding__id,
+            kind,
+            timestamp__ntp64,
+            express,
+            priority,
+            congestionControl,
+            attachment?.let { ZBytes(it) },
+            reliability,
+            sourceZid?.let { ZenohId(it) },
+            sourceEid,
+            sourceSn
+        )
+    }
 
 public fun sampleGetKeyExpr(s: Sample, onError: JniErrorHandler<KeyExpr>): KeyExpr {
     if (s.ptr == 0L) return onError.run("Operation on a closed native handle.")
