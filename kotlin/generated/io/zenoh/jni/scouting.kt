@@ -6,6 +6,7 @@ import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
+import io.zenoh.jni.__StringFolderHolder
 import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.WhatAmI
 import io.zenoh.jni.config.ZenohId
@@ -58,7 +59,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.helloGetLocators(this_ptr, __cap)
+            (JNINative.helloGetLocators(this_ptr, ArrayList<String>(), __StringFolderHolder.instance, __cap) as List<String>)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret

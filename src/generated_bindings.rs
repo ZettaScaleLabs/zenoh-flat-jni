@@ -5879,6 +5879,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
     h: jni::sys::jlong,
+    __acc: jni::objects::JObject<'a>,
+    __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
     #[allow(unused_variables)]
@@ -5905,23 +5907,68 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __out = zenoh_flat::hello_get_locators(&h);
-    match Vec_String_to_JObject_1e282499(&mut env, __out) {
-        ::core::result::Result::Ok(__w) => __w,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+    #[allow(non_upper_case_globals)]
+    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __CB_FQN: &str = "io/zenoh/jni/StringFolder";
+    const __CB_DESCR: &str = "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;";
+    let __vec = zenoh_flat::hello_get_locators(&h);
+    let mut __acc = __acc;
+    for __elem in __vec.into_iter() {
+        let __enc = match String_to_JString_c7f3ca43(&mut env, __elem) {
+            ::core::result::Result::Ok(__w) => __w,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        let __obj: jni::objects::JObject = __enc.into();
+        __acc = match __CB_MID
+            .call_object(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            jni::objects::JObject::null().into()
-        }
+                __CB_FQN,
+                "run",
+                __CB_DESCR,
+                &__fold,
+                &[
+                    jni::sys::jvalue {
+                        l: __acc.as_raw(),
+                    },
+                    jni::sys::jvalue {
+                        l: __obj.as_raw(),
+                    },
+                ],
+            )
+        {
+            ::core::result::Result::Ok(__o) => __o,
+            ::core::result::Result::Err(__e) => {
+                let _ = env.exception_describe();
+                let __e2 = <__JniErr as ::core::convert::From<
+                    String,
+                >>::from(__e.to_string());
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e2.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
     }
+    __acc
 }
 #[no_mangle]
 #[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
@@ -9181,9 +9228,11 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    timestamp_ntp64: jni::objects::JObject<'a>,
+    timestamp_ntp64_present: jni::sys::jboolean,
+    timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
-    express: jni::objects::JObject<'a>,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -9321,24 +9370,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
             return ();
         }
     };
-    let timestamp_ntp64 = match JObject_to_Option_i64_2ba9a5ed(
-        &mut env,
-        &timestamp_ntp64,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let timestamp_ntp64 = if timestamp_ntp64_present != 0u8 {
+        let __timestamp_ntp64_val = match jlong_to_i64_fbf9a9bc(
+            &mut env,
+            &timestamp_ntp64_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__timestamp_ntp64_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -9386,21 +9440,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
             return ();
         }
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::query_reply_delete(
         &query,
@@ -9861,9 +9920,11 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     encoding_present: jni::sys::jboolean,
     encoding_id: jni::sys::jint,
     encoding_schema: jni::objects::JString<'a>,
-    timestamp_ntp64: jni::objects::JObject<'a>,
+    timestamp_ntp64_present: jni::sys::jboolean,
+    timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
-    express: jni::objects::JObject<'a>,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -10118,24 +10179,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             return ();
         }
     };
-    let timestamp_ntp64 = match JObject_to_Option_i64_2ba9a5ed(
-        &mut env,
-        &timestamp_ntp64,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let timestamp_ntp64 = if timestamp_ntp64_present != 0u8 {
+        let __timestamp_ntp64_val = match jlong_to_i64_fbf9a9bc(
+            &mut env,
+            &timestamp_ntp64_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__timestamp_ntp64_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -10183,21 +10249,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             return ();
         }
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::query_reply_success(
         &query,
@@ -11273,12 +11344,17 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    timestamp_ntp64: jni::objects::JObject<'a>,
+    timestamp_ntp64_present: jni::sys::jboolean,
+    timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
-    reliability: jni::objects::JObject<'a>,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
+    reliability_present: jni::sys::jboolean,
+    reliability_value: jni::sys::jint,
     __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
@@ -11396,24 +11472,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let timestamp_ntp64 = match JObject_to_Option_i64_2ba9a5ed(
-        &mut env,
-        &timestamp_ntp64,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let timestamp_ntp64 = if timestamp_ntp64_present != 0u8 {
+        let __timestamp_ntp64_val = match jlong_to_i64_fbf9a9bc(
+            &mut env,
+            &timestamp_ntp64_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__timestamp_ntp64_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -11461,75 +11542,95 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
-    let reliability = match JObject_to_Option_Reliability_60b5e063(
-        &mut env,
-        &reliability,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let reliability = if reliability_present != 0u8 {
+        let __reliability_val = match jint_to_Reliability_5d4a96c8(
+            &mut env,
+            &reliability_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__reliability_val)
+    } else {
+        ::core::option::Option::None
     };
     #[allow(non_upper_case_globals)]
     static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
@@ -11948,12 +12049,17 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     encoding_present: jni::sys::jboolean,
     encoding_id: jni::sys::jint,
     encoding_schema: jni::objects::JString<'a>,
-    timestamp_ntp64: jni::objects::JObject<'a>,
+    timestamp_ntp64_present: jni::sys::jboolean,
+    timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
-    reliability: jni::objects::JObject<'a>,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
+    reliability_present: jni::sys::jboolean,
+    reliability_value: jni::sys::jint,
     __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
@@ -12188,24 +12294,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let timestamp_ntp64 = match JObject_to_Option_i64_2ba9a5ed(
-        &mut env,
-        &timestamp_ntp64,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let timestamp_ntp64 = if timestamp_ntp64_present != 0u8 {
+        let __timestamp_ntp64_val = match jlong_to_i64_fbf9a9bc(
+            &mut env,
+            &timestamp_ntp64_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__timestamp_ntp64_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -12253,75 +12364,95 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
-    let reliability = match JObject_to_Option_Reliability_60b5e063(
-        &mut env,
-        &reliability,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
+    let reliability = if reliability_present != 0u8 {
+        let __reliability_val = match jint_to_Reliability_5d4a96c8(
+            &mut env,
+            &reliability_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        ::core::option::Option::Some(__reliability_val)
+    } else {
+        ::core::option::Option::None
     };
     #[allow(non_upper_case_globals)]
     static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
@@ -12999,10 +13130,14 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
-    reliability: jni::objects::JObject<'a>,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
+    reliability_present: jni::sys::jboolean,
+    reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
     #[allow(unused_variables)]
@@ -13138,75 +13273,95 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
-    let reliability = match JObject_to_Option_Reliability_60b5e063(
-        &mut env,
-        &reliability,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let reliability = if reliability_present != 0u8 {
+        let __reliability_val = match jint_to_Reliability_5d4a96c8(
+            &mut env,
+            &reliability_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__reliability_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::session_declare_publisher(
         &session,
@@ -13282,13 +13437,20 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    target: jni::objects::JObject<'a>,
-    consolidation: jni::objects::JObject<'a>,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
-    timeout_ms: jni::objects::JObject<'a>,
-    accept_replies: jni::objects::JObject<'a>,
+    target_present: jni::sys::jboolean,
+    target_value: jni::sys::jint,
+    consolidation_present: jni::sys::jboolean,
+    consolidation_value: jni::sys::jint,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
+    timeout_ms_present: jni::sys::jboolean,
+    timeout_ms_value: jni::sys::jlong,
+    accept_replies_present: jni::sys::jboolean,
+    accept_replies_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
     #[allow(unused_variables)]
@@ -13424,126 +13586,161 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let target = match JObject_to_Option_QueryTarget_08d4f26d(&mut env, &target) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let target = if target_present != 0u8 {
+        let __target_val = match jint_to_QueryTarget_71d4db6a(&mut env, &target_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__target_val)
+    } else {
+        ::core::option::Option::None
     };
-    let consolidation = match JObject_to_Option_ConsolidationMode_25de8913(
-        &mut env,
-        &consolidation,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let consolidation = if consolidation_present != 0u8 {
+        let __consolidation_val = match jint_to_ConsolidationMode_dd4eaedc(
+            &mut env,
+            &consolidation_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__consolidation_val)
+    } else {
+        ::core::option::Option::None
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
-    let timeout_ms = match JObject_to_Option_i64_2ba9a5ed(&mut env, &timeout_ms) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let timeout_ms = if timeout_ms_present != 0u8 {
+        let __timeout_ms_val = match jlong_to_i64_fbf9a9bc(&mut env, &timeout_ms_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__timeout_ms_val)
+    } else {
+        ::core::option::Option::None
     };
-    let accept_replies = match JObject_to_Option_ReplyKeyExpr_91b36eb3(
-        &mut env,
-        &accept_replies,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let accept_replies = if accept_replies_present != 0u8 {
+        let __accept_replies_val = match jint_to_ReplyKeyExpr_0d9719f5(
+            &mut env,
+            &accept_replies_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__accept_replies_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::session_declare_querier(
         &session,
@@ -13622,7 +13819,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    complete: jni::objects::JObject<'a>,
+    complete_present: jni::sys::jboolean,
+    complete_value: jni::sys::jboolean,
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
@@ -13760,21 +13958,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let complete = match JObject_to_Option_bool_5c82fffd(&mut env, &complete) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
+    let complete = if complete_present != 0u8 {
+        let __complete_val = match jboolean_to_bool_31306d98(&mut env, &complete_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return 0 as jni::sys::jlong;
+            }
+        };
+        ::core::option::Option::Some(__complete_val)
+    } else {
+        ::core::option::Option::None
     };
     let callback = match JObject_to_impl_Fn_Query_Send_Sync_static_6c353bcb(
         &mut env,
@@ -14134,11 +14337,15 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
     attachment: jni::objects::JByteArray<'a>,
-    reliability: jni::objects::JObject<'a>,
+    reliability_present: jni::sys::jboolean,
+    reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -14276,56 +14483,71 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
             return ();
         }
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -14373,24 +14595,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
             return ();
         }
     };
-    let reliability = match JObject_to_Option_Reliability_60b5e063(
-        &mut env,
-        &reliability,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let reliability = if reliability_present != 0u8 {
+        let __reliability_val = match jint_to_Reliability_5d4a96c8(
+            &mut env,
+            &reliability_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__reliability_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::session_delete(
         &session,
@@ -14468,13 +14695,20 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
     parameters: jni::objects::JString<'a>,
-    timeout_ms: jni::objects::JObject<'a>,
-    target: jni::objects::JObject<'a>,
-    consolidation: jni::objects::JObject<'a>,
-    accept_replies: jni::objects::JObject<'a>,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
+    timeout_ms_present: jni::sys::jboolean,
+    timeout_ms_value: jni::sys::jlong,
+    target_present: jni::sys::jboolean,
+    target_value: jni::sys::jint,
+    consolidation_present: jni::sys::jboolean,
+    consolidation_value: jni::sys::jint,
+    accept_replies_present: jni::sys::jboolean,
+    accept_replies_value: jni::sys::jint,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
     payload: jni::objects::JByteArray<'a>,
     encoding_present: jni::sys::jboolean,
     encoding_id: jni::sys::jint,
@@ -14635,126 +14869,161 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             return ();
         }
     };
-    let timeout_ms = match JObject_to_Option_i64_2ba9a5ed(&mut env, &timeout_ms) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let timeout_ms = if timeout_ms_present != 0u8 {
+        let __timeout_ms_val = match jlong_to_i64_fbf9a9bc(&mut env, &timeout_ms_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__timeout_ms_val)
+    } else {
+        ::core::option::Option::None
     };
-    let target = match JObject_to_Option_QueryTarget_08d4f26d(&mut env, &target) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let target = if target_present != 0u8 {
+        let __target_val = match jint_to_QueryTarget_71d4db6a(&mut env, &target_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__target_val)
+    } else {
+        ::core::option::Option::None
     };
-    let consolidation = match JObject_to_Option_ConsolidationMode_25de8913(
-        &mut env,
-        &consolidation,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let consolidation = if consolidation_present != 0u8 {
+        let __consolidation_val = match jint_to_ConsolidationMode_dd4eaedc(
+            &mut env,
+            &consolidation_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__consolidation_val)
+    } else {
+        ::core::option::Option::None
     };
-    let accept_replies = match JObject_to_Option_ReplyKeyExpr_91b36eb3(
-        &mut env,
-        &accept_replies,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let accept_replies = if accept_replies_present != 0u8 {
+        let __accept_replies_val = match jint_to_ReplyKeyExpr_0d9719f5(
+            &mut env,
+            &accept_replies_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__accept_replies_val)
+    } else {
+        ::core::option::Option::None
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_payload = match JByteArray_to_Option_Vec_u8_6f4428ab(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15043,6 +15312,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
     session: jni::sys::jlong,
+    __acc: jni::objects::JObject<'a>,
+    __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
     #[allow(unused_variables)]
@@ -15069,23 +15340,68 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __out = zenoh_flat::session_get_peers_zid(&session);
-    match Vec_ZenohId_to_JObject_cd7f8e6c(&mut env, __out) {
-        ::core::result::Result::Ok(__w) => __w,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+    #[allow(non_upper_case_globals)]
+    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __CB_FQN: &str = "io/zenoh/jni/config/ZenohIdFolderRaw";
+    const __CB_DESCR: &str = "(Ljava/lang/Object;[B)Ljava/lang/Object;";
+    let __vec = zenoh_flat::session_get_peers_zid(&session);
+    let mut __acc = __acc;
+    for __elem in __vec.into_iter() {
+        let __enc = match ZenohId_to_JByteArray_2caee6f1(&mut env, __elem) {
+            ::core::result::Result::Ok(__w) => __w,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        let __obj: jni::objects::JObject = __enc.into();
+        __acc = match __CB_MID
+            .call_object(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            jni::objects::JObject::null().into()
-        }
+                __CB_FQN,
+                "run",
+                __CB_DESCR,
+                &__fold,
+                &[
+                    jni::sys::jvalue {
+                        l: __acc.as_raw(),
+                    },
+                    jni::sys::jvalue {
+                        l: __obj.as_raw(),
+                    },
+                ],
+            )
+        {
+            ::core::result::Result::Ok(__o) => __o,
+            ::core::result::Result::Err(__e) => {
+                let _ = env.exception_describe();
+                let __e2 = <__JniErr as ::core::convert::From<
+                    String,
+                >>::from(__e.to_string());
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e2.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
     }
+    __acc
 }
 #[no_mangle]
 #[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
@@ -15093,6 +15409,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
     session: jni::sys::jlong,
+    __acc: jni::objects::JObject<'a>,
+    __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
     #[allow(unused_variables)]
@@ -15119,23 +15437,68 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __out = zenoh_flat::session_get_routers_zid(&session);
-    match Vec_ZenohId_to_JObject_cd7f8e6c(&mut env, __out) {
-        ::core::result::Result::Ok(__w) => __w,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+    #[allow(non_upper_case_globals)]
+    static __CB_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __CB_FQN: &str = "io/zenoh/jni/config/ZenohIdFolderRaw";
+    const __CB_DESCR: &str = "(Ljava/lang/Object;[B)Ljava/lang/Object;";
+    let __vec = zenoh_flat::session_get_routers_zid(&session);
+    let mut __acc = __acc;
+    for __elem in __vec.into_iter() {
+        let __enc = match ZenohId_to_JByteArray_2caee6f1(&mut env, __elem) {
+            ::core::result::Result::Ok(__w) => __w,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
+        let __obj: jni::objects::JObject = __enc.into();
+        __acc = match __CB_MID
+            .call_object(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            jni::objects::JObject::null().into()
-        }
+                __CB_FQN,
+                "run",
+                __CB_DESCR,
+                &__fold,
+                &[
+                    jni::sys::jvalue {
+                        l: __acc.as_raw(),
+                    },
+                    jni::sys::jvalue {
+                        l: __obj.as_raw(),
+                    },
+                ],
+            )
+        {
+            ::core::result::Result::Ok(__o) => __o,
+            ::core::result::Result::Err(__e) => {
+                let _ = env.exception_describe();
+                let __e2 = <__JniErr as ::core::convert::From<
+                    String,
+                >>::from(__e.to_string());
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e2.to_string()),
+                    &__zd,
+                );
+                return jni::objects::JObject::null().into();
+            }
+        };
     }
+    __acc
 }
 #[no_mangle]
 #[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
@@ -15200,11 +15563,15 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     encoding_present: jni::sys::jboolean,
     encoding_id: jni::sys::jint,
     encoding_schema: jni::objects::JString<'a>,
-    congestion_control: jni::objects::JObject<'a>,
-    priority: jni::objects::JObject<'a>,
-    express: jni::objects::JObject<'a>,
+    congestion_control_present: jni::sys::jboolean,
+    congestion_control_value: jni::sys::jint,
+    priority_present: jni::sys::jboolean,
+    priority_value: jni::sys::jint,
+    express_present: jni::sys::jboolean,
+    express_value: jni::sys::jboolean,
     attachment: jni::objects::JByteArray<'a>,
-    reliability: jni::objects::JObject<'a>,
+    reliability_present: jni::sys::jboolean,
+    reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -15459,56 +15826,71 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             return ();
         }
     };
-    let congestion_control = match JObject_to_Option_CongestionControl_7053bb49(
-        &mut env,
-        &congestion_control,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let congestion_control = if congestion_control_present != 0u8 {
+        let __congestion_control_val = match jint_to_CongestionControl_62e38379(
+            &mut env,
+            &congestion_control_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__congestion_control_val)
+    } else {
+        ::core::option::Option::None
     };
-    let priority = match JObject_to_Option_Priority_ad5cbb32(&mut env, &priority) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let priority = if priority_present != 0u8 {
+        let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__priority_val)
+    } else {
+        ::core::option::Option::None
     };
-    let express = match JObject_to_Option_bool_5c82fffd(&mut env, &express) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let express = if express_present != 0u8 {
+        let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__express_val)
+    } else {
+        ::core::option::Option::None
     };
     let __exp_attachment = match JByteArray_to_Option_Vec_u8_6f4428ab(
         &mut env,
@@ -15556,24 +15938,29 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             return ();
         }
     };
-    let reliability = match JObject_to_Option_Reliability_60b5e063(
-        &mut env,
-        &reliability,
-    ) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let reliability = if reliability_present != 0u8 {
+        let __reliability_val = match jint_to_Reliability_5d4a96c8(
+            &mut env,
+            &reliability_value,
+        ) {
+            ::core::result::Result::Ok(__v) => __v,
+            ::core::result::Result::Err(__e) => {
+                let __zd = __ze_defaults(&mut env);
+                signal_error(
+                    &mut env,
+                    &__error_sink,
+                    &__SINK_MID,
+                    __SINK_FQN,
+                    __SINK_DESCR,
+                    ::core::option::Option::Some(&__e.to_string()),
+                    &__zd,
+                );
+                return ();
+            }
+        };
+        ::core::option::Option::Some(__reliability_val)
+    } else {
+        ::core::option::Option::None
     };
     let __out = match zenoh_flat::session_put(
         &session,

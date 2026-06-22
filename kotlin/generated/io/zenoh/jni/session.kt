@@ -8,6 +8,7 @@ import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
 import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.ZenohId
+import io.zenoh.jni.config.__ZenohIdFolderRawHolder
 import io.zenoh.jni.errors.ErrorHandler
 import io.zenoh.jni.errors.ErrorHandlerCapture
 import io.zenoh.jni.keyexpr.KeyExpr
@@ -110,10 +111,14 @@ public fun sessionDeclarePublisher(
                         keyExprSel,
                         keyExpr0,
                         keyExpr1_ptr,
-                        congestionControl?.value,
-                        priority?.value,
-                        express,
-                        reliability?.value,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        reliability != null,
+                        reliability?.value ?: 0,
                         __cap,
                     ),
                 )
@@ -163,11 +168,15 @@ public fun sessionPut(
                 encodingPresent,
                 encodingId,
                 encodingSchema,
-                congestionControl?.value,
-                priority?.value,
-                express,
+                congestionControl != null,
+                congestionControl?.value ?: 0,
+                priority != null,
+                priority?.value ?: 0,
+                express != null,
+                express ?: false,
                 attachment,
-                reliability?.value,
+                reliability != null,
+                reliability?.value ?: 0,
                 __cap,
             )
         }
@@ -204,11 +213,15 @@ public fun sessionDelete(
                 keyExprSel,
                 keyExpr0,
                 keyExpr1_ptr,
-                congestionControl?.value,
-                priority?.value,
-                express,
+                congestionControl != null,
+                congestionControl?.value ?: 0,
+                priority != null,
+                priority?.value ?: 0,
+                express != null,
+                express ?: false,
                 attachment,
-                reliability?.value,
+                reliability != null,
+                reliability?.value ?: 0,
                 __cap,
             )
         }
@@ -293,13 +306,20 @@ public fun sessionDeclareQuerier(
                         keyExprSel,
                         keyExpr0,
                         keyExpr1_ptr,
-                        target?.value,
-                        consolidation?.value,
-                        congestionControl?.value,
-                        priority?.value,
-                        express,
-                        timeoutMs,
-                        acceptReplies?.value,
+                        target != null,
+                        target?.value ?: 0,
+                        consolidation != null,
+                        consolidation?.value ?: 0,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        timeoutMs != null,
+                        timeoutMs ?: 0L,
+                        acceptReplies != null,
+                        acceptReplies?.value ?: 0,
                         __cap,
                     ),
                 )
@@ -342,7 +362,8 @@ public fun sessionDeclareQueryable(
                         keyExprSel,
                         keyExpr0,
                         keyExpr1_ptr,
-                        complete,
+                        complete != null,
+                        complete ?: false,
                         callback.asRaw(),
                         onClose,
                         __cap,
@@ -428,13 +449,20 @@ public fun sessionGet(
                 keyExpr0,
                 keyExpr1_ptr,
                 parameters,
-                timeoutMs,
-                target?.value,
-                consolidation?.value,
-                acceptReplies?.value,
-                congestionControl?.value,
-                priority?.value,
-                express,
+                timeoutMs != null,
+                timeoutMs ?: 0L,
+                target != null,
+                target?.value ?: 0,
+                consolidation != null,
+                consolidation?.value ?: 0,
+                acceptReplies != null,
+                acceptReplies?.value ?: 0,
+                congestionControl != null,
+                congestionControl?.value ?: 0,
+                priority != null,
+                priority?.value ?: 0,
+                express != null,
+                express ?: false,
                 payload,
                 encodingPresent,
                 encodingId,
@@ -457,7 +485,7 @@ public fun sessionGetPeersZid(
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        JNINative.sessionGetPeersZid(session_ptr, __cap).map { ZenohId(it) }
+        (JNINative.sessionGetPeersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
@@ -471,7 +499,7 @@ public fun sessionGetRoutersZid(
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        JNINative.sessionGetRoutersZid(session_ptr, __cap).map { ZenohId(it) }
+        (JNINative.sessionGetRoutersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret

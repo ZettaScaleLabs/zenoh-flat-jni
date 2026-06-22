@@ -365,7 +365,7 @@ public fun <R> sampleNewPut(
         withSortedHandleLocks(__locks) {
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, congestionControl?.value, priority?.value, express, reliability?.value, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
                 keyExpr1?.let { it.ptr = 0L }
             }
@@ -399,7 +399,7 @@ public fun <R> sampleNewDelete(
         withSortedHandleLocks(__locks) {
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64, attachment, congestionControl?.value, priority?.value, express, reliability?.value, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
                 keyExpr1?.let { it.ptr = 0L }
             }

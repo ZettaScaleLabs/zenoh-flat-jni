@@ -80,6 +80,16 @@ public fun interface VoidCallback {
     public fun run()
 }
 
+public fun interface StringFolder<A> {
+    public fun run(acc: A, element: String): A
+}
+
+internal object __StringFolderHolder {
+    @JvmField
+    val instance: StringFolder<ArrayList<String>> =
+    StringFolder { acc, element -> acc.add(element); acc }
+}
+
 public fun interface JniErrorHandler<out R> {
     public fun run(je: String?): R
 }
@@ -177,7 +187,7 @@ internal object JNINative {
     ): Long
     external fun encodingToString(e: Long, errorSink: Any): String
     external fun errorGetMessage(e: Long, errorSink: Any): String
-    external fun helloGetLocators(h: Long, errorSink: Any): List<String>
+    external fun helloGetLocators(h: Long, acc: Any?, fold: Any, errorSink: Any): Any?
     external fun helloGetWhatami(h: Long, errorSink: Any): Int
     external fun helloGetZid(h: Long, errorSink: Any): ByteArray
     external fun initAndroidLogs(filter: String, errorSink: Any)
@@ -259,9 +269,11 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        express: Boolean?,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         errorSink: Any,
     )
     external fun queryReplyError(
@@ -282,9 +294,11 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        express: Boolean?,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         errorSink: Any,
     )
     external fun replyErrorGetEncoding(e: Long, errorSink: Any): Long
@@ -311,12 +325,17 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         build: Any,
         errorSink: Any,
     ): Any?
@@ -328,12 +347,17 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         build: Any,
         errorSink: Any,
     ): Any?
@@ -350,10 +374,14 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     ): Long
     external fun sessionDeclareQuerier(
@@ -361,13 +389,20 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        target: Int?,
-        consolidation: Int?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        timeoutMs: Long?,
-        acceptReplies: Int?,
+        targetPresent: Boolean,
+        targetValue: Int,
+        consolidationPresent: Boolean,
+        consolidationValue: Int,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        timeoutMsPresent: Boolean,
+        timeoutMsValue: Long,
+        acceptRepliesPresent: Boolean,
+        acceptRepliesValue: Int,
         errorSink: Any,
     ): Long
     external fun sessionDeclareQueryable(
@@ -375,7 +410,8 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        complete: Boolean?,
+        completePresent: Boolean,
+        completeValue: Boolean,
         callback: Any,
         onClose: Any,
         errorSink: Any,
@@ -394,11 +430,15 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         attachment: ByteArray?,
-        reliability: Int?,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     )
     external fun sessionGet(
@@ -407,13 +447,20 @@ internal object JNINative {
         keyExpr0: String?,
         keyExpr1: Long,
         parameters: String?,
-        timeoutMs: Long?,
-        target: Int?,
-        consolidation: Int?,
-        acceptReplies: Int?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        timeoutMsPresent: Boolean,
+        timeoutMsValue: Long,
+        targetPresent: Boolean,
+        targetValue: Int,
+        consolidationPresent: Boolean,
+        consolidationValue: Int,
+        acceptRepliesPresent: Boolean,
+        acceptRepliesValue: Int,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         payload: ByteArray?,
         encodingPresent: Boolean,
         encodingId: Int,
@@ -423,8 +470,8 @@ internal object JNINative {
         onClose: Any,
         errorSink: Any,
     )
-    external fun sessionGetPeersZid(session: Long, errorSink: Any): List<ByteArray>
-    external fun sessionGetRoutersZid(session: Long, errorSink: Any): List<ByteArray>
+    external fun sessionGetPeersZid(session: Long, acc: Any?, fold: Any, errorSink: Any): Any?
+    external fun sessionGetRoutersZid(session: Long, acc: Any?, fold: Any, errorSink: Any): Any?
     external fun sessionGetZid(session: Long, errorSink: Any): ByteArray
     external fun sessionPut(
         session: Long,
@@ -435,11 +482,15 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         attachment: ByteArray?,
-        reliability: Int?,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     )
     external fun sessionUndeclareKeyexpr(session: Long, keyExpr: Long, errorSink: Any)

@@ -123,6 +123,30 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
+public fun interface ZenohIdFolder<A> {
+    public fun run(acc: A, element: ZenohId): A
+}
+
+public fun interface ZenohIdFolderRaw<A> {
+    public fun run(acc: A, element: ByteArray): A
+}
+
+public fun <A> ZenohIdFolder<A>.asRaw(): ZenohIdFolderRaw<A> =
+    ZenohIdFolderRaw<A> {
+        acc,
+        element ->
+        run(
+            acc,
+            ZenohId(element)
+        )
+    }
+
+internal object __ZenohIdFolderRawHolder {
+    @JvmField
+    val instance: ZenohIdFolderRaw<ArrayList<ZenohId>> =
+    ZenohIdFolderRaw { acc, element -> acc.add(ZenohId(element)); acc }
+}
+
 public fun configInsertJson5(c: Config, key: String, value: String, onError: ErrorHandler<Unit>) {
     if (c.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     val __cap = ErrorHandlerCapture.acquire()

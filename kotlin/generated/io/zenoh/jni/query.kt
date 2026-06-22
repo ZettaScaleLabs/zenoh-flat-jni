@@ -525,9 +525,11 @@ public fun queryReplySuccess(
                 encodingPresent,
                 encodingId,
                 encodingSchema,
-                timestampNtp64,
+                timestampNtp64 != null,
+                timestampNtp64 ?: 0L,
                 attachment,
-                express,
+                express != null,
+                express ?: false,
                 __cap,
             )
         }
@@ -586,9 +588,11 @@ public fun queryReplyDelete(
                 keyExprSel,
                 keyExpr0,
                 keyExpr1_ptr,
-                timestampNtp64,
+                timestampNtp64 != null,
+                timestampNtp64 ?: 0L,
                 attachment,
-                express,
+                express != null,
+                express ?: false,
                 __cap,
             )
         }
