@@ -600,29 +600,17 @@ public fun queryReplyDelete(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-public fun queryReplySample(
-    query: Query,
-    sampleSel: Int,
-    sample0: Sample?,
-    onError: ErrorHandler<Unit>,
-) {
+public fun queryReplySample(query: Query, sample: Sample, onError: ErrorHandler<Unit>) {
     if (query.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
-    if (sample0 != null && sample0.ptr == 0L) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
+    if (sample.ptr == 0L) { onError.run("Operation on a closed native handle.", ""); return }
     val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(query)
-        sample0?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val query_ptr = query.ptr
-            val sample0_ptr = sample0?.ptr ?: 0L
-            try {
-                JNINative.queryReplySample(query_ptr, sampleSel, sample0_ptr, __cap)
-            } finally {
-                sample0?.let { it.ptr = 0L }
-            }
+    withSortedHandleLocks(query, sample) {
+        val query_ptr = query.ptr
+        val sample_ptr = sample.ptr
+        try {
+            JNINative.queryReplySample(query_ptr, sample_ptr, __cap)
+        } finally {
+            sample.ptr = 0L
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)

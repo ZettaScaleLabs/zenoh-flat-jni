@@ -2811,19 +2811,6 @@ pub(crate) unsafe fn jlong_to_Option_KeyExpr_f7eec5be<'env, 'v>(
     })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
-pub(crate) unsafe fn jlong_to_Option_Sample_f6c35acc<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::sys::jlong,
-) -> ::core::result::Result<Option<zenoh_flat::Sample>, __JniErr> {
-    Ok({
-        if *v == 0 {
-            None
-        } else {
-            Some(*std::boxed::Box::from_raw(*v as *mut zenoh_flat::Sample))
-        }
-    })
-}
-#[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
 pub(crate) unsafe fn jlong_to_Option_ZBytes_e82c3945<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
@@ -9776,8 +9763,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
     query: jni::sys::jlong,
-    sample_sel: jni::sys::jint,
-    sample_0: jni::sys::jlong,
+    sample: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -9807,76 +9793,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
             return ();
         }
     };
-    let __exp_sample_sel = match jint_to_i32_a3e3b6ef(&mut env, &sample_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
+    let sample: zenoh_flat::Sample = unsafe {
+        *std::boxed::Box::from_raw(sample as *mut zenoh_flat::Sample)
     };
-    let __exp_sample_0 = match jlong_to_Option_Sample_f6c35acc(&mut env, &sample_0) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __folded_sample = match {
-        match __exp_sample_sel {
-            0i32 => {
-                match __exp_sample_0 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from("identity variant value missing"),
-                        )
-                    }
-                }
-            }
-            __sel => {
-                ::core::result::Result::Err(
-                    ::std::format!("invalid constructor selector: {}", __sel),
-                )
-            }
-        }
-    } {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __je = <__JniErr as ::core::convert::From<
-                ::std::string::String,
-            >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __out = match zenoh_flat::query_reply_sample(&query, __folded_sample) {
+    let __out = match zenoh_flat::query_reply_sample(&query, sample) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__de) => {
             let __eze0: jni::objects::JObject = {

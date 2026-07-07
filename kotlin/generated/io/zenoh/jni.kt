@@ -284,7 +284,7 @@ internal object JNINative {
         encodingSchema: String?,
         errorSink: Any,
     )
-    external fun queryReplySample(query: Long, sampleSel: Int, sample0: Long, errorSink: Any)
+    external fun queryReplySample(query: Long, sample: Long, errorSink: Any)
     external fun queryReplySuccess(
         query: Long,
         keyExprSel: Int,

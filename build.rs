@@ -14,18 +14,18 @@
 //! Opaque handles stay typed Kotlin classes derived from `NativeHandle`
 //! (locked, closeable) via `.class(ptr_class!(T))`.
 //!
-//! A type's default flatten shape — its input (`.flatten_input(fun!(ctor))` /
-//! `.flatten_input_self()`) and output (`.flatten_output(fun!(acc).name(..))` /
-//! `.flatten_output_self()`) — is declared once on the `ptr_class!` decl and
+//! A type's default boundary shape — its param variants (`.default_param_expand(fun!(ctor))` /
+//! `.default_param_expand_self()`) and output (`.default_return_expand(fun!(acc).name(..))` /
+//! `.default_return_expand_self()`) — is declared once on the `ptr_class!` decl and
 //! AUTO-APPLIES to every matching param / return. Class members are declared
 //! with `.fun(fun!(f).name(..))` (instance methods) and
 //! `.constructor(fun!(f).name(..))` (companion factories), and the per-fn
-//! `.flatten_input_suppress` / `.flatten_output_suppress` modifiers (chained
+//! identity-only `.param_expand_self(param)` / `.return_expand_self()` overrides (chained
 //! on the `fun!` decl) opt out.
 //!
 //! Errors are delivered through the per-call `onError` callback (no Rust-side
 //! JVM throw): `Error` (zenoh's native error) is the `E` of every fallible
-//! `Result<_, Error>`, and its default output flatten (`error_get_message ->
+//! `Result<_, Error>`, and its default return field (`error_get_message ->
 //! String`) auto-applies to the `E` position so `onError` receives the message.
 //!
 //! Names mirror zenoh-flat's de-prefixed Rust identifiers one-to-one
@@ -80,21 +80,21 @@ fn main() {
         .fun(fun!(encoding_get_schema).name("getSchema"))
         .fun(fun!(encoding_to_string).name("toStr"))
         // Whole-handle clone return — see KeyExpr's `newClone`.
-        .fun(fun!(encoding_new_clone).name("newClone").flatten_output_suppress())
+        .fun(fun!(encoding_new_clone).name("newClone").return_expand_self())
         // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
         // Encoding — a companion factory returning a raw handle (a constructor
-        // never output-flattens, so the result stays a usable handle rather than
+        // never return-field-decomposes, so the result stays a usable handle rather than
         // a decomposed builder).
         .constructor(fun!(encoding_new_with_schema).name("withSchema"))
         // Factories → companion members; `fromId` is also the input variant.
         .constructor(fun!(encoding_new_from_id).name("fromId"))
         .constructor(fun!(encoding_new_from_string).name("fromString"))
-        // Input flatten: encoding params cross as the decomposed value
-        // `(id, schema?)` (built via `fromId`). Output flatten: the handle +
+        // Default param variant: encoding params cross as the decomposed value
+        // `(id, schema?)` (built via `fromId`). Default return fields: the handle +
         // its id (both free jvalue slots); schema/string stay accessors.
-        .flatten_input(fun!(encoding_new_from_id))
-        .flatten_output_self()
-        .flatten_output(fun!(encoding_get_id).name("id"));
+        .default_param_expand(fun!(encoding_new_from_id))
+        .default_return_expand_self()
+        .default_return_expand(fun!(encoding_get_id).name("id"));
 
     // Predefined encoding constants — each is a nullary `() -> &'static Encoding`
     // factory, declared as a companion `.constructor` of `Encoding` so they
@@ -181,7 +181,7 @@ fn main() {
         package!("errors").class(
             ptr_class!(Error)
                 .fun(fun!(error_get_message).name("message"))
-                .flatten_output(fun!(error_get_message).name("message")),
+                .default_return_expand(fun!(error_get_message).name("message")),
         ),
     )
     // ── Key expressions ──────────────────────────────────────────────
@@ -195,11 +195,11 @@ fn main() {
                 ptr_class!(KeyExpr)
                     // Read accessors → instance methods on the KeyExpr class.
                     // `newClone` returns the borrowed clone as a WHOLE handle —
-                    // suppress the class's default output flatten (identity via
+                    // override the class's default return fields (identity via
                     // the owned converter) so the borrowed-opaque clone path
                     // applies instead.
                     .fun(fun!(keyexpr_get_str).name("getStr"))
-                    .fun(fun!(keyexpr_new_clone).name("newClone").flatten_output_suppress())
+                    .fun(fun!(keyexpr_new_clone).name("newClone").return_expand_self())
                     .fun(fun!(keyexpr_to_string).name("toStr"))
                     // Constructors → companion factories returning `Result<KeyExpr, Error>`;
                     // `tryFrom` is also the build-from-String input variant.
@@ -207,14 +207,14 @@ fn main() {
                     .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
                     .constructor(fun!(keyexpr_new_join).name("join"))
                     .constructor(fun!(keyexpr_new_concat).name("concat"))
-                    // Input flatten: a key-expr param accepts EITHER a String (built
-                    // via `tryFrom`) OR an existing handle (self). Output flatten: the
+                    // Default param variants: a key-expr param accepts EITHER a String (built
+                    // via `tryFrom`) OR an existing handle (self). Default return field: the
                     // handle only (the string form stays the `getStr` accessor method).
-                    .flatten_input(fun!(keyexpr_new_try_from))
-                    .flatten_input_self()
-                    .flatten_output_self()
+                    .default_param_expand(fun!(keyexpr_new_try_from))
+                    .default_param_expand_self()
+                    .default_return_expand_self()
                     // Consumer methods: the receiver key-expr is `this`; the other
-                    // param accepts a String (built via the input flatten above).
+                    // param accepts a String (built via the default param variants above).
                     .fun(fun!(keyexpr_intersects).name("intersects"))
                     .fun(fun!(keyexpr_includes).name("includes"))
                     .fun(fun!(keyexpr_relation_to).name("relationTo")),
@@ -259,9 +259,9 @@ fn main() {
                     .fun(fun!(hello_get_whatami).name("whatami")) // WhatAmI enum -> Int
                     .fun(fun!(hello_get_zid).name("zid")) // ZenohId value class -> ByteArray
                     .fun(fun!(hello_get_locators).name("locators")) // Vec<String> -> List<String>
-                    .flatten_output(fun!(hello_get_whatami).name("whatami"))
-                    .flatten_output(fun!(hello_get_zid).name("zid"))
-                    .flatten_output(fun!(hello_get_locators).name("locators")),
+                    .default_return_expand(fun!(hello_get_whatami).name("whatami"))
+                    .default_return_expand(fun!(hello_get_zid).name("zid"))
+                    .default_return_expand(fun!(hello_get_locators).name("locators")),
             )
             .class(ptr_class!(Scout))
             .fun(fun!(scout)),
@@ -291,14 +291,14 @@ fn main() {
                 ptr_class!(ZBytes)
                     .fun(fun!(zbytes_as_bytes).name("asBytes"))
                     // Whole-handle clone return — see KeyExpr's `newClone`.
-                    .fun(fun!(zbytes_new_clone).name("newClone").flatten_output_suppress())
+                    .fun(fun!(zbytes_new_clone).name("newClone").return_expand_self())
                     // `fromVec` builds a ZBytes from a `ByteArray` — both the
-                    // input-flatten build variant AND a companion factory (a
-                    // constructor never output-flattens, so the factory keeps its
+                    // param-variant build arm AND a companion factory (a
+                    // constructor never return-field-decomposes, so the factory keeps its
                     // raw-handle return).
                     .constructor(fun!(zbytes_new_from_vec).name("fromVec"))
-                    .flatten_input(fun!(zbytes_new_from_vec))
-                    .flatten_output_self(),
+                    .default_param_expand(fun!(zbytes_new_from_vec))
+                    .default_return_expand_self(),
             )
             .class(encoding),
     )
@@ -310,7 +310,7 @@ fn main() {
             ptr_class!(Timestamp)
                 .fun(fun!(timestamp_get_ntp64).name("ntp64"))
                 .fun(fun!(timestamp_get_id).name("getId"))
-                .flatten_output(fun!(timestamp_get_ntp64).name("ntp64")),
+                .default_return_expand(fun!(timestamp_get_ntp64).name("ntp64")),
         ),
     )
     // ── Sample ────────────────────────────────────────────────────────
@@ -345,20 +345,20 @@ fn main() {
                     .fun(fun!(sample_get_source_zid).name("sourceZid"))
                     .fun(fun!(sample_get_source_eid).name("sourceEid"))
                     .fun(fun!(sample_get_source_sn).name("sourceSn"))
-                    .flatten_input_self()
-                    .flatten_output(fun!(sample_get_key_expr).name("keyExpr"))
-                    .flatten_output(fun!(sample_get_payload).name("payload"))
-                    .flatten_output(fun!(sample_get_encoding).name("encoding"))
-                    .flatten_output(fun!(sample_get_kind).name("kind"))
-                    .flatten_output(fun!(sample_get_timestamp).name("timestamp"))
-                    .flatten_output(fun!(sample_get_express).name("express"))
-                    .flatten_output(fun!(sample_get_priority).name("priority"))
-                    .flatten_output(fun!(sample_get_congestion_control).name("congestionControl"))
-                    .flatten_output(fun!(sample_get_attachment).name("attachment"))
-                    .flatten_output(fun!(sample_get_reliability).name("reliability"))
-                    .flatten_output(fun!(sample_get_source_zid).name("sourceZid"))
-                    .flatten_output(fun!(sample_get_source_eid).name("sourceEid"))
-                    .flatten_output(fun!(sample_get_source_sn).name("sourceSn")),
+                    .default_param_expand_self()
+                    .default_return_expand(fun!(sample_get_key_expr).name("keyExpr"))
+                    .default_return_expand(fun!(sample_get_payload).name("payload"))
+                    .default_return_expand(fun!(sample_get_encoding).name("encoding"))
+                    .default_return_expand(fun!(sample_get_kind).name("kind"))
+                    .default_return_expand(fun!(sample_get_timestamp).name("timestamp"))
+                    .default_return_expand(fun!(sample_get_express).name("express"))
+                    .default_return_expand(fun!(sample_get_priority).name("priority"))
+                    .default_return_expand(fun!(sample_get_congestion_control).name("congestionControl"))
+                    .default_return_expand(fun!(sample_get_attachment).name("attachment"))
+                    .default_return_expand(fun!(sample_get_reliability).name("reliability"))
+                    .default_return_expand(fun!(sample_get_source_zid).name("sourceZid"))
+                    .default_return_expand(fun!(sample_get_source_eid).name("sourceEid"))
+                    .default_return_expand(fun!(sample_get_source_sn).name("sourceSn")),
             )
             // Standalone sample constructors (callable from Kotlin); consumed by handle.
             .fun(fun!(sample_new_put))
@@ -389,7 +389,7 @@ fn main() {
             // (`query_reply_*`) after the callback returns; a query must outlive
             // its callback to be answered.
             //
-            // ORDER MATTERS: `.flatten_output_self()` MUST be LAST. The root
+            // ORDER MATTERS: `.default_return_expand_self()` MUST be LAST. The root
             // identity moves the owned query while the nested KeyExpr identity
             // (from `query_get_keyexpr`) clones from a borrow of the same query;
             // identity leaves are emitted in declaration order, so the root move
@@ -402,13 +402,13 @@ fn main() {
                     .fun(fun!(query_get_encoding).name("encoding"))
                     .fun(fun!(query_get_attachment).name("attachment"))
                     .fun(fun!(query_get_accepts_replies).name("acceptsReplies"))
-                    .flatten_output(fun!(query_get_keyexpr).name("keyExpr"))
-                    .flatten_output(fun!(query_get_parameters).name("parameters"))
-                    .flatten_output(fun!(query_get_payload).name("payload"))
-                    .flatten_output(fun!(query_get_encoding).name("encoding"))
-                    .flatten_output(fun!(query_get_attachment).name("attachment"))
-                    .flatten_output(fun!(query_get_accepts_replies).name("acceptsReplies"))
-                    .flatten_output_self(),
+                    .default_return_expand(fun!(query_get_keyexpr).name("keyExpr"))
+                    .default_return_expand(fun!(query_get_parameters).name("parameters"))
+                    .default_return_expand(fun!(query_get_payload).name("payload"))
+                    .default_return_expand(fun!(query_get_encoding).name("encoding"))
+                    .default_return_expand(fun!(query_get_attachment).name("attachment"))
+                    .default_return_expand(fun!(query_get_accepts_replies).name("acceptsReplies"))
+                    .default_return_expand_self(),
             )
             // Reply ops on the owned/borrowed query handle.
             .fun(fun!(query_reply_success))
@@ -424,8 +424,8 @@ fn main() {
                 ptr_class!(ReplyError)
                     .fun(fun!(reply_error_get_payload).name("payload"))
                     .fun(fun!(reply_error_get_encoding).name("encoding"))
-                    .flatten_output(fun!(reply_error_get_payload).name("payload"))
-                    .flatten_output(fun!(reply_error_get_encoding).name("encoding")),
+                    .default_return_expand(fun!(reply_error_get_payload).name("payload"))
+                    .default_return_expand(fun!(reply_error_get_encoding).name("encoding")),
             )
             // Reply canonical output: the whole reply decomposed in ONE crossing
             // (PRODUCT model — both arms' leaves always present, the not-taken
@@ -443,11 +443,11 @@ fn main() {
                     .fun(fun!(reply_is_ok).name("isOk"))
                     .fun(fun!(reply_get_sample).name("sample"))
                     .fun(fun!(reply_get_err).name("err"))
-                    .flatten_output(fun!(reply_get_replier_zid).name("replierZid"))
-                    .flatten_output(fun!(reply_get_replier_eid).name("replierEid"))
-                    .flatten_output(fun!(reply_is_ok).name("isOk"))
-                    .flatten_output(fun!(reply_get_sample).name("sample"))
-                    .flatten_output(fun!(reply_get_err).name("err")),
+                    .default_return_expand(fun!(reply_get_replier_zid).name("replierZid"))
+                    .default_return_expand(fun!(reply_get_replier_eid).name("replierEid"))
+                    .default_return_expand(fun!(reply_is_ok).name("isOk"))
+                    .default_return_expand(fun!(reply_get_sample).name("sample"))
+                    .default_return_expand(fun!(reply_get_err).name("err")),
             ),
     )
     // ── Liveliness + Session ──────────────────────────────────────────
@@ -467,8 +467,8 @@ fn main() {
             .fun(fun!(session_declare_queryable))
             .fun(fun!(session_declare_keyexpr))
             // Undeclaring needs the declared handle, not a string — opt its
-            // key_expr param out of the (String-building) input flatten.
-            .fun(fun!(session_undeclare_keyexpr).flatten_input_suppress(pq!(key_expr)))
+            // key_expr param out of the (String-building) default param variants.
+            .fun(fun!(session_undeclare_keyexpr).param_expand_self(pq!(key_expr)))
             .fun(fun!(session_get))
             // `Vec<ZenohId>`: ZenohId is a value class, so these return
             // `List<ZenohId>` via the normal Vec converter.
