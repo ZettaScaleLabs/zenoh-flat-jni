@@ -93,7 +93,9 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetTimestamp(this_ptr, __cap).let { if (it == 0L) null else Timestamp(it) }
+            JNINative.sampleGetTimestamp(this_ptr, __cap).let {
+                if (it == 0L) null else Timestamp(it)
+            }
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -137,7 +139,9 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetAttachment(this_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
+            JNINative.sampleGetAttachment(this_ptr, __cap).let {
+                if (it == 0L) null else ZBytes(it)
+            }
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret

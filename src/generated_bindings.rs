@@ -2533,9 +2533,9 @@ pub(crate) unsafe fn jint_to_CongestionControl_62e38379<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::CongestionControl, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => CongestionControl::Drop,
-            1 => CongestionControl::Block,
-            2 => CongestionControl::BlockFirst,
+            0 => zenoh_flat::CongestionControl::Drop,
+            1 => zenoh_flat::CongestionControl::Block,
+            2 => zenoh_flat::CongestionControl::BlockFirst,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2557,10 +2557,10 @@ pub(crate) unsafe fn jint_to_ConsolidationMode_dd4eaedc<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::ConsolidationMode, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => ConsolidationMode::Auto,
-            1 => ConsolidationMode::None,
-            2 => ConsolidationMode::Monotonic,
-            3 => ConsolidationMode::Latest,
+            0 => zenoh_flat::ConsolidationMode::Auto,
+            1 => zenoh_flat::ConsolidationMode::None,
+            2 => zenoh_flat::ConsolidationMode::Monotonic,
+            3 => zenoh_flat::ConsolidationMode::Latest,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2582,13 +2582,13 @@ pub(crate) unsafe fn jint_to_Priority_447102d2<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::Priority, __JniErr> {
     Ok({
         match *v as i64 {
-            1 => Priority::RealTime,
-            2 => Priority::InteractiveHigh,
-            3 => Priority::InteractiveLow,
-            4 => Priority::DataHigh,
-            5 => Priority::Data,
-            6 => Priority::DataLow,
-            7 => Priority::Background,
+            1 => zenoh_flat::Priority::RealTime,
+            2 => zenoh_flat::Priority::InteractiveHigh,
+            3 => zenoh_flat::Priority::InteractiveLow,
+            4 => zenoh_flat::Priority::DataHigh,
+            5 => zenoh_flat::Priority::Data,
+            6 => zenoh_flat::Priority::DataLow,
+            7 => zenoh_flat::Priority::Background,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2606,9 +2606,9 @@ pub(crate) unsafe fn jint_to_QueryTarget_71d4db6a<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::QueryTarget, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => QueryTarget::BestMatching,
-            1 => QueryTarget::All,
-            2 => QueryTarget::AllComplete,
+            0 => zenoh_flat::QueryTarget::BestMatching,
+            1 => zenoh_flat::QueryTarget::All,
+            2 => zenoh_flat::QueryTarget::AllComplete,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2628,8 +2628,8 @@ pub(crate) unsafe fn jint_to_Reliability_5d4a96c8<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::Reliability, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => Reliability::BestEffort,
-            1 => Reliability::Reliable,
+            0 => zenoh_flat::Reliability::BestEffort,
+            1 => zenoh_flat::Reliability::Reliable,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2649,8 +2649,8 @@ pub(crate) unsafe fn jint_to_ReplyKeyExpr_0d9719f5<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::ReplyKeyExpr, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => ReplyKeyExpr::Any,
-            1 => ReplyKeyExpr::MatchingQuery,
+            0 => zenoh_flat::ReplyKeyExpr::Any,
+            1 => zenoh_flat::ReplyKeyExpr::MatchingQuery,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2670,8 +2670,8 @@ pub(crate) unsafe fn jint_to_SampleKind_d7ea75a8<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::SampleKind, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => SampleKind::Put,
-            1 => SampleKind::Delete,
+            0 => zenoh_flat::SampleKind::Put,
+            1 => zenoh_flat::SampleKind::Delete,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2689,10 +2689,10 @@ pub(crate) unsafe fn jint_to_SetIntersectionLevel_0e49fc84<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::SetIntersectionLevel, __JniErr> {
     Ok({
         match *v as i64 {
-            0 => SetIntersectionLevel::Disjoint,
-            1 => SetIntersectionLevel::Intersects,
-            2 => SetIntersectionLevel::Includes,
-            3 => SetIntersectionLevel::Equals,
+            0 => zenoh_flat::SetIntersectionLevel::Disjoint,
+            1 => zenoh_flat::SetIntersectionLevel::Intersects,
+            2 => zenoh_flat::SetIntersectionLevel::Includes,
+            3 => zenoh_flat::SetIntersectionLevel::Equals,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2714,9 +2714,9 @@ pub(crate) unsafe fn jint_to_WhatAmI_4c5d5738<'env, 'v>(
 ) -> ::core::result::Result<zenoh_flat::WhatAmI, __JniErr> {
     Ok({
         match *v as i64 {
-            1 => WhatAmI::Router,
-            2 => WhatAmI::Peer,
-            4 => WhatAmI::Client,
+            1 => zenoh_flat::WhatAmI::Router,
+            2 => zenoh_flat::WhatAmI::Peer,
+            4 => zenoh_flat::WhatAmI::Client,
             other => {
                 return ::core::result::Result::Err(
                     <__JniErr as ::core::convert::From<
@@ -2980,12 +2980,15 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
 ) -> jni::objects::JString<'a> {
     #[allow(unused_variables)]
     let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
+        ::std::vec![
+            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
+            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
+        ]
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -3018,24 +3021,48 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __out = zenoh_flat::config_get_json(&c, &key);
-    let __out_s0 = match Result_String_Error_to_String_1b7d13da(&mut env, __out) {
+    let __out = match zenoh_flat::config_get_json(&c, &key) {
         ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
+        ::core::result::Result::Err(__de) => {
+            let __eze0: jni::objects::JObject = {
+                let __enc0 = match String_to_JString_c7f3ca43(
+                    &mut env,
+                    zenoh_flat::error_get_message(&__de),
+                ) {
+                    ::core::result::Result::Ok(__w) => __w,
+                    ::core::result::Result::Err(__e) => {
+                        let __zd = __ze_defaults(&mut env);
+                        signal_error(
+                            &mut env,
+                            &__error_sink,
+                            &__SINK_MID,
+                            __SINK_FQN,
+                            __SINK_DESCR,
+                            ::core::option::Option::Some(&__e.to_string()),
+                            &__zd,
+                        );
+                        return jni::objects::JObject::null().into();
+                    }
+                };
+                __enc0.into()
+            };
             signal_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                ::core::option::Option::None,
+                &[
+                    jni::sys::jvalue {
+                        l: __eze0.as_raw(),
+                    },
+                ],
             );
             return jni::objects::JObject::null().into();
         }
     };
-    match String_to_JString_c7f3ca43(&mut env, __out_s0) {
+    match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);

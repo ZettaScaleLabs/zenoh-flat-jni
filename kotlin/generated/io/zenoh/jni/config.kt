@@ -60,14 +60,14 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         return Config(p)
     }
 
-    public fun getJson(key: String, onError: JniErrorHandler<String>): String {
-        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+    public fun getJson(key: String, onError: ErrorHandler<String>): String {
+        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.", "")
+        val __cap = ErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
             JNINative.configGetJson(this_ptr, key, __cap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
         return __ret
     }
 
