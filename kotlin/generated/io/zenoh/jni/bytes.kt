@@ -98,377 +98,6 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
             if (__cap.failed) return onError.run(__cap.je)
             return __ret
         }
-
-        public fun zenohBytes(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstZenohBytes(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun zenohString(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstZenohString(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun zenohSerialized(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstZenohSerialized(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationOctetStream(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationOctetStream(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textPlain(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextPlain(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJson(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJson(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textJson(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextJson(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationCdr(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationCdr(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationCbor(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationCbor(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationYaml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationYaml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textYaml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextYaml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textJson5(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextJson5(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationPythonSerializedObject(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationPythonSerializedObject(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationProtobuf(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationProtobuf(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJavaSerializedObject(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJavaSerializedObject(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationOpenmetricsText(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationOpenmetricsText(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun imagePng(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstImagePng(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun imageJpeg(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstImageJpeg(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun imageGif(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstImageGif(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun imageBmp(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstImageBmp(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun imageWebp(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstImageWebp(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationXml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationXml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationXWwwFormUrlencoded(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationXWwwFormUrlencoded(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textHtml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextHtml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textXml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextXml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textCss(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextCss(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textJavascript(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextJavascript(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textMarkdown(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextMarkdown(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun textCsv(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstTextCsv(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationSql(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationSql(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationCoapPayload(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationCoapPayload(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJsonPatchJson(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJsonPatchJson(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJsonSeq(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJsonSeq(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJsonpath(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJsonpath(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationJwt(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationJwt(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationMp4(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationMp4(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationSoapXml(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationSoapXml(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun applicationYang(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstApplicationYang(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun audioAac(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstAudioAac(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun audioFlac(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstAudioFlac(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun audioMp4(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstAudioMp4(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun audioOgg(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstAudioOgg(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun audioVorbis(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstAudioVorbis(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoH261(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoH261(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoH263(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoH263(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoH264(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoH264(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoH265(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoH265(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoH266(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoH266(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoMp4(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoMp4(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoOgg(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoOgg(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoRaw(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoRaw(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoVp8(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoVp8(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
-
-        public fun videoVp9(onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingConstVideoVp9(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
-            return __ret
-        }
     }
 }
 
@@ -524,3 +153,1067 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         }
     }
 }
+
+private fun constGetEncodingZenohBytes(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohBytes(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_zenoh_bytes ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_BYTES: String = constGetEncodingZenohBytes(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_BYTES: JNI getter failed") })
+
+private fun constGetEncodingZenohBytesId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohBytesId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_zenoh_bytes ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_BYTES_ID: Int = constGetEncodingZenohBytesId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_BYTES_ID: JNI getter failed") })
+
+private fun constGetEncodingZenohString(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohString(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_zenoh_string ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_STRING: String = constGetEncodingZenohString(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_STRING: JNI getter failed") })
+
+private fun constGetEncodingZenohStringId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohStringId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_zenoh_string ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_STRING_ID: Int = constGetEncodingZenohStringId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_STRING_ID: JNI getter failed") })
+
+private fun constGetEncodingZenohSerialized(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohSerialized(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_zenoh_serialized ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_SERIALIZED: String = constGetEncodingZenohSerialized(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_SERIALIZED: JNI getter failed") })
+
+private fun constGetEncodingZenohSerializedId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohSerializedId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_zenoh_serialized ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_ZENOH_SERIALIZED_ID: Int = constGetEncodingZenohSerializedId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_SERIALIZED_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationOctetStream(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOctetStream(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_octet_stream ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_OCTET_STREAM: String = constGetEncodingApplicationOctetStream(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OCTET_STREAM: JNI getter failed") })
+
+private fun constGetEncodingApplicationOctetStreamId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOctetStreamId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_octet_stream ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_OCTET_STREAM_ID: Int = constGetEncodingApplicationOctetStreamId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OCTET_STREAM_ID: JNI getter failed") })
+
+private fun constGetEncodingTextPlain(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextPlain(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_plain ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_PLAIN: String = constGetEncodingTextPlain(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_PLAIN: JNI getter failed") })
+
+private fun constGetEncodingTextPlainId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextPlainId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_plain ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_PLAIN_ID: Int = constGetEncodingTextPlainId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_PLAIN_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJson(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJson(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON: String = constGetEncodingApplicationJson(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON_ID: Int = constGetEncodingApplicationJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_ID: JNI getter failed") })
+
+private fun constGetEncodingTextJson(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JSON: String = constGetEncodingTextJson(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON: JNI getter failed") })
+
+private fun constGetEncodingTextJsonId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJsonId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JSON_ID: Int = constGetEncodingTextJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationCdr(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCdr(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_cdr ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_CDR: String = constGetEncodingApplicationCdr(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CDR: JNI getter failed") })
+
+private fun constGetEncodingApplicationCdrId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCdrId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_cdr ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_CDR_ID: Int = constGetEncodingApplicationCdrId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CDR_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationCbor(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCbor(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_cbor ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_CBOR: String = constGetEncodingApplicationCbor(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CBOR: JNI getter failed") })
+
+private fun constGetEncodingApplicationCborId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCborId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_cbor ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_CBOR_ID: Int = constGetEncodingApplicationCborId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CBOR_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationYaml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYaml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_yaml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_YAML: String = constGetEncodingApplicationYaml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YAML: JNI getter failed") })
+
+private fun constGetEncodingApplicationYamlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYamlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_yaml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_YAML_ID: Int = constGetEncodingApplicationYamlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YAML_ID: JNI getter failed") })
+
+private fun constGetEncodingTextYaml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextYaml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_yaml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_YAML: String = constGetEncodingTextYaml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_YAML: JNI getter failed") })
+
+private fun constGetEncodingTextYamlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextYamlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_yaml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_YAML_ID: Int = constGetEncodingTextYamlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_YAML_ID: JNI getter failed") })
+
+private fun constGetEncodingTextJson5(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson5(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_json5 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JSON5: String = constGetEncodingTextJson5(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON5: JNI getter failed") })
+
+private fun constGetEncodingTextJson5Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson5Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_json5 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JSON5_ID: Int = constGetEncodingTextJson5Id(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON5_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationPythonSerializedObject(
+    onError: JniErrorHandler<String>,
+): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObject(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_python_serialized_object ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT: String = constGetEncodingApplicationPythonSerializedObject(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT: JNI getter failed") })
+
+private fun constGetEncodingApplicationPythonSerializedObjectId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObjectId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_python_serialized_object ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT_ID: Int = constGetEncodingApplicationPythonSerializedObjectId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationProtobuf(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationProtobuf(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_protobuf ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_PROTOBUF: String = constGetEncodingApplicationProtobuf(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PROTOBUF: JNI getter failed") })
+
+private fun constGetEncodingApplicationProtobufId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationProtobufId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_protobuf ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_PROTOBUF_ID: Int = constGetEncodingApplicationProtobufId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PROTOBUF_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJavaSerializedObject(
+    onError: JniErrorHandler<String>,
+): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObject(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_java_serialized_object ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT: String = constGetEncodingApplicationJavaSerializedObject(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT: JNI getter failed") })
+
+private fun constGetEncodingApplicationJavaSerializedObjectId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObjectId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_java_serialized_object ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT_ID: Int = constGetEncodingApplicationJavaSerializedObjectId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationOpenmetricsText(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOpenmetricsText(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_openmetrics_text ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_OPENMETRICS_TEXT: String = constGetEncodingApplicationOpenmetricsText(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OPENMETRICS_TEXT: JNI getter failed") })
+
+private fun constGetEncodingApplicationOpenmetricsTextId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOpenmetricsTextId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_openmetrics_text ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_OPENMETRICS_TEXT_ID: Int = constGetEncodingApplicationOpenmetricsTextId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OPENMETRICS_TEXT_ID: JNI getter failed") })
+
+private fun constGetEncodingImagePng(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImagePng(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_image_png ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_PNG: String = constGetEncodingImagePng(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_PNG: JNI getter failed") })
+
+private fun constGetEncodingImagePngId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImagePngId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_image_png ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_PNG_ID: Int = constGetEncodingImagePngId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_PNG_ID: JNI getter failed") })
+
+private fun constGetEncodingImageJpeg(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageJpeg(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_image_jpeg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_JPEG: String = constGetEncodingImageJpeg(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_JPEG: JNI getter failed") })
+
+private fun constGetEncodingImageJpegId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageJpegId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_image_jpeg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_JPEG_ID: Int = constGetEncodingImageJpegId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_JPEG_ID: JNI getter failed") })
+
+private fun constGetEncodingImageGif(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageGif(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_image_gif ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_GIF: String = constGetEncodingImageGif(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_GIF: JNI getter failed") })
+
+private fun constGetEncodingImageGifId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageGifId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_image_gif ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_GIF_ID: Int = constGetEncodingImageGifId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_GIF_ID: JNI getter failed") })
+
+private fun constGetEncodingImageBmp(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageBmp(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_image_bmp ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_BMP: String = constGetEncodingImageBmp(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_BMP: JNI getter failed") })
+
+private fun constGetEncodingImageBmpId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageBmpId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_image_bmp ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_BMP_ID: Int = constGetEncodingImageBmpId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_BMP_ID: JNI getter failed") })
+
+private fun constGetEncodingImageWebp(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageWebp(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_image_webp ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_WEBP: String = constGetEncodingImageWebp(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_WEBP: JNI getter failed") })
+
+private fun constGetEncodingImageWebpId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageWebpId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_image_webp ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_IMAGE_WEBP_ID: Int = constGetEncodingImageWebpId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_WEBP_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationXml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_XML: String = constGetEncodingApplicationXml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_XML: JNI getter failed") })
+
+private fun constGetEncodingApplicationXmlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXmlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_XML_ID: Int = constGetEncodingApplicationXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_XML_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationXWwwFormUrlencoded(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencoded(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_x_www_form_urlencoded ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_X_WWW_FORM_URLENCODED: String = constGetEncodingApplicationXWwwFormUrlencoded(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_X_WWW_FORM_URLENCODED: JNI getter failed") })
+
+private fun constGetEncodingApplicationXWwwFormUrlencodedId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencodedId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_x_www_form_urlencoded ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_X_WWW_FORM_URLENCODED_ID: Int = constGetEncodingApplicationXWwwFormUrlencodedId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_X_WWW_FORM_URLENCODED_ID: JNI getter failed") })
+
+private fun constGetEncodingTextHtml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextHtml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_html ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_HTML: String = constGetEncodingTextHtml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_HTML: JNI getter failed") })
+
+private fun constGetEncodingTextHtmlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextHtmlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_html ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_HTML_ID: Int = constGetEncodingTextHtmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_HTML_ID: JNI getter failed") })
+
+private fun constGetEncodingTextXml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextXml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_XML: String = constGetEncodingTextXml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_XML: JNI getter failed") })
+
+private fun constGetEncodingTextXmlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextXmlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_XML_ID: Int = constGetEncodingTextXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_XML_ID: JNI getter failed") })
+
+private fun constGetEncodingTextCss(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCss(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_css ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_CSS: String = constGetEncodingTextCss(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSS: JNI getter failed") })
+
+private fun constGetEncodingTextCssId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCssId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_css ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_CSS_ID: Int = constGetEncodingTextCssId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSS_ID: JNI getter failed") })
+
+private fun constGetEncodingTextJavascript(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJavascript(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_javascript ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JAVASCRIPT: String = constGetEncodingTextJavascript(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JAVASCRIPT: JNI getter failed") })
+
+private fun constGetEncodingTextJavascriptId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJavascriptId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_javascript ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_JAVASCRIPT_ID: Int = constGetEncodingTextJavascriptId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JAVASCRIPT_ID: JNI getter failed") })
+
+private fun constGetEncodingTextMarkdown(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextMarkdown(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_markdown ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_MARKDOWN: String = constGetEncodingTextMarkdown(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_MARKDOWN: JNI getter failed") })
+
+private fun constGetEncodingTextMarkdownId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextMarkdownId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_markdown ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_MARKDOWN_ID: Int = constGetEncodingTextMarkdownId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_MARKDOWN_ID: JNI getter failed") })
+
+private fun constGetEncodingTextCsv(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCsv(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_text_csv ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_CSV: String = constGetEncodingTextCsv(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSV: JNI getter failed") })
+
+private fun constGetEncodingTextCsvId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCsvId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_text_csv ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_TEXT_CSV_ID: Int = constGetEncodingTextCsvId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSV_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationSql(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSql(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_sql ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_SQL: String = constGetEncodingApplicationSql(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SQL: JNI getter failed") })
+
+private fun constGetEncodingApplicationSqlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSqlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_sql ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_SQL_ID: Int = constGetEncodingApplicationSqlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SQL_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationCoapPayload(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCoapPayload(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_coap_payload ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_COAP_PAYLOAD: String = constGetEncodingApplicationCoapPayload(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_COAP_PAYLOAD: JNI getter failed") })
+
+private fun constGetEncodingApplicationCoapPayloadId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCoapPayloadId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_coap_payload ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_COAP_PAYLOAD_ID: Int = constGetEncodingApplicationCoapPayloadId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_COAP_PAYLOAD_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonPatchJson(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonPatchJson(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_json_patch_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON_PATCH_JSON: String = constGetEncodingApplicationJsonPatchJson(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_PATCH_JSON: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonPatchJsonId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonPatchJsonId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_json_patch_json ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON_PATCH_JSON_ID: Int = constGetEncodingApplicationJsonPatchJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_PATCH_JSON_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonSeq(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonSeq(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_json_seq ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON_SEQ: String = constGetEncodingApplicationJsonSeq(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_SEQ: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonSeqId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonSeqId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_json_seq ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSON_SEQ_ID: Int = constGetEncodingApplicationJsonSeqId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_SEQ_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonpath(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonpath(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_jsonpath ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSONPATH: String = constGetEncodingApplicationJsonpath(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSONPATH: JNI getter failed") })
+
+private fun constGetEncodingApplicationJsonpathId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonpathId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_jsonpath ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JSONPATH_ID: Int = constGetEncodingApplicationJsonpathId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSONPATH_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationJwt(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJwt(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_jwt ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JWT: String = constGetEncodingApplicationJwt(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JWT: JNI getter failed") })
+
+private fun constGetEncodingApplicationJwtId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJwtId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_jwt ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_JWT_ID: Int = constGetEncodingApplicationJwtId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JWT_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationMp4(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationMp4(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_MP4: String = constGetEncodingApplicationMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_MP4: JNI getter failed") })
+
+private fun constGetEncodingApplicationMp4Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationMp4Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_MP4_ID: Int = constGetEncodingApplicationMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_MP4_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationSoapXml(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSoapXml(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_soap_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_SOAP_XML: String = constGetEncodingApplicationSoapXml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SOAP_XML: JNI getter failed") })
+
+private fun constGetEncodingApplicationSoapXmlId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSoapXmlId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_soap_xml ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_SOAP_XML_ID: Int = constGetEncodingApplicationSoapXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SOAP_XML_ID: JNI getter failed") })
+
+private fun constGetEncodingApplicationYang(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYang(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_application_yang ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_YANG: String = constGetEncodingApplicationYang(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YANG: JNI getter failed") })
+
+private fun constGetEncodingApplicationYangId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYangId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_application_yang ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_APPLICATION_YANG_ID: Int = constGetEncodingApplicationYangId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YANG_ID: JNI getter failed") })
+
+private fun constGetEncodingAudioAac(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioAac(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_audio_aac ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_AAC: String = constGetEncodingAudioAac(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_AAC: JNI getter failed") })
+
+private fun constGetEncodingAudioAacId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioAacId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_audio_aac ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_AAC_ID: Int = constGetEncodingAudioAacId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_AAC_ID: JNI getter failed") })
+
+private fun constGetEncodingAudioFlac(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioFlac(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_audio_flac ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_FLAC: String = constGetEncodingAudioFlac(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_FLAC: JNI getter failed") })
+
+private fun constGetEncodingAudioFlacId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioFlacId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_audio_flac ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_FLAC_ID: Int = constGetEncodingAudioFlacId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_FLAC_ID: JNI getter failed") })
+
+private fun constGetEncodingAudioMp4(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioMp4(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_audio_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_MP4: String = constGetEncodingAudioMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_MP4: JNI getter failed") })
+
+private fun constGetEncodingAudioMp4Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioMp4Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_audio_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_MP4_ID: Int = constGetEncodingAudioMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_MP4_ID: JNI getter failed") })
+
+private fun constGetEncodingAudioOgg(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioOgg(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_audio_ogg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_OGG: String = constGetEncodingAudioOgg(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_OGG: JNI getter failed") })
+
+private fun constGetEncodingAudioOggId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioOggId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_audio_ogg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_OGG_ID: Int = constGetEncodingAudioOggId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_OGG_ID: JNI getter failed") })
+
+private fun constGetEncodingAudioVorbis(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioVorbis(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_audio_vorbis ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_VORBIS: String = constGetEncodingAudioVorbis(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_VORBIS: JNI getter failed") })
+
+private fun constGetEncodingAudioVorbisId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioVorbisId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_audio_vorbis ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_AUDIO_VORBIS_ID: Int = constGetEncodingAudioVorbisId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_VORBIS_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoH261(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH261(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_h261 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H261: String = constGetEncodingVideoH261(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H261: JNI getter failed") })
+
+private fun constGetEncodingVideoH261Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH261Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_h261 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H261_ID: Int = constGetEncodingVideoH261Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H261_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoH263(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH263(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_h263 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H263: String = constGetEncodingVideoH263(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H263: JNI getter failed") })
+
+private fun constGetEncodingVideoH263Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH263Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_h263 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H263_ID: Int = constGetEncodingVideoH263Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H263_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoH264(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH264(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_h264 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H264: String = constGetEncodingVideoH264(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H264: JNI getter failed") })
+
+private fun constGetEncodingVideoH264Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH264Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_h264 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H264_ID: Int = constGetEncodingVideoH264Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H264_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoH265(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH265(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_h265 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H265: String = constGetEncodingVideoH265(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H265: JNI getter failed") })
+
+private fun constGetEncodingVideoH265Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH265Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_h265 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H265_ID: Int = constGetEncodingVideoH265Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H265_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoH266(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH266(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_h266 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H266: String = constGetEncodingVideoH266(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H266: JNI getter failed") })
+
+private fun constGetEncodingVideoH266Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH266Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_h266 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_H266_ID: Int = constGetEncodingVideoH266Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H266_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoMp4(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoMp4(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_MP4: String = constGetEncodingVideoMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_MP4: JNI getter failed") })
+
+private fun constGetEncodingVideoMp4Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoMp4Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_mp4 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_MP4_ID: Int = constGetEncodingVideoMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_MP4_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoOgg(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoOgg(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_ogg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_OGG: String = constGetEncodingVideoOgg(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_OGG: JNI getter failed") })
+
+private fun constGetEncodingVideoOggId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoOggId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_ogg ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_OGG_ID: Int = constGetEncodingVideoOggId(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_OGG_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoRaw(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoRaw(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_raw ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_RAW: String = constGetEncodingVideoRaw(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_RAW: JNI getter failed") })
+
+private fun constGetEncodingVideoRawId(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoRawId(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_raw ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_RAW_ID: Int = constGetEncodingVideoRawId(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_RAW_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoVp8(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp8(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_vp8 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_VP8: String = constGetEncodingVideoVp8(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP8: JNI getter failed") })
+
+private fun constGetEncodingVideoVp8Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp8Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_vp8 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_VP8_ID: Int = constGetEncodingVideoVp8Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP8_ID: JNI getter failed") })
+
+private fun constGetEncodingVideoVp9(onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp9(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_to_string (encoding_const_video_vp9 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_VP9: String = constGetEncodingVideoVp9(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP9: JNI getter failed") })
+
+private fun constGetEncodingVideoVp9Id(onError: JniErrorHandler<Int>): Int {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp9Id(__cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Binding-defined constant: `encoding_get_id (encoding_const_video_vp9 ())` (evaluated once through the generated JNI getter). */
+public val ENCODING_VIDEO_VP9_ID: Int = constGetEncodingVideoVp9Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP9_ID: JNI getter failed") })
