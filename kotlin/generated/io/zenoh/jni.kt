@@ -28,23 +28,39 @@ import io.zenoh.jni.time.Timestamp
  * Base class for every typed native handle: owns the raw `Box<T>` pointer
  * slot and its monitor. Subclasses add their type-specific `close()` /
  * `take()` / `freePtr`.
+ *
+ * Lifecycle is a tag bit: `Box` pointers are at least 2-aligned (asserted
+ * on the Rust side), so bit 0 is free — closing/consuming sets `ptr = p or 1`
+ * instead of zeroing. The address bits (`ptr and -2`) are therefore
+ * write-once for the object's whole lifetime, which is what makes them a
+ * sound lock-ordering key (a mutable key could reorder concurrent lock
+ * acquisition and deadlock). All `ptr` writes happen under this handle's
+ * monitor.
  */
 public abstract class NativeHandle(initialPtr: Long) : AutoCloseable {
     @Volatile internal var ptr: Long = initialPtr
 
-    public fun peek(): Long = ptr
+    /** The live pointer, or `0` if this handle is closed. */
+    public fun peek(): Long {
+        val p = ptr
+        return if (p == 0L || (p and 1L) != 0L) 0L else p
+    }
 
-    public fun isClosed(): Boolean = ptr == 0L
+    public fun isClosed(): Boolean = ptr == 0L || (ptr and 1L) != 0L
 }
 
 /**
- * Acquire every handle's monitor in one global order (sorted by raw
- * pointer) so concurrent calls touching the same handles can't deadlock,
- * then run [body]. Closed handles (`ptr == 0`) are still locked; callers
- * re-read and null-check each pointer inside [body]. Scales to any arity.
+ * Acquire every handle's monitor in one global order — sorted by the
+ * immutable address bits (`ptr and -2`; bit 0 is the closed tag and
+ * never participates) — so concurrent calls touching the same handles
+ * can't deadlock, then run [body]. The key never changes after
+ * construction: closing only sets bit 0, so a concurrent `close()`
+ * can't reorder anyone's acquisition. Closed handles are still locked;
+ * their tagged pointers are rejected by the Rust-side converter guard
+ * inside the native call. Scales to any arity.
  */
 internal fun <R> withSortedHandleLocks(handles: List<NativeHandle>, body: () -> R): R {
-    val sorted = handles.sortedBy { it.ptr }
+    val sorted = handles.sortedBy { it.ptr and -2L }
     fun rec(i: Int): R = if (i == sorted.size) body() else synchronized(sorted[i]) { rec(i + 1) }
     return rec(0)
 }
@@ -52,11 +68,11 @@ internal fun <R> withSortedHandleLocks(handles: List<NativeHandle>, body: () -> 
 /** Allocation-free single-handle lock (one monitor, nothing to order). */
 internal inline fun <R> withSortedHandleLocks(a: NativeHandle, body: () -> R): R = synchronized(a) { body() }
 
-/** Allocation-free two-handle lock: order by `ptr` then nest monitors. */
+/** Allocation-free two-handle lock: order by masked address then nest monitors. */
 internal inline fun <R> withSortedHandleLocks(a: NativeHandle, b: NativeHandle, body: () -> R): R {
     val first: NativeHandle
     val second: NativeHandle
-    if (a.ptr <= b.ptr) { first = a; second = b } else { first = b; second = a }
+    if ((a.ptr and -2L) <= (b.ptr and -2L)) { first = a; second = b } else { first = b; second = a }
     return synchronized(first) { synchronized(second) { body() } }
 }
 
@@ -70,9 +86,9 @@ internal inline fun <R> withSortedHandleLocks(
     var x = a
     var y = b
     var z = c
-    if (x.ptr > y.ptr) { val t = x; x = y; y = t }
-    if (y.ptr > z.ptr) { val t = y; y = z; z = t }
-    if (x.ptr > y.ptr) { val t = x; x = y; y = t }
+    if ((x.ptr and -2L) > (y.ptr and -2L)) { val t = x; x = y; y = t }
+    if ((y.ptr and -2L) > (z.ptr and -2L)) { val t = y; y = z; z = t }
+    if ((x.ptr and -2L) > (y.ptr and -2L)) { val t = x; x = y; y = t }
     return synchronized(x) { synchronized(y) { synchronized(z) { body() } } }
 }
 
@@ -80,6 +96,50 @@ public fun interface VoidCallback {
     public fun run()
 }
 
+public fun interface StringFolder<A> {
+    public fun run(acc: A, element: String): A
+}
+
+internal object __StringFolderHolder {
+    @JvmField
+    val instance: StringFolder<ArrayList<String>> =
+    StringFolder { acc, element -> acc.add(element); acc }
+}
+
+/**
+ * Error callback. Contract: `je != null` ⇒ a binding/system-tier failure — `je` is
+ * its message and the remaining parameters carry defaults; `je == null` ⇒ a domain
+ * error — the remaining parameters carry the decomposed `Error`. The
+ * wrapper returns whatever `run` returns; throwing from `run` is safe (it executes
+ * after the native call has returned).
+ */
+public fun interface ErrorHandler<out R> {
+    public fun run(je: String?, message: String): R
+}
+
+internal class ErrorHandlerCapture : ErrorHandler<Unit> {
+    @JvmField var failed: Boolean = false
+    @JvmField var je: String? = null
+    @JvmField var ze0: String? = null
+    override fun run(je: String?, message: String) {
+        failed = true; this.je = je; this.ze0 = message
+    }
+    companion object {
+        private val TL: ThreadLocal<ErrorHandlerCapture> = ThreadLocal.withInitial { ErrorHandlerCapture() }
+        @JvmStatic fun acquire(): ErrorHandlerCapture {
+            val c = TL.get()
+            c.failed = false; c.je = null; c.ze0 = null
+            return c
+        }
+    }
+}
+
+/**
+ * Error callback for wrappers without a declared error type. `je` is the
+ * binding/system failure message (any converter in the chain may fail). The
+ * wrapper returns whatever `run` returns; throwing from `run` is safe (it
+ * executes after the native call has returned).
+ */
 public fun interface JniErrorHandler<out R> {
     public fun run(je: String?): R
 }
@@ -111,59 +171,6 @@ internal object JNINative {
     external fun configNewFromJson(s: String, errorSink: Any): Long
     external fun configNewFromJson5(s: String, errorSink: Any): Long
     external fun configNewFromYaml(s: String, errorSink: Any): Long
-    external fun encodingConstApplicationCbor(errorSink: Any): Long
-    external fun encodingConstApplicationCdr(errorSink: Any): Long
-    external fun encodingConstApplicationCoapPayload(errorSink: Any): Long
-    external fun encodingConstApplicationJavaSerializedObject(errorSink: Any): Long
-    external fun encodingConstApplicationJson(errorSink: Any): Long
-    external fun encodingConstApplicationJsonPatchJson(errorSink: Any): Long
-    external fun encodingConstApplicationJsonSeq(errorSink: Any): Long
-    external fun encodingConstApplicationJsonpath(errorSink: Any): Long
-    external fun encodingConstApplicationJwt(errorSink: Any): Long
-    external fun encodingConstApplicationMp4(errorSink: Any): Long
-    external fun encodingConstApplicationOctetStream(errorSink: Any): Long
-    external fun encodingConstApplicationOpenmetricsText(errorSink: Any): Long
-    external fun encodingConstApplicationProtobuf(errorSink: Any): Long
-    external fun encodingConstApplicationPythonSerializedObject(errorSink: Any): Long
-    external fun encodingConstApplicationSoapXml(errorSink: Any): Long
-    external fun encodingConstApplicationSql(errorSink: Any): Long
-    external fun encodingConstApplicationXWwwFormUrlencoded(errorSink: Any): Long
-    external fun encodingConstApplicationXml(errorSink: Any): Long
-    external fun encodingConstApplicationYaml(errorSink: Any): Long
-    external fun encodingConstApplicationYang(errorSink: Any): Long
-    external fun encodingConstAudioAac(errorSink: Any): Long
-    external fun encodingConstAudioFlac(errorSink: Any): Long
-    external fun encodingConstAudioMp4(errorSink: Any): Long
-    external fun encodingConstAudioOgg(errorSink: Any): Long
-    external fun encodingConstAudioVorbis(errorSink: Any): Long
-    external fun encodingConstImageBmp(errorSink: Any): Long
-    external fun encodingConstImageGif(errorSink: Any): Long
-    external fun encodingConstImageJpeg(errorSink: Any): Long
-    external fun encodingConstImagePng(errorSink: Any): Long
-    external fun encodingConstImageWebp(errorSink: Any): Long
-    external fun encodingConstTextCss(errorSink: Any): Long
-    external fun encodingConstTextCsv(errorSink: Any): Long
-    external fun encodingConstTextHtml(errorSink: Any): Long
-    external fun encodingConstTextJavascript(errorSink: Any): Long
-    external fun encodingConstTextJson(errorSink: Any): Long
-    external fun encodingConstTextJson5(errorSink: Any): Long
-    external fun encodingConstTextMarkdown(errorSink: Any): Long
-    external fun encodingConstTextPlain(errorSink: Any): Long
-    external fun encodingConstTextXml(errorSink: Any): Long
-    external fun encodingConstTextYaml(errorSink: Any): Long
-    external fun encodingConstVideoH261(errorSink: Any): Long
-    external fun encodingConstVideoH263(errorSink: Any): Long
-    external fun encodingConstVideoH264(errorSink: Any): Long
-    external fun encodingConstVideoH265(errorSink: Any): Long
-    external fun encodingConstVideoH266(errorSink: Any): Long
-    external fun encodingConstVideoMp4(errorSink: Any): Long
-    external fun encodingConstVideoOgg(errorSink: Any): Long
-    external fun encodingConstVideoRaw(errorSink: Any): Long
-    external fun encodingConstVideoVp8(errorSink: Any): Long
-    external fun encodingConstVideoVp9(errorSink: Any): Long
-    external fun encodingConstZenohBytes(errorSink: Any): Long
-    external fun encodingConstZenohSerialized(errorSink: Any): Long
-    external fun encodingConstZenohString(errorSink: Any): Long
     external fun encodingGetId(e: Long, errorSink: Any): Int
     external fun encodingGetSchema(e: Long, errorSink: Any): String?
     external fun encodingNewClone(e: Long, errorSink: Any): Long
@@ -176,8 +183,7 @@ internal object JNINative {
         errorSink: Any,
     ): Long
     external fun encodingToString(e: Long, errorSink: Any): String
-    external fun errorGetMessage(e: Long, errorSink: Any): String
-    external fun helloGetLocators(h: Long, errorSink: Any): List<String>
+    external fun helloGetLocators(h: Long, acc: Any?, fold: Any, errorSink: Any): Any?
     external fun helloGetWhatami(h: Long, errorSink: Any): Int
     external fun helloGetZid(h: Long, errorSink: Any): ByteArray
     external fun initAndroidLogs(filter: String, errorSink: Any)
@@ -259,9 +265,11 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        express: Boolean?,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         errorSink: Any,
     )
     external fun queryReplyError(
@@ -272,7 +280,7 @@ internal object JNINative {
         encodingSchema: String?,
         errorSink: Any,
     )
-    external fun queryReplySample(query: Long, sampleSel: Int, sample0: Long, errorSink: Any)
+    external fun queryReplySample(query: Long, sample: Long, errorSink: Any)
     external fun queryReplySuccess(
         query: Long,
         keyExprSel: Int,
@@ -282,9 +290,11 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        express: Boolean?,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         errorSink: Any,
     )
     external fun replyErrorGetEncoding(e: Long, errorSink: Any): Long
@@ -311,12 +321,17 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         build: Any,
         errorSink: Any,
     ): Any?
@@ -328,12 +343,17 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        timestampNtp64: Long?,
+        timestampNtp64Present: Boolean,
+        timestampNtp64Value: Long,
         attachment: ByteArray?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         build: Any,
         errorSink: Any,
     ): Any?
@@ -350,10 +370,14 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        reliability: Int?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     ): Long
     external fun sessionDeclareQuerier(
@@ -361,13 +385,20 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        target: Int?,
-        consolidation: Int?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
-        timeoutMs: Long?,
-        acceptReplies: Int?,
+        targetPresent: Boolean,
+        targetValue: Int,
+        consolidationPresent: Boolean,
+        consolidationValue: Int,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        timeoutMsPresent: Boolean,
+        timeoutMsValue: Long,
+        acceptRepliesPresent: Boolean,
+        acceptRepliesValue: Int,
         errorSink: Any,
     ): Long
     external fun sessionDeclareQueryable(
@@ -375,7 +406,8 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        complete: Boolean?,
+        completePresent: Boolean,
+        completeValue: Boolean,
         callback: Any,
         onClose: Any,
         errorSink: Any,
@@ -394,11 +426,15 @@ internal object JNINative {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: Long,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         attachment: ByteArray?,
-        reliability: Int?,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     )
     external fun sessionGet(
@@ -407,13 +443,20 @@ internal object JNINative {
         keyExpr0: String?,
         keyExpr1: Long,
         parameters: String?,
-        timeoutMs: Long?,
-        target: Int?,
-        consolidation: Int?,
-        acceptReplies: Int?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        timeoutMsPresent: Boolean,
+        timeoutMsValue: Long,
+        targetPresent: Boolean,
+        targetValue: Int,
+        consolidationPresent: Boolean,
+        consolidationValue: Int,
+        acceptRepliesPresent: Boolean,
+        acceptRepliesValue: Int,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         payload: ByteArray?,
         encodingPresent: Boolean,
         encodingId: Int,
@@ -423,8 +466,8 @@ internal object JNINative {
         onClose: Any,
         errorSink: Any,
     )
-    external fun sessionGetPeersZid(session: Long, errorSink: Any): List<ByteArray>
-    external fun sessionGetRoutersZid(session: Long, errorSink: Any): List<ByteArray>
+    external fun sessionGetPeersZid(session: Long, acc: Any?, fold: Any, errorSink: Any): Any?
+    external fun sessionGetRoutersZid(session: Long, acc: Any?, fold: Any, errorSink: Any): Any?
     external fun sessionGetZid(session: Long, errorSink: Any): ByteArray
     external fun sessionPut(
         session: Long,
@@ -435,11 +478,15 @@ internal object JNINative {
         encodingPresent: Boolean,
         encodingId: Int,
         encodingSchema: String?,
-        congestionControl: Int?,
-        priority: Int?,
-        express: Boolean?,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
         attachment: ByteArray?,
-        reliability: Int?,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
         errorSink: Any,
     )
     external fun sessionUndeclareKeyexpr(session: Long, keyExpr: Long, errorSink: Any)
@@ -451,4 +498,110 @@ internal object JNINative {
     external fun zbytesNewFromVec(bytes: ByteArray, errorSink: Any): Long
     external fun zenohIdToBytes(z: ByteArray, errorSink: Any): ByteArray
     external fun zenohIdToString(z: ByteArray, errorSink: Any): String
+    external fun constGetEncodingApplicationCbor(errorSink: Any): String
+    external fun constGetEncodingApplicationCborId(errorSink: Any): Int
+    external fun constGetEncodingApplicationCdr(errorSink: Any): String
+    external fun constGetEncodingApplicationCdrId(errorSink: Any): Int
+    external fun constGetEncodingApplicationCoapPayload(errorSink: Any): String
+    external fun constGetEncodingApplicationCoapPayloadId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJavaSerializedObject(errorSink: Any): String
+    external fun constGetEncodingApplicationJavaSerializedObjectId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJson(errorSink: Any): String
+    external fun constGetEncodingApplicationJsonpath(errorSink: Any): String
+    external fun constGetEncodingApplicationJsonpathId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJsonId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJsonPatchJson(errorSink: Any): String
+    external fun constGetEncodingApplicationJsonPatchJsonId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJsonSeq(errorSink: Any): String
+    external fun constGetEncodingApplicationJsonSeqId(errorSink: Any): Int
+    external fun constGetEncodingApplicationJwt(errorSink: Any): String
+    external fun constGetEncodingApplicationJwtId(errorSink: Any): Int
+    external fun constGetEncodingApplicationMp4(errorSink: Any): String
+    external fun constGetEncodingApplicationMp4Id(errorSink: Any): Int
+    external fun constGetEncodingApplicationOctetStream(errorSink: Any): String
+    external fun constGetEncodingApplicationOctetStreamId(errorSink: Any): Int
+    external fun constGetEncodingApplicationOpenmetricsText(errorSink: Any): String
+    external fun constGetEncodingApplicationOpenmetricsTextId(errorSink: Any): Int
+    external fun constGetEncodingApplicationProtobuf(errorSink: Any): String
+    external fun constGetEncodingApplicationProtobufId(errorSink: Any): Int
+    external fun constGetEncodingApplicationPythonSerializedObject(errorSink: Any): String
+    external fun constGetEncodingApplicationPythonSerializedObjectId(errorSink: Any): Int
+    external fun constGetEncodingApplicationSoapXml(errorSink: Any): String
+    external fun constGetEncodingApplicationSoapXmlId(errorSink: Any): Int
+    external fun constGetEncodingApplicationSql(errorSink: Any): String
+    external fun constGetEncodingApplicationSqlId(errorSink: Any): Int
+    external fun constGetEncodingApplicationXml(errorSink: Any): String
+    external fun constGetEncodingApplicationXmlId(errorSink: Any): Int
+    external fun constGetEncodingApplicationXWwwFormUrlencoded(errorSink: Any): String
+    external fun constGetEncodingApplicationXWwwFormUrlencodedId(errorSink: Any): Int
+    external fun constGetEncodingApplicationYaml(errorSink: Any): String
+    external fun constGetEncodingApplicationYamlId(errorSink: Any): Int
+    external fun constGetEncodingApplicationYang(errorSink: Any): String
+    external fun constGetEncodingApplicationYangId(errorSink: Any): Int
+    external fun constGetEncodingAudioAac(errorSink: Any): String
+    external fun constGetEncodingAudioAacId(errorSink: Any): Int
+    external fun constGetEncodingAudioFlac(errorSink: Any): String
+    external fun constGetEncodingAudioFlacId(errorSink: Any): Int
+    external fun constGetEncodingAudioMp4(errorSink: Any): String
+    external fun constGetEncodingAudioMp4Id(errorSink: Any): Int
+    external fun constGetEncodingAudioOgg(errorSink: Any): String
+    external fun constGetEncodingAudioOggId(errorSink: Any): Int
+    external fun constGetEncodingAudioVorbis(errorSink: Any): String
+    external fun constGetEncodingAudioVorbisId(errorSink: Any): Int
+    external fun constGetEncodingImageBmp(errorSink: Any): String
+    external fun constGetEncodingImageBmpId(errorSink: Any): Int
+    external fun constGetEncodingImageGif(errorSink: Any): String
+    external fun constGetEncodingImageGifId(errorSink: Any): Int
+    external fun constGetEncodingImageJpeg(errorSink: Any): String
+    external fun constGetEncodingImageJpegId(errorSink: Any): Int
+    external fun constGetEncodingImagePng(errorSink: Any): String
+    external fun constGetEncodingImagePngId(errorSink: Any): Int
+    external fun constGetEncodingImageWebp(errorSink: Any): String
+    external fun constGetEncodingImageWebpId(errorSink: Any): Int
+    external fun constGetEncodingTextCss(errorSink: Any): String
+    external fun constGetEncodingTextCssId(errorSink: Any): Int
+    external fun constGetEncodingTextCsv(errorSink: Any): String
+    external fun constGetEncodingTextCsvId(errorSink: Any): Int
+    external fun constGetEncodingTextHtml(errorSink: Any): String
+    external fun constGetEncodingTextHtmlId(errorSink: Any): Int
+    external fun constGetEncodingTextJavascript(errorSink: Any): String
+    external fun constGetEncodingTextJavascriptId(errorSink: Any): Int
+    external fun constGetEncodingTextJson(errorSink: Any): String
+    external fun constGetEncodingTextJson5(errorSink: Any): String
+    external fun constGetEncodingTextJson5Id(errorSink: Any): Int
+    external fun constGetEncodingTextJsonId(errorSink: Any): Int
+    external fun constGetEncodingTextMarkdown(errorSink: Any): String
+    external fun constGetEncodingTextMarkdownId(errorSink: Any): Int
+    external fun constGetEncodingTextPlain(errorSink: Any): String
+    external fun constGetEncodingTextPlainId(errorSink: Any): Int
+    external fun constGetEncodingTextXml(errorSink: Any): String
+    external fun constGetEncodingTextXmlId(errorSink: Any): Int
+    external fun constGetEncodingTextYaml(errorSink: Any): String
+    external fun constGetEncodingTextYamlId(errorSink: Any): Int
+    external fun constGetEncodingVideoH261(errorSink: Any): String
+    external fun constGetEncodingVideoH261Id(errorSink: Any): Int
+    external fun constGetEncodingVideoH263(errorSink: Any): String
+    external fun constGetEncodingVideoH263Id(errorSink: Any): Int
+    external fun constGetEncodingVideoH264(errorSink: Any): String
+    external fun constGetEncodingVideoH264Id(errorSink: Any): Int
+    external fun constGetEncodingVideoH265(errorSink: Any): String
+    external fun constGetEncodingVideoH265Id(errorSink: Any): Int
+    external fun constGetEncodingVideoH266(errorSink: Any): String
+    external fun constGetEncodingVideoH266Id(errorSink: Any): Int
+    external fun constGetEncodingVideoMp4(errorSink: Any): String
+    external fun constGetEncodingVideoMp4Id(errorSink: Any): Int
+    external fun constGetEncodingVideoOgg(errorSink: Any): String
+    external fun constGetEncodingVideoOggId(errorSink: Any): Int
+    external fun constGetEncodingVideoRaw(errorSink: Any): String
+    external fun constGetEncodingVideoRawId(errorSink: Any): Int
+    external fun constGetEncodingVideoVp8(errorSink: Any): String
+    external fun constGetEncodingVideoVp8Id(errorSink: Any): Int
+    external fun constGetEncodingVideoVp9(errorSink: Any): String
+    external fun constGetEncodingVideoVp9Id(errorSink: Any): Int
+    external fun constGetEncodingZenohBytes(errorSink: Any): String
+    external fun constGetEncodingZenohBytesId(errorSink: Any): Int
+    external fun constGetEncodingZenohSerialized(errorSink: Any): String
+    external fun constGetEncodingZenohSerializedId(errorSink: Any): Int
+    external fun constGetEncodingZenohString(errorSink: Any): String
+    external fun constGetEncodingZenohStringId(errorSink: Any): Int
 }

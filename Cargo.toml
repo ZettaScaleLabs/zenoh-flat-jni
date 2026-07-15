@@ -23,6 +23,7 @@ zenoh-ext = ["dep:zenoh-ext"]
 zenoh-flat = { version = "1.9.0", path = "../zenoh-flat", features = ["unstable"] }
 # Runtime home of the JNI binding helpers and the default `JniBindingError`
 # (`::prebindgen::lang::JniBindingError`) that the generated bindings reference.
+# CI rewrites both local prebindgen paths to its GitHub `main` branch.
 # TODO: Once prebindgen is published to crates.io, replace path dep with version constraint
 prebindgen = { path = "../prebindgen/prebindgen" }
 # Direct zenoh/zenoh-ext deps for the self-contained ZBytes serialization JNI.

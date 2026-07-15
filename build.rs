@@ -9,28 +9,40 @@
 //! ## Model
 //!
 //! This is the **flat tier**: every `#[prebindgen]` free function is declared
-//! as a package function ([`JniGen::fun`]) under a module namespace
-//! ([`JniGen::package`]). Opaque handles stay typed Kotlin classes derived from
-//! `NativeHandle` (locked, closeable) via [`JniGen::ptr_class`].
+//! as a package function (`package!("x").fun(fun!(...))`) under a module
+//! namespace, and each `PackageDecl` batch is handed to [`JniGen::package`].
+//! Opaque handles stay typed Kotlin classes derived from `NativeHandle`
+//! (locked, closeable) via `.class(ptr_class!(T))`.
 //!
-//! A type's default flatten shape — its input ([`JniGen::flatten_input`]) and
-//! output ([`JniGen::flatten_output`]) — is declared once on the `ptr_class` and
-//! AUTO-APPLIES to every matching param / return. Class members are declared
-//! with [`JniGen::accessor`] / [`JniGen::method`] / [`JniGen::constructor`]
-//! (emitted as instance methods / companion factories of their class) and the
-//! per-fn `flatten_input_suppress` / `flatten_output_suppress` overrides opt out.
+//! A type's default boundary shape is declared once, per direction, at the
+//! generator level and AUTO-APPLIES to every matching param / return: input
+//! variants via `.expand(expand_param!(T).variant(fun!(ctor)).variant_self())`
+//! (an OR-list, runtime-selected) and output fields via
+//! `.expand(expand_return!(T).field(fun!(acc)).field_self())` (an
+//! AND-set, one crossing). A `.field(fun!(acc))` inherits its Kotlin name from
+//! the class member declaration of the same fn. Class members are declared
+//! with `.fun(fun!(f).name(..))` (instance methods) and
+//! `.constructor(fun!(f).name(..))` (companion factories), and the per-fn
+//! `.expand_param(name, …)` / `.expand_return(…)` overrides (chained on
+//! the `fun!` decl, taking the same expand-decl objects) replace them — an
+//! identity-only set (`.variant_self()` / `.field_self()` alone) is the plain
+//! raw-handle form.
 //!
 //! Errors are delivered through the per-call `onError` callback (no Rust-side
 //! JVM throw): `Error` (zenoh's native error) is the `E` of every fallible
-//! `Result<_, Error>`, and its default output flatten (`error_get_message ->
+//! `Result<_, Error>`, and its default return field (`error_get_message ->
 //! String`) auto-applies to the `E` position so `onError` receives the message.
 //!
 //! Names mirror zenoh-flat's de-prefixed Rust identifiers one-to-one
 //! (`KeyExpr`, `Session`, `keyexpr_new_try_from`, `open`, …); the Kotlin-side
 //! names are derived from them automatically.
 
-use prebindgen::core::Registry;
-use prebindgen::lang::JniGen;
+use prebindgen::{
+    core::Registry,
+    enum_class, expand_param, expand_return, fun,
+    lang::{ConstDecl, FunctionDecl, JniGen},
+    package, ptr_class, value_class,
+};
 use syn::parse_quote as pq;
 
 fn fail(context: &str, err: impl std::fmt::Display) -> ! {
@@ -38,251 +50,297 @@ fn fail(context: &str, err: impl std::fmt::Display) -> ! {
     std::process::exit(1);
 }
 
-/// Companion-factory name for a predefined `encoding_const_<x>` constant:
-/// strip the `encoding_const_` prefix and lower-camelCase the rest
-/// (`encoding_const_text_plain` → `textPlain`).
-fn const_name(ident: &syn::Ident) -> String {
-    let s = ident.to_string();
-    let leaf = s.strip_prefix("encoding_const_").unwrap_or(&s);
-    let mut out = String::new();
-    let mut upper = false;
-    for c in leaf.chars() {
-        if c == '_' {
-            upper = true;
-        } else if upper {
-            out.push(c.to_ascii_uppercase());
-            upper = false;
-        } else {
-            out.push(c);
-        }
-    }
-    out
+/// The two expression constants for one predefined encoding, composed from
+/// zenoh-flat's general accessors over its `encoding_const_<name>()` loaning
+/// factory (no per-preset accessor exists in the source crate):
+/// `ENCODING_<NAME>: String` (canonical form, upstream `Display`) and
+/// `ENCODING_<NAME>_ID: Int` (numeric wire id).
+fn encoding_consts(lower: &str) -> [ConstDecl; 2] {
+    let upper = lower.to_uppercase();
+    let factory: syn::Ident = syn::parse_str(&format!("encoding_const_{lower}")).unwrap();
+    [
+        ConstDecl::named(format!("ENCODING_{upper}"))
+            .expr(pq!(String), pq!(encoding_to_string(#factory()))),
+        ConstDecl::named(format!("ENCODING_{upper}_ID"))
+            .expr(pq!(i32), pq!(encoding_get_id(#factory()))),
+    ]
 }
 
 fn main() {
-    // The builder is type-state: each call returns a different `JniGen<S>`, so
-    // the configuration is one fluent chain. It is split in two only to let the
-    // long, modifier-free encoding-constant list collapse into a `for` loop
-    // (see below); `package(...)` is available on every state, so the tail
-    // chain resumes seamlessly afterwards.
+    // Declarations are plain values (`PackageDecl` / class decls / `fun!`
+    // decls) handed to `JniGen::package` batch by batch — no typestate
+    // cursor, so the long encoding-constant list below is an ordinary loop
+    // over an ordinary `PtrClassDecl` binding.
+
+    // ── Bytes: Encoding ───────────────────────────────────────────────
+    // Canonical input: encoding params cross as their decomposed value
+    // `(id: i32, schema: Option<String>)` (built via `encoding_new_from_id`)
+    // — cheap primitives, no per-call String parse, no native handle.
+    // Canonical output: the handle (identity) + id (raw jint), both free
+    // jvalue slots; schema and the canonical string stay on-demand accessors.
+    let encoding = ptr_class!(Encoding)
+        .fun(fun!(encoding_get_id).name("id"))
+        .fun(fun!(encoding_get_schema))
+        .fun(fun!(encoding_to_string).name("toStr"))
+        // Whole-handle clone return — see KeyExpr's `newClone`.
+        .fun(
+            fun!(encoding_new_clone)
+                .name("newClone")
+                .expand_return(expand_return!(Encoding).field_self()),
+        )
+        // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
+        // Encoding — a companion factory returning a raw handle (a constructor
+        // never return-field-decomposes, so the result stays a usable handle rather than
+        // a decomposed builder).
+        .constructor(fun!(encoding_new_with_schema).name("withSchema"))
+        // Factories → companion members; `fromId` is also the input variant
+        // (see the `expand_param!(Encoding)` declaration below).
+        .constructor(fun!(encoding_new_from_id).name("fromId"))
+        .constructor(fun!(encoding_new_from_string).name("fromString"));
+
+    // ── Bytes package: ZBytes + Encoding + predefined-encoding consts ────
+    // ZBytes canonical input: `payload`/`attachment` params accept a `ByteArray`
+    // (built via `zbytes_new_from_vec`). Canonical output: the handle only
+    // (identity) — the bytes are heavy and fetched on demand via
+    // `zbytesAsBytes` (one borrow-copy).
+    //
+    // Predefined encoding constants — each surfaces as a pair of
+    // lazily-initialized top-level `val`s in the bytes package (pure JVM
+    // values, no native handle), both **expression constants**
+    // (`.expr`-sourced constants): this binding composes zenoh-flat's general
+    // accessors over the `encoding_const_<name>()` loaning factory
+    // (`encoding_to_string(...)` / `encoding_get_id(...)`), evaluated once
+    // on first access — the source crate exposes each preset exactly once and
+    // stores no decomposed values (see `encoding_consts` above). The loaning
+    // factories themselves are not bound as Kotlin members (see the
+    // `ignore` declaration below).
+    let mut bytes = package!("bytes")
+        .class(
+            ptr_class!(ZBytes)
+                .fun(fun!(zbytes_as_bytes))
+                // Whole-handle clone return — see KeyExpr's `newClone`.
+                .fun(
+                    fun!(zbytes_new_clone)
+                        .name("newClone")
+                        .expand_return(expand_return!(ZBytes).field_self()),
+                )
+                // `fromVec` builds a ZBytes from a `ByteArray` — both the
+                // param-variant build arm (see `expand_param!(ZBytes)` below)
+                // AND a companion factory (a constructor never
+                // return-field-decomposes, so the factory keeps its
+                // raw-handle return).
+                .constructor(fun!(zbytes_new_from_vec).name("fromVec")),
+        )
+        .class(encoding);
+    for lower in [
+        "zenoh_bytes",
+        "zenoh_string",
+        "zenoh_serialized",
+        "application_octet_stream",
+        "text_plain",
+        "application_json",
+        "text_json",
+        "application_cdr",
+        "application_cbor",
+        "application_yaml",
+        "text_yaml",
+        "text_json5",
+        "application_python_serialized_object",
+        "application_protobuf",
+        "application_java_serialized_object",
+        "application_openmetrics_text",
+        "image_png",
+        "image_jpeg",
+        "image_gif",
+        "image_bmp",
+        "image_webp",
+        "application_xml",
+        "application_x_www_form_urlencoded",
+        "text_html",
+        "text_xml",
+        "text_css",
+        "text_javascript",
+        "text_markdown",
+        "text_csv",
+        "application_sql",
+        "application_coap_payload",
+        "application_json_patch_json",
+        "application_json_seq",
+        "application_jsonpath",
+        "application_jwt",
+        "application_mp4",
+        "application_soap_xml",
+        "application_yang",
+        "audio_aac",
+        "audio_flac",
+        "audio_mp4",
+        "audio_ogg",
+        "audio_vorbis",
+        "video_h261",
+        "video_h263",
+        "video_h264",
+        "video_h265",
+        "video_h266",
+        "video_mp4",
+        "video_ogg",
+        "video_raw",
+        "video_vp8",
+        "video_vp9",
+    ] {
+        for decl in encoding_consts(lower) {
+            bytes = bytes.constant(decl);
+        }
+    }
+
     let mut jni = JniGen::new()
-        .source_module(pq!(zenoh_flat)) // module prefix for prebindgen-marked items
-        .package_prefix("io.zenoh.jni") // base package of the generated JNI bindings
+        .set_package_prefix("io.zenoh.jni") // base package of the generated JNI bindings
         // Every generated native call routes through `JNINative`; trigger our own
         // loader from its static initializer so the native library is loaded
         // transparently before any extern resolves (consumers never load it).
-        .jni_native_init("io.zenoh.jni.NativeLibrary.ensureLoaded()")
+        .set_jni_native_init("io.zenoh.jni.NativeLibrary.ensureLoaded()")
         // ── Errors ────────────────────────────────────────────────────────
-        // `Error` is the `E` of every fallible `Result<_, Error>`. Declaring it
-        // as a `ptr_class` lets the `Result<T, Error>` resolver find its
-        // converters; the handle never actually crosses (the extern peels the
-        // `Result` and delivers the message via the error callback). Its
-        // canonical output is the message string (1 leaf), auto-applied to the
-        // `E` of every such `Result` — i.e. the `onError` callback's argument.
-        // `error_get_message` is that output's accessor (a class method named
-        // `message`, referenced by `.flatten_output().field("message")`).
-        .package("errors")
-        .ptr_class(pq!(Error))
-        .accessor(pq!(error_get_message), "message")
-        .flatten_output()
-        .field("message")
+        // `Error` is the `E` of every fallible `Result<_, Error>` — a
+        // RUST-SIDE-ONLY type: no class declaration, so no Kotlin `Error`
+        // class exists and the value never crosses. Its canonical output is
+        // the message string (1 leaf), auto-applied to the `E` position of
+        // every such `Result` — i.e. the `onError` callback's argument. The
+        // field name is explicit (no class member to inherit from).
+        .expand(expand_return!(Error).field(fun!(error_get_message).name("message")))
         // ── Key expressions ──────────────────────────────────────────────
         // Canonical input: a key-expr param accepts EITHER a String (built via
         // `keyexpr_new_try_from`) OR an existing handle (identity), selector-
         // dispatched. Canonical output: the handle only (identity, 1 raw jlong);
         // the string form stays an on-demand accessor method (`getStr`).
-        .package("keyexpr")
-        .ptr_class(pq!(KeyExpr))
-        // Read accessors → instance methods on the KeyExpr class.
-        .accessor(pq!(keyexpr_get_str), "getStr")
-        .accessor(pq!(keyexpr_new_clone), "newClone")
-        .accessor(pq!(keyexpr_to_string), "toStr")
-        // Constructors → companion factories returning `Result<KeyExpr, Error>`;
-        // `tryFrom` is also the build-from-String input variant.
-        .constructor(pq!(keyexpr_new_try_from), "tryFrom")
-        .constructor(pq!(keyexpr_new_autocanonize), "autocanonize")
-        .constructor(pq!(keyexpr_new_join), "join")
-        .constructor(pq!(keyexpr_new_concat), "concat")
-        // Input flatten: a key-expr param accepts EITHER a String (built via
-        // `tryFrom`) OR an existing handle (self). Output flatten: the handle
-        // only (the string form stays the `getStr` accessor method).
-        .flatten_input()
-        .variant("tryFrom")
-        .variant_self()
-        .flatten_output()
-        .field_self()
-        // Consumer methods: the receiver key-expr is `this`; the other param
-        // accepts a String (built via the input flatten above).
-        .method(pq!(keyexpr_intersects), "intersects")
-        .method(pq!(keyexpr_includes), "includes")
-        .method(pq!(keyexpr_relation_to), "relationTo")
-        .enum_class(pq!(SetIntersectionLevel))
+        .package(
+            package!("keyexpr")
+                .class(
+                    ptr_class!(KeyExpr)
+                        // Read accessors → instance methods on the KeyExpr class.
+                        // `newClone` returns the borrowed clone as a WHOLE handle —
+                        // override the class's default return fields (identity via
+                        // the owned converter) so the borrowed-opaque clone path
+                        // applies instead.
+                        .fun(fun!(keyexpr_get_str))
+                        .fun(
+                            fun!(keyexpr_new_clone)
+                                .name("newClone")
+                                .expand_return(expand_return!(KeyExpr).field_self()),
+                        )
+                        .fun(fun!(keyexpr_to_string).name("toStr"))
+                        // Constructors → companion factories returning `Result<KeyExpr, Error>`;
+                        // `tryFrom` is also the build-from-String input variant
+                        // (see `expand_param!(KeyExpr)` below).
+                        .constructor(fun!(keyexpr_new_try_from).name("tryFrom"))
+                        .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
+                        .constructor(fun!(keyexpr_new_join).name("join"))
+                        .constructor(fun!(keyexpr_new_concat).name("concat"))
+                        // Consumer methods: the receiver key-expr is `this`; the other
+                        // param accepts a String (built via the default param variants below).
+                        .fun(fun!(keyexpr_intersects))
+                        .fun(fun!(keyexpr_includes))
+                        .fun(fun!(keyexpr_relation_to)),
+                )
+                .class(enum_class!(SetIntersectionLevel)),
+        )
+        // Default param variants: a key-expr param accepts EITHER a String (built
+        // via `tryFrom`) OR an existing handle (self). Default return field: the
+        // handle only (the string form stays the `getStr` accessor method).
+        .expand(
+            expand_param!(KeyExpr)
+                .variant(fun!(keyexpr_new_try_from))
+                .variant_self(),
+        )
+        .expand(expand_return!(KeyExpr).field_self())
         // ── Config + ZenohId ──────────────────────────────────────────────
-        .package("config")
-        .ptr_class(pq!(Config))
-        .accessor(pq!(config_get_json), "getJson")
-        .accessor(pq!(config_new_clone), "newClone")
-        // Factories → Config companion-object members.
-        .constructor(pq!(config_new_default), "newDefault")
-        .constructor(pq!(config_new_from_file), "fromFile")
-        .constructor(pq!(config_new_from_json), "fromJson")
-        .constructor(pq!(config_new_from_json5), "fromJson5")
-        .constructor(pq!(config_new_from_yaml), "fromYaml")
-        .fun(pq!(config_insert_json5))
-        .enum_class(pq!(WhatAmI))
-        // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
-        // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
-        // handle. `Vec<ZenohId>` (session peers/routers) folds each element WHOLE
-        // as the typed `ZenohId` value class. Its read accessors become methods
-        // on the value class (receiver = `this.bytes`).
-        .value_class(pq!(ZenohId))
-        .accessor(pq!(zenoh_id_to_bytes), "toBytes")
-        .accessor(pq!(zenoh_id_to_string), "toStr")
+        .package(
+            package!("config")
+                .class(
+                    ptr_class!(Config)
+                        .fun(fun!(config_get_json))
+                        .fun(fun!(config_new_clone))
+                        // Factories → Config companion-object members.
+                        .constructor(fun!(config_new_default))
+                        .constructor(fun!(config_new_from_file).name("fromFile"))
+                        .constructor(fun!(config_new_from_json).name("fromJson"))
+                        .constructor(fun!(config_new_from_json5).name("fromJson5"))
+                        .constructor(fun!(config_new_from_yaml).name("fromYaml")),
+                )
+                .fun(fun!(config_insert_json5))
+                .class(enum_class!(WhatAmI))
+                // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
+                // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
+                // handle. `Vec<ZenohId>` (session peers/routers) folds each element WHOLE
+                // as the typed `ZenohId` value class. Its read accessors become methods
+                // on the value class (receiver = `this.bytes`).
+                .class(
+                    value_class!(ZenohId)
+                        .fun(fun!(zenoh_id_to_bytes))
+                        .fun(fun!(zenoh_id_to_string).name("toStr")),
+                ),
+        )
         // ── Scouting ──────────────────────────────────────────────────────
         // Canonical output: the scout callback decomposes a `Hello` into its
         // three read fields in ONE crossing (no handle — read-only). Auto-applies
         // to `scout`'s `Fn(Hello)`.
-        .package("scouting")
-        .ptr_class(pq!(Hello))
-        .accessor(pq!(hello_get_whatami), "whatami") // WhatAmI enum -> Int
-        .accessor(pq!(hello_get_zid), "zid") // ZenohId value class -> ByteArray
-        .accessor(pq!(hello_get_locators), "locators") // Vec<String> -> List<String>
-        .flatten_output()
-        .field("whatami")
-        .field("zid")
-        .field("locators")
-        .ptr_class(pq!(Scout))
-        .fun(pq!(scout))
+        .package(
+            package!("scouting")
+                .class(
+                    ptr_class!(Hello)
+                        .fun(fun!(hello_get_whatami).name("whatami")) // WhatAmI enum -> Int
+                        .fun(fun!(hello_get_zid).name("zid")) // ZenohId value class -> ByteArray
+                        .fun(fun!(hello_get_locators).name("locators")), // Vec<String> -> List<String>
+                )
+                .class(ptr_class!(Scout))
+                .fun(fun!(scout)),
+        )
+        .expand(
+            expand_return!(Hello)
+                .field(fun!(hello_get_whatami))
+                .field(fun!(hello_get_zid))
+                .field(fun!(hello_get_locators)),
+        )
         // ── Logger ────────────────────────────────────────────────────────
-        .package("logger")
-        .fun(pq!(init_android_logs))
-        .fun(pq!(try_init_zenoh_logs_from_env))
-        .fun(pq!(init_zenoh_logs_from_env_or))
+        .package(
+            package!("logger")
+                .fun(fun!(init_android_logs))
+                .fun(fun!(try_init_zenoh_logs_from_env))
+                .fun(fun!(init_zenoh_logs_from_env_or)),
+        )
         // ── QoS enums ─────────────────────────────────────────────────────
-        .package("qos")
-        .enum_class(pq!(Reliability))
-        .enum_class(pq!(Priority))
-        .enum_class(pq!(CongestionControl))
-        // ── Bytes: ZBytes ─────────────────────────────────────────────────
-        // Canonical input: `payload`/`attachment` params accept a `ByteArray`
-        // (built via `zbytes_new_from_vec`). Canonical output: the handle only
-        // (identity) — the bytes are heavy and fetched on demand via
-        // `zbytesAsBytes` (one borrow-copy).
-        .package("bytes")
-        .ptr_class(pq!(ZBytes))
-        .accessor(pq!(zbytes_as_bytes), "asBytes")
-        .accessor(pq!(zbytes_new_clone), "newClone")
-        // `fromVec` builds a ZBytes from a `ByteArray` — both the input-flatten
-        // build variant AND a companion factory (a constructor never
-        // output-flattens, so the factory keeps its raw-handle return).
-        .constructor(pq!(zbytes_new_from_vec), "fromVec")
-        .flatten_input()
-        .variant("fromVec")
-        .flatten_output()
-        .field_self()
-        // ── Bytes: Encoding ───────────────────────────────────────────────
-        // Canonical input: encoding params cross as their decomposed value
-        // `(id: i32, schema: Option<String>)` (built via `encoding_new_from_id`)
-        // — cheap primitives, no per-call String parse, no native handle.
-        // Canonical output: the handle (identity) + id (raw jint), both free
-        // jvalue slots; schema and the canonical string stay on-demand accessors.
-        .ptr_class(pq!(Encoding))
-        .accessor(pq!(encoding_get_id), "id")
-        .accessor(pq!(encoding_get_schema), "getSchema")
-        .accessor(pq!(encoding_to_string), "toStr")
-        .accessor(pq!(encoding_new_clone), "newClone")
-        // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
-        // Encoding — a companion factory returning a raw handle (a constructor
-        // never output-flattens, so the result stays a usable handle rather than
-        // a decomposed builder).
-        .constructor(pq!(encoding_new_with_schema), "withSchema")
-        // Factories → companion members; `fromId` is also the input variant.
-        .constructor(pq!(encoding_new_from_id), "fromId")
-        .constructor(pq!(encoding_new_from_string), "fromString")
-        // Input flatten: encoding params cross as the decomposed value
-        // `(id, schema?)` (built via `fromId`). Output flatten: the handle +
-        // its id (both free jvalue slots); schema/string stay accessors.
-        .flatten_input()
-        .variant("fromId")
-        .flatten_output()
-        .field_self()
-        .field("id");
-
-    // Predefined encoding constants — each is a nullary `() -> &'static Encoding`
-    // factory, declared as a companion `.constructor` of `Encoding` so they
-    // collapse into one loop instead of ~50 identical lines. `.constructor`
-    // returns `JniGen<PtrClass>` (the Encoding class is still live), so the
-    // reassignment keeps a stable type. The factory name strips the
-    // `encoding_const_` prefix and camelCases the rest (`text_plain` → `textPlain`).
-    for ctor in [
-        pq!(encoding_const_zenoh_bytes),
-        pq!(encoding_const_zenoh_string),
-        pq!(encoding_const_zenoh_serialized),
-        pq!(encoding_const_application_octet_stream),
-        pq!(encoding_const_text_plain),
-        pq!(encoding_const_application_json),
-        pq!(encoding_const_text_json),
-        pq!(encoding_const_application_cdr),
-        pq!(encoding_const_application_cbor),
-        pq!(encoding_const_application_yaml),
-        pq!(encoding_const_text_yaml),
-        pq!(encoding_const_text_json5),
-        pq!(encoding_const_application_python_serialized_object),
-        pq!(encoding_const_application_protobuf),
-        pq!(encoding_const_application_java_serialized_object),
-        pq!(encoding_const_application_openmetrics_text),
-        pq!(encoding_const_image_png),
-        pq!(encoding_const_image_jpeg),
-        pq!(encoding_const_image_gif),
-        pq!(encoding_const_image_bmp),
-        pq!(encoding_const_image_webp),
-        pq!(encoding_const_application_xml),
-        pq!(encoding_const_application_x_www_form_urlencoded),
-        pq!(encoding_const_text_html),
-        pq!(encoding_const_text_xml),
-        pq!(encoding_const_text_css),
-        pq!(encoding_const_text_javascript),
-        pq!(encoding_const_text_markdown),
-        pq!(encoding_const_text_csv),
-        pq!(encoding_const_application_sql),
-        pq!(encoding_const_application_coap_payload),
-        pq!(encoding_const_application_json_patch_json),
-        pq!(encoding_const_application_json_seq),
-        pq!(encoding_const_application_jsonpath),
-        pq!(encoding_const_application_jwt),
-        pq!(encoding_const_application_mp4),
-        pq!(encoding_const_application_soap_xml),
-        pq!(encoding_const_application_yang),
-        pq!(encoding_const_audio_aac),
-        pq!(encoding_const_audio_flac),
-        pq!(encoding_const_audio_mp4),
-        pq!(encoding_const_audio_ogg),
-        pq!(encoding_const_audio_vorbis),
-        pq!(encoding_const_video_h261),
-        pq!(encoding_const_video_h263),
-        pq!(encoding_const_video_h264),
-        pq!(encoding_const_video_h265),
-        pq!(encoding_const_video_h266),
-        pq!(encoding_const_video_mp4),
-        pq!(encoding_const_video_ogg),
-        pq!(encoding_const_video_raw),
-        pq!(encoding_const_video_vp8),
-        pq!(encoding_const_video_vp9),
-    ] {
-        let name = const_name(&ctor);
-        jni = jni.constructor(ctor, name);
-    }
-
-    let jni = jni
+        .package(
+            package!("qos")
+                .class(enum_class!(Reliability))
+                .class(enum_class!(Priority))
+                .class(enum_class!(CongestionControl)),
+        )
+        // ── Bytes: ZBytes + Encoding (declared above) ─────────────────────
+        .package(bytes)
+        // ZBytes default input: built from a `ByteArray` via `fromVec`.
+        // Default output: the handle only — the bytes are heavy and fetched
+        // on demand via `zbytesAsBytes` (one borrow-copy).
+        .expand(expand_param!(ZBytes).variant(fun!(zbytes_new_from_vec)))
+        .expand(expand_return!(ZBytes).field_self())
+        // Encoding default input: the decomposed value `(id, schema?)` (built
+        // via `fromId`) — cheap primitives, no per-call String parse. Default
+        // output: the handle + its id (both free jvalue slots); schema and
+        // the canonical string stay on-demand accessors.
+        .expand(expand_param!(Encoding).variant(fun!(encoding_new_from_id)))
+        .expand(
+            expand_return!(Encoding)
+                .field_self()
+                .field(fun!(encoding_get_id)),
+        )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`
         // -> i64 -> Long, 1 leaf); nested in a `Sample` it contributes that Long.
-        .package("time")
-        .ptr_class(pq!(Timestamp))
-        .accessor(pq!(timestamp_get_ntp64), "ntp64")
-        .accessor(pq!(timestamp_get_id), "getId")
-        .flatten_output()
-        .field("ntp64")
+        .package(
+            package!("time").class(
+                ptr_class!(Timestamp)
+                    .fun(fun!(timestamp_get_ntp64).name("ntp64"))
+                    .fun(fun!(timestamp_get_id)),
+            ),
+        )
+        .expand(expand_return!(Timestamp).field(fun!(timestamp_get_ntp64)))
         // ── Sample ────────────────────────────────────────────────────────
         // Canonical INPUT: identity only — a `Sample` param takes the owned
         // handle directly. (The full-options constructors carry `Option<ptr_class>`
@@ -294,158 +352,221 @@ fn main() {
         // timestamp -> Long?, kind/priority/congestion/reliability -> Int, express
         // -> Boolean, source_zid -> ByteArray?, source_eid -> Int, source_sn ->
         // Long). Auto-applies to every (non-Result) `Sample` return.
-        .package("sample")
-        .enum_class(pq!(SampleKind))
-        .ptr_class(pq!(Sample))
-        // All sample getters are record sources AND instance methods on the
-        // Sample class; decomposition happens via the canonical output below.
-        .accessor(pq!(sample_get_key_expr), "keyExpr")
-        .accessor(pq!(sample_get_payload), "payload")
-        .accessor(pq!(sample_get_encoding), "encoding")
-        .accessor(pq!(sample_get_kind), "kind")
-        .accessor(pq!(sample_get_timestamp), "timestamp")
-        .accessor(pq!(sample_get_express), "express")
-        .accessor(pq!(sample_get_priority), "priority")
-        .accessor(pq!(sample_get_congestion_control), "congestionControl")
-        .accessor(pq!(sample_get_attachment), "attachment")
-        .accessor(pq!(sample_get_reliability), "reliability")
-        .accessor(pq!(sample_get_source_zid), "sourceZid")
-        .accessor(pq!(sample_get_source_eid), "sourceEid")
-        .accessor(pq!(sample_get_source_sn), "sourceSn")
-        .flatten_input()
-        .variant_self()
-        .flatten_output()
-        .field("keyExpr")
-        .field("payload")
-        .field("encoding")
-        .field("kind")
-        .field("timestamp")
-        .field("express")
-        .field("priority")
-        .field("congestionControl")
-        .field("attachment")
-        .field("reliability")
-        .field("sourceZid")
-        .field("sourceEid")
-        .field("sourceSn")
-        // Standalone sample constructors (callable from Kotlin); consumed by handle.
-        .fun(pq!(sample_new_put))
-        .fun(pq!(sample_new_delete))
+        .package(
+            package!("sample")
+                .class(enum_class!(SampleKind))
+                .class(
+                    ptr_class!(Sample)
+                        // All sample getters are record sources AND instance methods on
+                        // the Sample class; decomposition happens via the canonical
+                        // output below.
+                        .fun(fun!(sample_get_key_expr).name("keyExpr"))
+                        .fun(fun!(sample_get_payload).name("payload"))
+                        .fun(fun!(sample_get_encoding).name("encoding"))
+                        .fun(fun!(sample_get_kind).name("kind"))
+                        .fun(fun!(sample_get_timestamp).name("timestamp"))
+                        .fun(fun!(sample_get_express).name("express"))
+                        .fun(fun!(sample_get_priority).name("priority"))
+                        .fun(fun!(sample_get_congestion_control).name("congestionControl"))
+                        .fun(fun!(sample_get_attachment).name("attachment"))
+                        .fun(fun!(sample_get_reliability).name("reliability"))
+                        .fun(fun!(sample_get_source_zid).name("sourceZid"))
+                        .fun(fun!(sample_get_source_eid).name("sourceEid"))
+                        .fun(fun!(sample_get_source_sn).name("sourceSn")),
+                )
+                // Standalone sample constructors (callable from Kotlin); consumed by handle.
+                .fun(fun!(sample_new_put))
+                .fun(fun!(sample_new_delete)),
+        )
+        // Identity-only input: exactly the default (documented no-op).
+        .expand(expand_param!(Sample).variant_self())
+        // Full-sample decomposition; field names inherit from the members above.
+        .expand(
+            expand_return!(Sample)
+                .field(fun!(sample_get_key_expr))
+                .field(fun!(sample_get_payload))
+                .field(fun!(sample_get_encoding))
+                .field(fun!(sample_get_kind))
+                .field(fun!(sample_get_timestamp))
+                .field(fun!(sample_get_express))
+                .field(fun!(sample_get_priority))
+                .field(fun!(sample_get_congestion_control))
+                .field(fun!(sample_get_attachment))
+                .field(fun!(sample_get_reliability))
+                .field(fun!(sample_get_source_zid))
+                .field(fun!(sample_get_source_eid))
+                .field(fun!(sample_get_source_sn)),
+        )
         // ── Pub/Sub ───────────────────────────────────────────────────────
         // key_expr / payload / attachment / encoding params are auto-constructed
         // by their types' canonical inputs (no per-fn calls).
-        .package("pubsub")
-        .ptr_class(pq!(Publisher))
-        .fun(pq!(publisher_put))
-        .fun(pq!(publisher_delete))
-        .ptr_class(pq!(Subscriber))
+        .package(
+            package!("pubsub")
+                .class(ptr_class!(Publisher))
+                .fun(fun!(publisher_put))
+                .fun(fun!(publisher_delete))
+                .class(ptr_class!(Subscriber)),
+        )
         // ── Query / Queryable / Querier ───────────────────────────────────
-        .package("query")
-        .ptr_class(pq!(Queryable))
-        .ptr_class(pq!(Querier))
-        .fun(pq!(querier_get))
-        .enum_class(pq!(ReplyKeyExpr))
-        .enum_class(pq!(QueryTarget))
-        .enum_class(pq!(ConsolidationMode))
-        // Canonical output: the queryable callback decomposes a `Query` into BOTH
-        // its read fields AND the owned handle (identity) in ONE crossing — the
-        // `output_direct` keeps the handle so the consumer can reply
-        // (`query_reply_*`) after the callback returns; a query must outlive its
-        // callback to be answered.
-        //
-        // ORDER MATTERS: `.flatten_output().field_self()` MUST be LAST. The root
-        // identity moves the owned query while the nested KeyExpr identity (from
-        // `query_get_keyexpr`) clones from a borrow of the same query; identity
-        // leaves are emitted in declaration order, so the root move must follow
-        // the nested borrow to avoid a "use of moved value" error.
-        .ptr_class(pq!(Query))
-        .accessor(pq!(query_get_keyexpr), "keyExpr")
-        .accessor(pq!(query_get_parameters), "parameters")
-        .accessor(pq!(query_get_payload), "payload")
-        .accessor(pq!(query_get_encoding), "encoding")
-        .accessor(pq!(query_get_attachment), "attachment")
-        .accessor(pq!(query_get_accepts_replies), "acceptsReplies")
-        .flatten_output()
-        .field("keyExpr")
-        .field("parameters")
-        .field("payload")
-        .field("encoding")
-        .field("attachment")
-        .field("acceptsReplies")
-        .field_self()
-        // Reply ops on the owned/borrowed query handle.
-        .fun(pq!(query_reply_success))
-        .fun(pq!(query_reply_error))
-        .fun(pq!(query_reply_delete))
-        // `query_reply_sample` takes the sample by owned handle (Sample's
-        // canonical input is identity — see the sample package above).
-        .fun(pq!(query_reply_sample))
-        // ── Reply / ReplyError ────────────────────────────────────────────
-        // ReplyError canonical output: a failed reply's error decomposed in one
-        // crossing — payload -> ByteArray, encoding -> String.
-        .ptr_class(pq!(ReplyError))
-        .accessor(pq!(reply_error_get_payload), "payload")
-        .accessor(pq!(reply_error_get_encoding), "encoding")
-        .flatten_output()
-        .field("payload")
-        .field("encoding")
+        .package(
+            package!("query")
+                .class(ptr_class!(Queryable))
+                .class(ptr_class!(Querier))
+                .fun(fun!(querier_get))
+                .class(enum_class!(ReplyKeyExpr))
+                .class(enum_class!(QueryTarget))
+                .class(enum_class!(ConsolidationMode))
+                .class(
+                    ptr_class!(Query)
+                        .fun(fun!(query_get_keyexpr).name("keyExpr"))
+                        .fun(fun!(query_get_parameters).name("parameters"))
+                        .fun(fun!(query_get_payload).name("payload"))
+                        .fun(fun!(query_get_encoding).name("encoding"))
+                        .fun(fun!(query_get_attachment).name("attachment"))
+                        .fun(fun!(query_get_accepts_replies).name("acceptsReplies")),
+                )
+                // Reply ops on the owned/borrowed query handle.
+                .fun(fun!(query_reply_success))
+                .fun(fun!(query_reply_error))
+                .fun(fun!(query_reply_delete))
+                // `query_reply_sample` takes the sample by owned handle (Sample's
+                // canonical input is identity — see the sample package above).
+                .fun(fun!(query_reply_sample))
+                // ── Reply / ReplyError ────────────────────────────────────────
+                .class(
+                    ptr_class!(ReplyError)
+                        .fun(fun!(reply_error_get_payload).name("payload"))
+                        .fun(fun!(reply_error_get_encoding).name("encoding")),
+                )
+                .class(
+                    ptr_class!(Reply)
+                        // Record sources are class methods — `reply.sample()`'s
+                        // standalone export is therefore the cloned-handle form.
+                        .fun(fun!(reply_get_replier_zid).name("replierZid"))
+                        .fun(fun!(reply_get_replier_eid).name("replierEid"))
+                        .fun(fun!(reply_is_ok))
+                        .fun(fun!(reply_get_sample).name("sample"))
+                        .fun(fun!(reply_get_err).name("err")),
+                ),
+        )
+        // Canonical output: the queryable callback decomposes a `Query` into
+        // BOTH its read fields AND the owned handle (identity) in ONE crossing
+        // — keeping the handle lets the consumer reply (`query_reply_*`) after
+        // the callback returns; a query must outlive its callback to be
+        // answered. `.field_self()` is declared LAST: the root identity moves
+        // the owned query while the nested KeyExpr identity (from
+        // `query_get_keyexpr`) clones from a borrow of it — the generator
+        // hard-errors on the reverse order.
+        .expand(
+            expand_return!(Query)
+                .field(fun!(query_get_keyexpr))
+                .field(fun!(query_get_parameters))
+                .field(fun!(query_get_payload))
+                .field(fun!(query_get_encoding))
+                .field(fun!(query_get_attachment))
+                .field(fun!(query_get_accepts_replies))
+                .field_self(),
+        )
+        // ReplyError canonical output: a failed reply's error decomposed in
+        // one crossing — payload -> ByteArray, encoding -> String.
+        .expand(
+            expand_return!(ReplyError)
+                .field(fun!(reply_error_get_payload))
+                .field(fun!(reply_error_get_encoding)),
+        )
         // Reply canonical output: the whole reply decomposed in ONE crossing
-        // (PRODUCT model — both arms' leaves always present, the not-taken arm's
-        // are null). replier zid/eid + the is_ok discriminator, then the ok arm
-        // splices the full sample and the err arm splices payload/encoding.
-        // Auto-applies to the `Fn(Reply)` callbacks of `session_get` /
-        // `querier_get` / liveliness get; no identity record, so no `Reply`
-        // handle crosses.
-        .ptr_class(pq!(Reply))
-        // Record sources are class methods — `reply.sample()`'s standalone
-        // export is therefore the cloned-handle form.
-        .accessor(pq!(reply_get_replier_zid), "replierZid")
-        .accessor(pq!(reply_get_replier_eid), "replierEid")
-        .accessor(pq!(reply_is_ok), "isOk")
-        .accessor(pq!(reply_get_sample), "sample")
-        .accessor(pq!(reply_get_err), "err")
-        .flatten_output()
-        .field("replierZid")
-        .field("replierEid")
-        .field("isOk")
-        .field("sample")
-        .field("err")
+        // (PRODUCT model — both arms' leaves always present, the not-taken
+        // arm's are null). replier zid/eid + the is_ok discriminator, then the
+        // ok arm splices the full sample and the err arm splices
+        // payload/encoding. Auto-applies to the `Fn(Reply)` callbacks of
+        // `session_get` / `querier_get` / liveliness get; no identity record,
+        // so no `Reply` handle crosses.
+        .expand(
+            expand_return!(Reply)
+                .field(fun!(reply_get_replier_zid))
+                .field(fun!(reply_get_replier_eid))
+                .field(fun!(reply_is_ok))
+                .field(fun!(reply_get_sample))
+                .field(fun!(reply_get_err)),
+        )
         // ── Liveliness + Session ──────────────────────────────────────────
         // `LivelinessToken` is just an opaque handle; the liveliness operations
-        // (`liveliness_*`) are declared under the active `session` package below,
+        // (`liveliness_*`) are declared under the `session` package below,
         // alongside the session API they extend.
-        .package("liveliness")
-        .ptr_class(pq!(LivelinessToken))
-        .package("session")
-        .ptr_class(pq!(Session))
-        .accessor(pq!(session_get_zid), "getZid")
-        .fun(pq!(open))
-        .fun(pq!(session_declare_publisher))
-        .fun(pq!(session_put))
-        .fun(pq!(session_delete))
-        .fun(pq!(session_declare_subscriber))
-        .fun(pq!(session_declare_querier))
-        .fun(pq!(session_declare_queryable))
-        .fun(pq!(session_declare_keyexpr))
-        // Undeclaring needs the declared handle, not a string — opt its key_expr
-        // param out of the (String-building) input flatten.
-        .fun(pq!(session_undeclare_keyexpr))
-        .flatten_input_suppress(pq!(key_expr))
-        .fun(pq!(session_get))
-        // `Vec<ZenohId>`: ZenohId is a value class, so these return `List<ZenohId>`
-        // via the normal Vec converter.
-        .fun(pq!(session_get_peers_zid))
-        .fun(pq!(session_get_routers_zid))
-        // Liveliness ops (key_expr params auto-constructed by the canonical input).
-        .fun(pq!(liveliness_declare_token))
-        .fun(pq!(liveliness_get))
-        .fun(pq!(liveliness_declare_subscriber));
+        .package(package!("liveliness").class(ptr_class!(LivelinessToken)))
+        .package(
+            package!("session")
+                .class(ptr_class!(Session).fun(fun!(session_get_zid)))
+                .fun(fun!(open))
+                .fun(fun!(session_declare_publisher))
+                .fun(fun!(session_put))
+                .fun(fun!(session_delete))
+                .fun(fun!(session_declare_subscriber))
+                .fun(fun!(session_declare_querier))
+                .fun(fun!(session_declare_queryable))
+                .fun(fun!(session_declare_keyexpr))
+                // Undeclaring needs the declared handle, not a string — opt its
+                // key_expr param out of the (String-building) default param variants.
+                .fun(
+                    fun!(session_undeclare_keyexpr)
+                        .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
+                )
+                .fun(fun!(session_get))
+                // `Vec<ZenohId>`: ZenohId is a value class, so these return
+                // `List<ZenohId>` via the normal Vec converter.
+                .fun(fun!(session_get_peers_zid))
+                .fun(fun!(session_get_routers_zid))
+                // Liveliness ops (key_expr params auto-constructed by the canonical input).
+                .fun(fun!(liveliness_declare_token))
+                .fun(fun!(liveliness_get))
+                .fun(fun!(liveliness_declare_subscriber)),
+        );
+
+    // zenoh-flat's `encoding_const_*` `&'static Encoding` loaning factories
+    // are superseded here by the `ENCODING_*` consts above — acknowledge the
+    // whole naming family so the generator doesn't warn about undeclared
+    // functions.
+    jni = jni.ignore(prebindgen::matching(|name| {
+        name.starts_with("encoding_const_")
+    }));
+
+    // The remaining flat functions are intentionally outside this binding
+    // surface. Handle classes already provide close/take lifecycle operations;
+    // the SDK retains its declared key expression/entity metadata; and the Vec
+    // ZBytes constructor is the canonical ByteArray input path. Acknowledge the
+    // exclusions explicitly so newly added source functions remain visible as
+    // generation warnings instead of being lost in a standing warning list.
+    for name in [
+        "liveliness_undeclare_token",
+        "publisher_get_eid",
+        "publisher_get_keyexpr",
+        "publisher_get_zid",
+        "publisher_undeclare",
+        "querier_get_eid",
+        "querier_get_keyexpr",
+        "querier_get_zid",
+        "querier_undeclare",
+        "queryable_get_eid",
+        "queryable_get_keyexpr",
+        "queryable_get_zid",
+        "queryable_undeclare",
+        "session_close",
+        "session_is_closed",
+        "session_new_timestamp",
+        "subscriber_get_eid",
+        "subscriber_get_keyexpr",
+        "subscriber_get_zid",
+        "subscriber_undeclare",
+        "zbytes_new_from_slice",
+    ] {
+        jni = jni.ignore(FunctionDecl::new(syn::parse_str(name).unwrap()));
+    }
 
     // ── Outputs ───────────────────────────────────────────────────────────
     // Run the configured adapter over zenoh-flat's captured `#[prebindgen]`
     // items and write both generated artifacts.
     let source = prebindgen::Source::new(zenoh_flat::PREBINDGEN_OUT_DIR);
-    let mut registry = match Registry::from_items(source.items_all()) {
+    let registry = match Registry::from_items(source.items_all()) {
         Ok(registry) => registry,
         Err(err) => fail("scan failed", err),
     };
@@ -456,7 +577,11 @@ fn main() {
     let rust_dest = std::path::Path::new(&crate_dir)
         .join("src")
         .join("generated_bindings.rs");
-    let rust_path = match registry.write_rust(&jni, &rust_dest) {
+    let generation = match registry.resolve(jni) {
+        Ok(generation) => generation,
+        Err(err) => fail("resolve failed", err),
+    };
+    let rust_path = match generation.write_rust(&rust_dest) {
         Ok(path) => path,
         Err(err) => fail("write_rust failed", err),
     };
@@ -471,17 +596,23 @@ fn main() {
     let kotlin_root = std::path::Path::new(&crate_dir)
         .join("kotlin")
         .join("generated");
-    // Remove stale generated files so package moves don't leave old classes
-    // behind (e.g. io/zenoh/jni/* and io/zenoh/jni/<subpackage>/* side by side).
-    if let Err(err) = std::fs::remove_dir_all(&kotlin_root) {
-        if err.kind() != std::io::ErrorKind::NotFound {
-            fail("cleanup kotlin/generated failed", err);
-        }
-    }
-    for path in match jni.write_kotlin(&registry, &kotlin_root) {
+    // The root is generator-owned: `write_kotlin` deletes and recreates it,
+    // so no consumer-side cleanup is needed.
+    for path in match generation.write_kotlin(&kotlin_root) {
         Ok(paths) => paths,
         Err(err) => fail("write_kotlin failed", err),
     } {
         println!("cargo:warning=Wrote {}", path.display());
+    }
+
+    // The resolved-surface report: committed next to the regen so a decl's
+    // effect is reviewable without reading generated Kotlin.
+    if let Err(err) = std::fs::write(
+        std::path::Path::new(&crate_dir)
+            .join("kotlin")
+            .join("REPORT.md"),
+        generation.report(),
+    ) {
+        fail("write REPORT.md failed", err);
     }
 }

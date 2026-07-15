@@ -12,8 +12,8 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
-        if (p != 0L) {
-            ptr = 0L
+        if (p != 0L && (p and 1L) == 0L) {
+            ptr = p or 1L
             freePtr(p)
         }
     }
@@ -21,12 +21,13 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     public fun take(): Timestamp {
         val p = ptr
-        ptr = 0L
+        ptr = p or 1L
         return Timestamp(p)
     }
 
+    /** NTP64 time component of the timestamp. */
     public fun ntp64(onError: JniErrorHandler<Long>): Long {
-        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
@@ -36,8 +37,9 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    /** Raw bytes of the originating `TimestampId`. */
     public fun getId(onError: JniErrorHandler<ByteArray>): ByteArray {
-        if (this.ptr == 0L) return onError.run("Operation on a closed native handle.")
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr

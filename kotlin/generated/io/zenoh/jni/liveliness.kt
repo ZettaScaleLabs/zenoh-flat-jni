@@ -8,8 +8,8 @@ public class LivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
         val p = ptr
-        if (p != 0L) {
-            ptr = 0L
+        if (p != 0L && (p and 1L) == 0L) {
+            ptr = p or 1L
             freePtr(p)
         }
     }
@@ -17,7 +17,7 @@ public class LivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     public fun take(): LivelinessToken {
         val p = ptr
-        ptr = 0L
+        ptr = p or 1L
         return LivelinessToken(p)
     }
 
