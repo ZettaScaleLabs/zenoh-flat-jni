@@ -99,6 +99,21 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    /**
+     * Insert a JSON5-formatted value at `key` in the configuration.
+     *
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun insertJson5(key: String, value: String, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.configInsertJson5(this_ptr, key, value, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -185,19 +200,4 @@ internal object __ZZenohIdFolderRawHolder {
     @JvmField
     val instance: ZZenohIdFolderRaw<ArrayList<ZenohId>> =
     ZZenohIdFolderRaw { acc, element -> acc.add(ZenohId(element)); acc }
-}
-
-/**
- * Insert a JSON5-formatted value at `key` in the configuration.
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun configInsertJson5(c: Config, key: String, value: String, onError: ErrorHandler<Unit>) {
-    if (c.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(c) {
-        val c_ptr = c.ptr
-        JNINative.configInsertJson5(c_ptr, key, value, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }

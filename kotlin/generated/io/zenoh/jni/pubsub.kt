@@ -25,6 +25,51 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
         return Publisher(p)
     }
 
+    /**
+     * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `ZEncoding` argument, expanded: its `z_encoding_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `payload` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun put(
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.publisherPut(
+                this_ptr,
+                payload,
+                encodingPresent,
+                encodingId,
+                encodingSchema,
+                attachment,
+                __cap,
+            )
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    /**
+     * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun delete(attachment: ByteArray?, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.publisherDelete(this_ptr, attachment, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -53,54 +98,4 @@ public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
         @JvmStatic
         external fun freePtr(ptr: Long)
     }
-}
-
-/**
- * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `ZEncoding` argument, expanded: its `z_encoding_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `payload` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun publisherPut(
-    publisher: Publisher,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (publisher.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(publisher) {
-        val publisher_ptr = publisher.ptr
-        JNINative.publisherPut(
-            publisher_ptr,
-            payload,
-            encodingPresent,
-            encodingId,
-            encodingSchema,
-            attachment,
-            __cap,
-        )
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun publisherDelete(
-    publisher: Publisher,
-    attachment: ByteArray?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (publisher.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(publisher) {
-        val publisher_ptr = publisher.ptr
-        JNINative.publisherDelete(publisher_ptr, attachment, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }

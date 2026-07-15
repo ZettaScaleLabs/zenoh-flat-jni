@@ -8,11 +8,11 @@
 //!
 //! ## Model
 //!
-//! This is the **flat tier**: every `#[prebindgen]` free function is declared
-//! as a package function (`package!("x").fun(fun!(...))`) under a module
-//! namespace, and each `PackageDecl` batch is handed to [`JniGen::package`].
-//! Opaque handles stay typed Kotlin classes derived from `NativeHandle`
-//! (locked, closeable) via `.class(ptr_class!(T))`.
+//! This is the **flat tier**: the Rust source remains ordinary prefixed free
+//! functions for C compatibility, while JniGen places receiver-shaped calls
+//! into typed Kotlin classes with `.method(...)` and factories with
+//! `.constructor(...)`. The package/class-aware name hooks remove structural
+//! `z_<namespace>_` prefixes; only semantic renames need `.name(...)`.
 //!
 //! A type's default boundary shape is declared once, per direction, at the
 //! generator level and AUTO-APPLIES to every matching param / return: input
@@ -21,7 +21,7 @@
 //! `.expand(expand_return!(T).field(fun!(acc)).field_self())` (an
 //! AND-set, one crossing). A `.field(fun!(acc))` inherits its Kotlin name from
 //! the class member declaration of the same fn. Class members are declared
-//! with `.fun(fun!(f).name(..))` (instance methods) and
+//! with `.method(fun!(f).name(..))` (instance methods) and
 //! `.constructor(fun!(f).name(..))` (companion factories), and the per-fn
 //! `.expand_param(name, …)` / `.expand_return(…)` overrides (chained on
 //! the `fun!` decl, taking the same expand-decl objects) replace them — an
@@ -34,8 +34,9 @@
 //! String`) auto-applies to the `E` position so `onError` receives the message.
 //!
 //! The Rust source keeps its original `Z*` / `z_*` opaque-tier naming. JniGen's
-//! type and function mangle hooks remove that FFI marker for Kotlin, while
-//! per-member names describe only semantic differences (`id`, `toStr`, …).
+//! package-aware type/function hooks and the package/class-aware method hook
+//! remove that FFI marker for Kotlin. This changes no zenoh-flat symbol, so
+//! zenoh-flat-c keeps consuming the same stable `z_*` surface.
 
 use prebindgen::{
     core::Registry,
@@ -106,6 +107,50 @@ fn fail(context: &str, err: impl std::fmt::Display) -> ! {
     std::process::exit(1);
 }
 
+fn lower_first(name: &str) -> String {
+    let mut chars = name.chars();
+    match chars.next() {
+        Some(first) => first.to_lowercase().chain(chars).collect(),
+        None => String::new(),
+    }
+}
+
+/// Remove the leading `z` FFI marker from a camelCased Rust function name.
+fn strip_z_marker(name: &str) -> String {
+    name.strip_prefix('z')
+        .filter(|rest| rest.chars().next().is_some_and(char::is_uppercase))
+        .map(lower_first)
+        .unwrap_or_else(|| name.to_string())
+}
+
+fn strip_context_prefix(context: &str, name: &str) -> String {
+    if name
+        .get(..context.len())
+        .is_some_and(|prefix| prefix.eq_ignore_ascii_case(context))
+    {
+        let rest = &name[context.len()..];
+        if !rest.is_empty() {
+            return lower_first(rest);
+        }
+    }
+    name.to_string()
+}
+
+fn mangle_flat_function(package: &str, name: &str) -> String {
+    let unprefixed = strip_z_marker(name);
+    let namespace = package.rsplit('.').next().unwrap_or(package);
+    strip_context_prefix(namespace, &unprefixed)
+}
+
+fn mangle_flat_method(_package: &str, class: &str, name: &str) -> String {
+    let unprefixed = strip_z_marker(name);
+    if class == "JNINative" {
+        unprefixed
+    } else {
+        strip_context_prefix(class, &unprefixed)
+    }
+}
+
 /// The two expression constants for one predefined encoding, composed from
 /// zenoh-flat's general accessors over its `z_encoding_<name>()` loaning
 /// factory (no per-preset accessor exists in the source crate):
@@ -135,11 +180,11 @@ fn main() {
     // Canonical output: the handle (identity) + id (raw jint), both free
     // jvalue slots; schema and the canonical string stay on-demand accessors.
     let encoding = ptr_class!(ZEncoding)
-        .fun(fun!(z_encoding_id).name("id"))
-        .fun(fun!(z_encoding_schema).name("getSchema"))
-        .fun(fun!(z_encoding_to_string).name("toStr"))
+        .method(fun!(z_encoding_id))
+        .method(fun!(z_encoding_schema).name("getSchema"))
+        .method(fun!(z_encoding_to_string).name("toStr"))
         // Whole-handle clone return — see KeyExpr's `newClone`.
-        .fun(
+        .method(
             fun!(z_encoding_clone)
                 .name("newClone")
                 .expand_return(expand_return!(ZEncoding).field_self()),
@@ -148,11 +193,11 @@ fn main() {
         // Encoding — a companion factory returning a raw handle (a constructor
         // never return-field-decomposes, so the result stays a usable handle rather than
         // a decomposed builder).
-        .constructor(fun!(z_encoding_with_schema).name("withSchema"))
+        .constructor(fun!(z_encoding_with_schema))
         // Factories → companion members; `fromId` is also the input variant
         // (see the `expand_param!(Encoding)` declaration below).
-        .constructor(fun!(z_encoding_from_id).name("fromId"))
-        .constructor(fun!(z_encoding_from_string).name("fromString"));
+        .constructor(fun!(z_encoding_from_id))
+        .constructor(fun!(z_encoding_from_string));
 
     // ── Bytes package: ZBytes + Encoding + predefined-encoding consts ────
     // ZBytes canonical input: `payload`/`attachment` params accept a `ByteArray`
@@ -173,9 +218,9 @@ fn main() {
     let mut bytes = package!("bytes")
         .class(
             ptr_class!(ZZBytes)
-                .fun(fun!(z_zbytes_to_bytes).name("asBytes"))
+                .method(fun!(z_zbytes_to_bytes).name("asBytes"))
                 // Whole-handle clone return — see KeyExpr's `newClone`.
-                .fun(
+                .method(
                     fun!(z_zbytes_clone)
                         .name("newClone")
                         .expand_return(expand_return!(ZZBytes).field_self()),
@@ -185,7 +230,7 @@ fn main() {
                 // AND a companion factory (a constructor never
                 // return-field-decomposes, so the factory keeps its
                 // raw-handle return).
-                .constructor(fun!(z_zbytes_from_vec).name("fromVec")),
+                .constructor(fun!(z_zbytes_from_vec)),
         )
         .class(encoding);
     for lower in ENCODING_NAMES {
@@ -198,24 +243,10 @@ fn main() {
         .set_package_prefix("io.zenoh.jni") // base package of the generated JNI bindings
         // Keep the Rust FFI tier visibly prefixed while presenting the same
         // concise Kotlin names (`ZSession` -> `Session`, `ZZBytes` -> `ZBytes`).
-        .set_ptr_class_name_mangle(|name| name.strip_prefix('Z').unwrap_or(name).to_string())
-        .set_data_class_name_mangle(|name| name.strip_prefix('Z').unwrap_or(name).to_string())
-        // The default JNI name is already camel-cased. Remove a leading `z`
-        // namespace marker and lowercase the next character (`zOpen` -> `open`,
-        // `zSessionPut` -> `sessionPut`).
-        .set_fun_name_mangle(|name| {
-            let Some(rest) = name
-                .strip_prefix('z')
-                .filter(|rest| rest.chars().next().is_some_and(char::is_uppercase))
-            else {
-                return name.to_string();
-            };
-            let mut chars = rest.chars();
-            let Some(first) = chars.next() else {
-                return name.to_string();
-            };
-            first.to_lowercase().chain(chars).collect()
-        })
+        .set_ptr_class_name_mangle(|_, name| name.strip_prefix('Z').unwrap_or(name).to_string())
+        .set_data_class_name_mangle(|_, name| name.strip_prefix('Z').unwrap_or(name).to_string())
+        .set_fun_name_mangle(mangle_flat_function)
+        .set_method_name_mangle(mangle_flat_method)
         // Every generated native call routes through `JNINative`; trigger our own
         // loader from its static initializer so the native library is loaded
         // transparently before any extern resolves (consumers never load it).
@@ -242,25 +273,25 @@ fn main() {
                         // override the class's default return fields (identity via
                         // the owned converter) so the borrowed-opaque clone path
                         // applies instead.
-                        .fun(fun!(z_keyexpr_get_str))
-                        .fun(
+                        .method(fun!(z_keyexpr_get_str))
+                        .method(
                             fun!(z_keyexpr_clone)
                                 .name("newClone")
                                 .expand_return(expand_return!(ZKeyExpr).field_self()),
                         )
-                        .fun(fun!(z_keyexpr_to_string).name("toStr"))
+                        .method(fun!(z_keyexpr_to_string).name("toStr"))
                         // Constructors → companion factories returning `Result<KeyExpr, Error>`;
                         // `tryFrom` is also the build-from-String input variant
                         // (see `expand_param!(KeyExpr)` below).
-                        .constructor(fun!(z_keyexpr_try_from).name("tryFrom"))
-                        .constructor(fun!(z_keyexpr_autocanonize).name("autocanonize"))
-                        .constructor(fun!(z_keyexpr_join).name("join").split_on_param("a"))
-                        .constructor(fun!(z_keyexpr_concat).name("concat").split_on_param("a"))
+                        .constructor(fun!(z_keyexpr_try_from))
+                        .constructor(fun!(z_keyexpr_autocanonize))
+                        .constructor(fun!(z_keyexpr_join).split_on_param("a"))
+                        .constructor(fun!(z_keyexpr_concat).split_on_param("a"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
-                        .fun(fun!(z_keyexpr_intersects).split_on_param("b"))
-                        .fun(fun!(z_keyexpr_includes).split_on_param("b"))
-                        .fun(fun!(z_keyexpr_relation_to).split_on_param("b")),
+                        .method(fun!(z_keyexpr_intersects).split_on_param("b"))
+                        .method(fun!(z_keyexpr_includes).split_on_param("b"))
+                        .method(fun!(z_keyexpr_relation_to).split_on_param("b")),
                 )
                 .class(enum_class!(SetIntersectionLevel)),
         )
@@ -278,16 +309,16 @@ fn main() {
             package!("config")
                 .class(
                     ptr_class!(ZConfig)
-                        .fun(fun!(z_config_get_json))
-                        .fun(fun!(z_config_clone).name("newClone"))
+                        .method(fun!(z_config_get_json))
+                        .method(fun!(z_config_clone).name("newClone"))
+                        .method(fun!(z_config_insert_json5))
                         // Factories → Config companion-object members.
                         .constructor(fun!(z_config_default).name("newDefault"))
-                        .constructor(fun!(z_config_from_file).name("fromFile"))
-                        .constructor(fun!(z_config_from_json).name("fromJson"))
-                        .constructor(fun!(z_config_from_json5).name("fromJson5"))
-                        .constructor(fun!(z_config_from_yaml).name("fromYaml")),
+                        .constructor(fun!(z_config_from_file))
+                        .constructor(fun!(z_config_from_json))
+                        .constructor(fun!(z_config_from_json5))
+                        .constructor(fun!(z_config_from_yaml)),
                 )
-                .fun(fun!(z_config_insert_json5).name("configInsertJson5"))
                 .class(enum_class!(WhatAmI))
                 // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
                 // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
@@ -296,8 +327,8 @@ fn main() {
                 // on the value class (receiver = `this.bytes`).
                 .class(
                     value_class!(ZZenohId)
-                        .fun(fun!(z_zenoh_id_to_bytes))
-                        .fun(fun!(z_zenoh_id_to_string).name("toStr")),
+                        .method(fun!(z_zenoh_id_to_bytes))
+                        .method(fun!(z_zenoh_id_to_string).name("toStr")),
                 ),
         )
         // ── Scouting ──────────────────────────────────────────────────────
@@ -308,12 +339,12 @@ fn main() {
             package!("scouting")
                 .class(
                     ptr_class!(ZHello)
-                        .fun(fun!(z_hello_whatami).name("whatami")) // WhatAmI enum -> Int
-                        .fun(fun!(z_hello_zid).name("zid")) // ZenohId value class -> ByteArray
-                        .fun(fun!(z_hello_locators).name("locators")), // Vec<String> -> List<String>
+                        .method(fun!(z_hello_whatami)) // WhatAmI enum -> Int
+                        .method(fun!(z_hello_zid)) // ZenohId value class -> ByteArray
+                        .method(fun!(z_hello_locators)), // Vec<String> -> List<String>
                 )
                 .class(ptr_class!(ZScout))
-                .fun(fun!(z_scout).name("scout")),
+                .fun(fun!(z_scout)),
         )
         .expand(
             expand_return!(ZHello)
@@ -358,8 +389,8 @@ fn main() {
         .package(
             package!("time").class(
                 ptr_class!(ZTimestamp)
-                    .fun(fun!(z_timestamp_ntp64).name("ntp64"))
-                    .fun(fun!(z_timestamp_id).name("getId")),
+                    .method(fun!(z_timestamp_ntp64))
+                    .method(fun!(z_timestamp_id).name("getId")),
             ),
         )
         .expand(expand_return!(ZTimestamp).field(fun!(z_timestamp_ntp64)))
@@ -380,19 +411,19 @@ fn main() {
                     // All sample getters are record sources AND instance methods on
                     // the Sample class; decomposition happens via the canonical
                     // output below.
-                    .fun(fun!(z_sample_key_expr).name("keyExpr"))
-                    .fun(fun!(z_sample_payload).name("payload"))
-                    .fun(fun!(z_sample_encoding).name("encoding"))
-                    .fun(fun!(z_sample_kind).name("kind"))
-                    .fun(fun!(z_sample_timestamp).name("timestamp"))
-                    .fun(fun!(z_sample_express).name("express"))
-                    .fun(fun!(z_sample_priority).name("priority"))
-                    .fun(fun!(z_sample_congestion_control).name("congestionControl"))
-                    .fun(fun!(z_sample_attachment).name("attachment"))
-                    .fun(fun!(z_sample_reliability).name("reliability"))
-                    .fun(fun!(z_sample_source_zid).name("sourceZid"))
-                    .fun(fun!(z_sample_source_eid).name("sourceEid"))
-                    .fun(fun!(z_sample_source_sn).name("sourceSn")),
+                    .method(fun!(z_sample_key_expr))
+                    .method(fun!(z_sample_payload))
+                    .method(fun!(z_sample_encoding))
+                    .method(fun!(z_sample_kind))
+                    .method(fun!(z_sample_timestamp))
+                    .method(fun!(z_sample_express))
+                    .method(fun!(z_sample_priority))
+                    .method(fun!(z_sample_congestion_control))
+                    .method(fun!(z_sample_attachment))
+                    .method(fun!(z_sample_reliability))
+                    .method(fun!(z_sample_source_zid))
+                    .method(fun!(z_sample_source_eid))
+                    .method(fun!(z_sample_source_sn)),
             ),
         )
         // Identity-only input: exactly the default (documented no-op).
@@ -419,52 +450,45 @@ fn main() {
         // by their types' canonical inputs (no per-fn calls).
         .package(
             package!("pubsub")
-                .class(ptr_class!(ZPublisher))
-                .fun(fun!(z_publisher_put).name("publisherPut"))
-                .fun(fun!(z_publisher_delete).name("publisherDelete"))
+                .class(
+                    ptr_class!(ZPublisher)
+                        .method(fun!(z_publisher_put))
+                        .method(fun!(z_publisher_delete)),
+                )
                 .class(ptr_class!(ZSubscriber)),
         )
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
                 .class(ptr_class!(ZQueryable))
-                .class(ptr_class!(ZQuerier))
-                .fun(fun!(z_querier_get).name("querierGet"))
+                .class(ptr_class!(ZQuerier).method(fun!(z_querier_get)))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
                 .class(
                     ptr_class!(ZQuery)
-                        .fun(fun!(z_query_keyexpr).name("keyExpr"))
-                        .fun(fun!(z_query_parameters).name("parameters"))
-                        .fun(fun!(z_query_payload).name("payload"))
-                        .fun(fun!(z_query_encoding).name("encoding"))
-                        .fun(fun!(z_query_attachment).name("attachment"))
-                        .fun(fun!(z_query_accepts_replies).name("acceptsReplies")),
-                )
-                // Reply ops on the owned/borrowed query handle.
-                .fun(
-                    fun!(z_query_reply_success)
-                        .name("queryReplySuccess")
-                        .split_on_param("key_expr"),
-                )
-                .fun(fun!(z_query_reply_error).name("queryReplyError"))
-                .fun(
-                    fun!(z_query_reply_delete)
-                        .name("queryReplyDelete")
-                        .split_on_param("key_expr"),
+                        .method(fun!(z_query_keyexpr))
+                        .method(fun!(z_query_parameters))
+                        .method(fun!(z_query_payload))
+                        .method(fun!(z_query_encoding))
+                        .method(fun!(z_query_attachment))
+                        .method(fun!(z_query_accepts_replies))
+                        // Reply ops on the owned/borrowed query handle.
+                        .method(fun!(z_query_reply_success).split_on_param("key_expr"))
+                        .method(fun!(z_query_reply_error))
+                        .method(fun!(z_query_reply_delete).split_on_param("key_expr")),
                 )
                 // ── Reply ─────────────────────────────────────────────────────
                 .class(
                     ptr_class!(ZReply)
                         // Record sources are class methods — `reply.sample()`'s
                         // standalone export is therefore the cloned-handle form.
-                        .fun(fun!(z_reply_replier_zid).name("replierZid"))
-                        .fun(fun!(z_reply_replier_eid).name("replierEid"))
-                        .fun(fun!(z_reply_is_ok))
-                        .fun(fun!(z_reply_sample).name("sample"))
-                        .fun(fun!(z_reply_error_payload).name("errorPayload"))
-                        .fun(fun!(z_reply_error_encoding).name("errorEncoding")),
+                        .method(fun!(z_reply_replier_zid))
+                        .method(fun!(z_reply_replier_eid))
+                        .method(fun!(z_reply_is_ok))
+                        .method(fun!(z_reply_sample))
+                        .method(fun!(z_reply_error_payload))
+                        .method(fun!(z_reply_error_encoding)),
                 ),
         )
         // Canonical output: the queryable callback decomposes a `Query` into
@@ -507,72 +531,34 @@ fn main() {
         // alongside the session API they extend.
         .package(package!("liveliness").class(ptr_class!(ZLivelinessToken)))
         .package(
-            package!("session")
-                .class(ptr_class!(ZSession).fun(fun!(z_session_zid).name("getZid")))
-                .fun(fun!(z_open).name("open"))
-                .fun(
-                    fun!(z_session_declare_publisher)
-                        .name("sessionDeclarePublisher")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_session_put)
-                        .name("sessionPut")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_session_delete)
-                        .name("sessionDelete")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_session_declare_subscriber)
-                        .name("sessionDeclareSubscriber")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_session_declare_querier)
-                        .name("sessionDeclareQuerier")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_session_declare_queryable)
-                        .name("sessionDeclareQueryable")
-                        .split_on_param("key_expr"),
-                )
-                .fun(fun!(z_session_declare_keyexpr).name("sessionDeclareKeyexpr"))
-                // Undeclaring needs the declared handle, not a string — opt its
-                // key_expr param out of the (String-building) default param variants.
-                .fun(
-                    fun!(z_session_undeclare_keyexpr)
-                        .name("sessionUndeclareKeyexpr")
-                        .expand_param("key_expr", expand_param!(ZKeyExpr).variant_self()),
-                )
-                .fun(
-                    fun!(z_session_get)
-                        .name("sessionGet")
-                        .split_on_param("key_expr"),
-                )
-                // `Vec<ZenohId>`: ZenohId is a value class, so these return
-                // `List<ZenohId>` via the normal Vec converter.
-                .fun(fun!(z_session_peers_zid).name("sessionGetPeersZid"))
-                .fun(fun!(z_session_routers_zid).name("sessionGetRoutersZid"))
-                // Liveliness ops (key_expr params auto-constructed by the canonical input).
-                .fun(
-                    fun!(z_liveliness_declare_token)
-                        .name("livelinessDeclareToken")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_liveliness_get)
-                        .name("livelinessGet")
-                        .split_on_param("key_expr"),
-                )
-                .fun(
-                    fun!(z_liveliness_declare_subscriber)
-                        .name("livelinessDeclareSubscriber")
-                        .split_on_param("key_expr"),
-                ),
+            package!("session").class(
+                ptr_class!(ZSession)
+                    .constructor(fun!(z_open))
+                    .method(fun!(z_session_zid).name("getZid"))
+                    .method(fun!(z_session_declare_publisher).split_on_param("key_expr"))
+                    .method(fun!(z_session_put).split_on_param("key_expr"))
+                    .method(fun!(z_session_delete).split_on_param("key_expr"))
+                    .method(fun!(z_session_declare_subscriber).split_on_param("key_expr"))
+                    .method(fun!(z_session_declare_querier).split_on_param("key_expr"))
+                    .method(fun!(z_session_declare_queryable).split_on_param("key_expr"))
+                    .method(fun!(z_session_declare_keyexpr))
+                    // Undeclaring needs the declared handle, not a string — opt its
+                    // key_expr param out of the default construction variants.
+                    .method(
+                        fun!(z_session_undeclare_keyexpr)
+                            .expand_param("key_expr", expand_param!(ZKeyExpr).variant_self()),
+                    )
+                    .method(fun!(z_session_get).split_on_param("key_expr"))
+                    // `Vec<ZenohId>` folds each value-blob element normally.
+                    .method(fun!(z_session_peers_zid))
+                    .method(fun!(z_session_routers_zid))
+                    // Liveliness extends Session but retains its own source namespace;
+                    // after stripping only the `z` marker these become
+                    // `livelinessDeclareToken`, `livelinessGet`, … automatically.
+                    .method(fun!(z_liveliness_declare_token).split_on_param("key_expr"))
+                    .method(fun!(z_liveliness_get).split_on_param("key_expr"))
+                    .method(fun!(z_liveliness_declare_subscriber).split_on_param("key_expr")),
+            ),
         );
 
     // zenoh-flat's `z_encoding_*` `&'static ZEncoding` loaning factories
