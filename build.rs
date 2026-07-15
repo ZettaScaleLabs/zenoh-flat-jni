@@ -83,11 +83,7 @@ fn main() {
         .fun(fun!(encoding_get_schema))
         .fun(fun!(encoding_to_string).name("toStr"))
         // Whole-handle clone return — see KeyExpr's `newClone`.
-        .fun(
-            fun!(encoding_new_clone)
-                .name("newClone")
-                .expand_return(expand_return!(Encoding).field_self()),
-        )
+        .fun(fun!(encoding_new_clone).expand_return(expand_return!(Encoding).field_self()))
         // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
         // Encoding — a companion factory returning a raw handle (a constructor
         // never return-field-decomposes, so the result stays a usable handle rather than
@@ -119,11 +115,7 @@ fn main() {
             ptr_class!(ZBytes)
                 .fun(fun!(zbytes_as_bytes))
                 // Whole-handle clone return — see KeyExpr's `newClone`.
-                .fun(
-                    fun!(zbytes_new_clone)
-                        .name("newClone")
-                        .expand_return(expand_return!(ZBytes).field_self()),
-                )
+                .fun(fun!(zbytes_new_clone).expand_return(expand_return!(ZBytes).field_self()))
                 // `fromVec` builds a ZBytes from a `ByteArray` — both the
                 // param-variant build arm (see `expand_param!(ZBytes)` below)
                 // AND a companion factory (a constructor never
@@ -223,7 +215,6 @@ fn main() {
                         .fun(fun!(keyexpr_get_str))
                         .fun(
                             fun!(keyexpr_new_clone)
-                                .name("newClone")
                                 .expand_return(expand_return!(KeyExpr).field_self()),
                         )
                         .fun(fun!(keyexpr_to_string).name("toStr"))
@@ -232,13 +223,13 @@ fn main() {
                         // (see `expand_param!(KeyExpr)` below).
                         .constructor(fun!(keyexpr_new_try_from).name("tryFrom"))
                         .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
-                        .constructor(fun!(keyexpr_new_join).name("join"))
-                        .constructor(fun!(keyexpr_new_concat).name("concat"))
+                        .constructor(fun!(keyexpr_new_join).name("join").split_on_param("a"))
+                        .constructor(fun!(keyexpr_new_concat).name("concat").split_on_param("a"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
-                        .fun(fun!(keyexpr_intersects))
-                        .fun(fun!(keyexpr_includes))
-                        .fun(fun!(keyexpr_relation_to)),
+                        .fun(fun!(keyexpr_intersects).split_on_param("b"))
+                        .fun(fun!(keyexpr_includes).split_on_param("b"))
+                        .fun(fun!(keyexpr_relation_to).split_on_param("b")),
                 )
                 .class(enum_class!(SetIntersectionLevel)),
         )
@@ -426,9 +417,9 @@ fn main() {
                         .fun(fun!(query_get_accepts_replies).name("acceptsReplies")),
                 )
                 // Reply ops on the owned/borrowed query handle.
-                .fun(fun!(query_reply_success))
+                .fun(fun!(query_reply_success).split_on_param("key_expr"))
                 .fun(fun!(query_reply_error))
-                .fun(fun!(query_reply_delete))
+                .fun(fun!(query_reply_delete).split_on_param("key_expr"))
                 // `query_reply_sample` takes the sample by owned handle (Sample's
                 // canonical input is identity — see the sample package above).
                 .fun(fun!(query_reply_sample))
@@ -498,12 +489,12 @@ fn main() {
             package!("session")
                 .class(ptr_class!(Session).fun(fun!(session_get_zid)))
                 .fun(fun!(open))
-                .fun(fun!(session_declare_publisher))
-                .fun(fun!(session_put))
-                .fun(fun!(session_delete))
-                .fun(fun!(session_declare_subscriber))
-                .fun(fun!(session_declare_querier))
-                .fun(fun!(session_declare_queryable))
+                .fun(fun!(session_declare_publisher).split_on_param("key_expr"))
+                .fun(fun!(session_put).split_on_param("key_expr"))
+                .fun(fun!(session_delete).split_on_param("key_expr"))
+                .fun(fun!(session_declare_subscriber).split_on_param("key_expr"))
+                .fun(fun!(session_declare_querier).split_on_param("key_expr"))
+                .fun(fun!(session_declare_queryable).split_on_param("key_expr"))
                 .fun(fun!(session_declare_keyexpr))
                 // Undeclaring needs the declared handle, not a string — opt its
                 // key_expr param out of the (String-building) default param variants.
@@ -511,15 +502,15 @@ fn main() {
                     fun!(session_undeclare_keyexpr)
                         .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
                 )
-                .fun(fun!(session_get))
+                .fun(fun!(session_get).split_on_param("key_expr"))
                 // `Vec<ZenohId>`: ZenohId is a value class, so these return
                 // `List<ZenohId>` via the normal Vec converter.
                 .fun(fun!(session_get_peers_zid))
                 .fun(fun!(session_get_routers_zid))
                 // Liveliness ops (key_expr params auto-constructed by the canonical input).
-                .fun(fun!(liveliness_declare_token))
-                .fun(fun!(liveliness_get))
-                .fun(fun!(liveliness_declare_subscriber)),
+                .fun(fun!(liveliness_declare_token).split_on_param("key_expr"))
+                .fun(fun!(liveliness_get).split_on_param("key_expr"))
+                .fun(fun!(liveliness_declare_subscriber).split_on_param("key_expr")),
         );
 
     // zenoh-flat's `encoding_const_*` `&'static Encoding` loaning factories

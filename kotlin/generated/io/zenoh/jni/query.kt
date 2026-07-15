@@ -542,6 +542,32 @@ public fun querierGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun queryReplySuccess(
+    query: Query,
+    s: String,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    timestampNtp64: Long?,
+    attachment: ByteArray?,
+    express: Boolean?,
+    onError: ErrorHandler<Unit>,
+) = queryReplySuccess(query, 0, s, null, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
+public fun queryReplySuccess(
+    query: Query,
+    keyExpr: KeyExpr,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    timestampNtp64: Long?,
+    attachment: ByteArray?,
+    express: Boolean?,
+    onError: ErrorHandler<Unit>,
+) = queryReplySuccess(query, 1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
 /**
  * Reply to a query with a successful PUT sample built from its parts — the flat
  * port of `zenoh::query::Query::reply`. `encoding`, `timestamp_ntp64`,
@@ -634,6 +660,24 @@ public fun queryReplyError(
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
+
+public fun queryReplyDelete(
+    query: Query,
+    s: String,
+    timestampNtp64: Long?,
+    attachment: ByteArray?,
+    express: Boolean?,
+    onError: ErrorHandler<Unit>,
+) = queryReplyDelete(query, 0, s, null, timestampNtp64, attachment, express, onError)
+
+public fun queryReplyDelete(
+    query: Query,
+    keyExpr: KeyExpr,
+    timestampNtp64: Long?,
+    attachment: ByteArray?,
+    express: Boolean?,
+    onError: ErrorHandler<Unit>,
+) = queryReplyDelete(query, 1, null, keyExpr, timestampNtp64, attachment, express, onError)
 
 /**
  * Reply to a query with a DELETE sample (tombstone) on `key_expr` — the flat

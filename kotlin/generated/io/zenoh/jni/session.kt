@@ -67,9 +67,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /**
- * Open a session with the given configuration. The config is consumed by value
- * (matching native `zenoh::open`); C callers that need to keep it should
- * `config_new_clone` first.
+ * Open a session with the given configuration. The configuration is borrowed;
+ * the flat layer clones it for zenoh's consuming `open` operation so callers
+ * can reuse the same handle without a separate FFI clone call.
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
@@ -78,15 +78,31 @@ public fun open(config: Config, onError: ErrorHandler<Session>): Session {
     val __cap = ErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(config) {
         val config_ptr = config.ptr
-        try {
-            Session(JNINative.open(config_ptr, __cap))
-        } finally {
-            config.ptr = config.ptr or 1L
-        }
+        Session(JNINative.open(config_ptr, __cap))
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionDeclarePublisher(
+    session: Session,
+    s: String,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Publisher>,
+): Publisher = sessionDeclarePublisher(session, 0, s, null, congestionControl, priority, express, reliability, onError)
+
+public fun sessionDeclarePublisher(
+    session: Session,
+    keyExpr: KeyExpr,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Publisher>,
+): Publisher = sessionDeclarePublisher(session, 1, null, keyExpr, congestionControl, priority, express, reliability, onError)
 
 /**
  * Declare a publisher for `key_expr` with optional default QoS — the flat port
@@ -122,32 +138,58 @@ public fun sessionDeclarePublisher(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Publisher(
-                    JNINative.sessionDeclarePublisher(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        congestionControl != null,
-                        congestionControl?.value ?: 0,
-                        priority != null,
-                        priority?.value ?: 0,
-                        express != null,
-                        express ?: false,
-                        reliability != null,
-                        reliability?.value ?: 0,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            Publisher(
+                JNINative.sessionDeclarePublisher(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    congestionControl != null,
+                    congestionControl?.value ?: 0,
+                    priority != null,
+                    priority?.value ?: 0,
+                    express != null,
+                    express ?: false,
+                    reliability != null,
+                    reliability?.value ?: 0,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionPut(
+    session: Session,
+    s: String,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionPut(session, 0, s, null, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
+
+public fun sessionPut(
+    session: Session,
+    keyExpr: KeyExpr,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionPut(session, 1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
 
 /**
  * Publish `payload` on `key_expr` in one shot, without declaring a publisher —
@@ -213,6 +255,28 @@ public fun sessionPut(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun sessionDelete(
+    session: Session,
+    s: String,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionDelete(session, 0, s, null, congestionControl, priority, express, attachment, reliability, onError)
+
+public fun sessionDelete(
+    session: Session,
+    keyExpr: KeyExpr,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionDelete(session, 1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
+
 /**
  * Publish a delete (tombstone) on `key_expr` in one shot — the flat port of
  * `zenoh::Session::delete`. Subscribers receive a `SampleKind::Delete` sample.
@@ -268,6 +332,22 @@ public fun sessionDelete(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun sessionDeclareSubscriber(
+    session: Session,
+    s: String,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = sessionDeclareSubscriber(session, 0, s, null, callback, onClose, onError)
+
+public fun sessionDeclareSubscriber(
+    session: Session,
+    keyExpr: KeyExpr,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = sessionDeclareSubscriber(session, 1, null, keyExpr, callback, onClose, onError)
+
 /**
  * Declare a subscriber delivering each change as an opaque [`Sample`] handle
  * (thin surface). `on_close` fires when the subscriber is dropped.
@@ -297,26 +377,48 @@ public fun sessionDeclareSubscriber(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Subscriber(
-                    JNINative.sessionDeclareSubscriber(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            Subscriber(
+                JNINative.sessionDeclareSubscriber(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    callback.asRaw(),
+                    onClose,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionDeclareQuerier(
+    session: Session,
+    s: String,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    timeoutMs: Long?,
+    acceptReplies: ReplyKeyExpr?,
+    onError: ErrorHandler<Querier>,
+): Querier = sessionDeclareQuerier(session, 0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+
+public fun sessionDeclareQuerier(
+    session: Session,
+    keyExpr: KeyExpr,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    timeoutMs: Long?,
+    acceptReplies: ReplyKeyExpr?,
+    onError: ErrorHandler<Querier>,
+): Querier = sessionDeclareQuerier(session, 1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
 
 /**
  * Declare a querier for `key_expr` with optional default query settings — the
@@ -355,38 +457,52 @@ public fun sessionDeclareQuerier(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Querier(
-                    JNINative.sessionDeclareQuerier(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        target != null,
-                        target?.value ?: 0,
-                        consolidation != null,
-                        consolidation?.value ?: 0,
-                        congestionControl != null,
-                        congestionControl?.value ?: 0,
-                        priority != null,
-                        priority?.value ?: 0,
-                        express != null,
-                        express ?: false,
-                        timeoutMs != null,
-                        timeoutMs ?: 0L,
-                        acceptReplies != null,
-                        acceptReplies?.value ?: 0,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            Querier(
+                JNINative.sessionDeclareQuerier(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    target != null,
+                    target?.value ?: 0,
+                    consolidation != null,
+                    consolidation?.value ?: 0,
+                    congestionControl != null,
+                    congestionControl?.value ?: 0,
+                    priority != null,
+                    priority?.value ?: 0,
+                    express != null,
+                    express ?: false,
+                    timeoutMs != null,
+                    timeoutMs ?: 0L,
+                    acceptReplies != null,
+                    acceptReplies?.value ?: 0,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionDeclareQueryable(
+    session: Session,
+    s: String,
+    complete: Boolean?,
+    callback: QueryCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Queryable>,
+): Queryable = sessionDeclareQueryable(session, 0, s, null, complete, callback, onClose, onError)
+
+public fun sessionDeclareQueryable(
+    session: Session,
+    keyExpr: KeyExpr,
+    complete: Boolean?,
+    callback: QueryCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Queryable>,
+): Queryable = sessionDeclareQueryable(session, 1, null, keyExpr, complete, callback, onClose, onError)
 
 /**
  * Declare a queryable delivering each query as an opaque [`Query`] handle
@@ -418,23 +534,19 @@ public fun sessionDeclareQueryable(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Queryable(
-                    JNINative.sessionDeclareQueryable(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        complete != null,
-                        complete ?: false,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            Queryable(
+                JNINative.sessionDeclareQueryable(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    complete != null,
+                    complete ?: false,
+                    callback.asRaw(),
+                    onClose,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -485,6 +597,48 @@ public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: 
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
+
+public fun sessionGet(
+    session: Session,
+    s: String,
+    parameters: String?,
+    timeoutMs: Long?,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    acceptReplies: ReplyKeyExpr?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    payload: ByteArray?,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    attachment: ByteArray?,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = sessionGet(session, 0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
+
+public fun sessionGet(
+    session: Session,
+    keyExpr: KeyExpr,
+    parameters: String?,
+    timeoutMs: Long?,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    acceptReplies: ReplyKeyExpr?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    payload: ByteArray?,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    attachment: ByteArray?,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = sessionGet(session, 1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
 
 /**
  * Query matching queryables, delivering each reply as an opaque [`Reply`]
@@ -600,6 +754,18 @@ public fun sessionGetRoutersZid(
     return __ret
 }
 
+public fun livelinessDeclareToken(
+    session: Session,
+    s: String,
+    onError: ErrorHandler<LivelinessToken>,
+): LivelinessToken = livelinessDeclareToken(session, 0, s, null, onError)
+
+public fun livelinessDeclareToken(
+    session: Session,
+    keyExpr: KeyExpr,
+    onError: ErrorHandler<LivelinessToken>,
+): LivelinessToken = livelinessDeclareToken(session, 1, null, keyExpr, onError)
+
 /**
  * Declare a [`LivelinessToken`] on `key_expr`. The token keeps the liveliness
  * alive until its handle is dropped, which undeclares it.
@@ -627,24 +793,38 @@ public fun livelinessDeclareToken(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                LivelinessToken(
-                    JNINative.livelinessDeclareToken(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            LivelinessToken(
+                JNINative.livelinessDeclareToken(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun livelinessGet(
+    session: Session,
+    s: String,
+    timeoutMs: Long,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = livelinessGet(session, 0, s, null, timeoutMs, callback, onClose, onError)
+
+public fun livelinessGet(
+    session: Session,
+    keyExpr: KeyExpr,
+    timeoutMs: Long,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = livelinessGet(session, 1, null, keyExpr, timeoutMs, callback, onClose, onError)
 
 /**
  * Query liveliness tokens matching `key_expr`, delivering each reply as an
@@ -691,6 +871,24 @@ public fun livelinessGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun livelinessDeclareSubscriber(
+    session: Session,
+    s: String,
+    history: Boolean,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = livelinessDeclareSubscriber(session, 0, s, null, history, callback, onClose, onError)
+
+public fun livelinessDeclareSubscriber(
+    session: Session,
+    keyExpr: KeyExpr,
+    history: Boolean,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = livelinessDeclareSubscriber(session, 1, null, keyExpr, history, callback, onClose, onError)
+
 /**
  * Declare a subscriber to liveliness changes matching `key_expr`, delivering
  * each change as an opaque [`Sample`] handle (thin surface). With `history`,
@@ -723,22 +921,18 @@ public fun livelinessDeclareSubscriber(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Subscriber(
-                    JNINative.livelinessDeclareSubscriber(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        history,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
+            Subscriber(
+                JNINative.livelinessDeclareSubscriber(
+                    session_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    history,
+                    callback.asRaw(),
+                    onClose,
+                    __cap,
+                ),
+            )
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)

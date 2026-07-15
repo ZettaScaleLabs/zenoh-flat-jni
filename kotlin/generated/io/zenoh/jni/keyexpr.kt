@@ -93,6 +93,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun intersects(s: String, onError: JniErrorHandler<Boolean>): Boolean = intersects(0, s, null, onError)
+
+    public fun intersects(b: KeyExpr, onError: JniErrorHandler<Boolean>): Boolean = intersects(1, null, b, onError)
+
     /**
      * Whether `a` and `b` share at least one key they both match (the flat port of
      * `keyexpr::intersects`).
@@ -122,6 +126,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun includes(s: String, onError: JniErrorHandler<Boolean>): Boolean = includes(0, s, null, onError)
+
+    public fun includes(b: KeyExpr, onError: JniErrorHandler<Boolean>): Boolean = includes(1, null, b, onError)
+
     /**
      * Whether every key matched by `b` is also matched by `a`, i.e. `a` includes
      * `b` (the flat port of `keyexpr::includes`).
@@ -150,6 +158,16 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
+
+    public fun relationTo(
+        s: String,
+        onError: JniErrorHandler<SetIntersectionLevel>,
+    ): SetIntersectionLevel = relationTo(0, s, null, onError)
+
+    public fun relationTo(
+        b: KeyExpr,
+        onError: JniErrorHandler<SetIntersectionLevel>,
+    ): SetIntersectionLevel = relationTo(1, null, b, onError)
 
     /**
      * The set relation of `a` to `b` (disjoint / intersects / includes / equals) —
@@ -218,6 +236,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
             return __ret
         }
 
+        public fun join(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(0, s, null, b, onError)
+
+        public fun join(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(1, null, a, b, onError)
+
         /**
          * Join `a` with `b` using `/` as separator, returning a new owned key
          * expression (the flat port of `keyexpr::join`). Errors if the result is not a
@@ -249,6 +271,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
+
+        public fun concat(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(0, s, null, b, onError)
+
+        public fun concat(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(1, null, a, b, onError)
 
         /**
          * Concatenate `b` onto `a` verbatim (no separator inserted), returning a new

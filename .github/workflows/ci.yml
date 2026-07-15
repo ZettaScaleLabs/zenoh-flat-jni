@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ZettaScaleLabs/zenoh-flat
-          ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
+          ref: ff6279292e34e0a1880495426dc7f70f764b77b1
           path: zenoh-flat
 
       - name: Use prebindgen from GitHub main
@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ZettaScaleLabs/zenoh-flat
-          ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
+          ref: ff6279292e34e0a1880495426dc7f70f764b77b1
           path: zenoh-flat
 
       - name: Use prebindgen from GitHub main
@@ -161,7 +161,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ZettaScaleLabs/zenoh-flat
-          ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
+          ref: ff6279292e34e0a1880495426dc7f70f764b77b1
           path: zenoh-flat
 
       - name: Use prebindgen from GitHub main

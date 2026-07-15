@@ -6881,25 +6881,6 @@ pub(crate) unsafe fn jlong_to_Option_KeyExpr_d960fa7d<'env, 'v>(
     Ok({ if *v == 0 { None } else { Some(jlong_to_KeyExpr_5d6bcc5b(env, v)?) } })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
-pub(crate) unsafe fn jlong_to_Option_KeyExpr_f7eec5be<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::sys::jlong,
-) -> ::core::result::Result<Option<zenoh_flat::KeyExpr>, __JniErr> {
-    Ok({
-        if *v == 0 {
-            None
-        } else if (*v & 1) == 1 {
-            return ::core::result::Result::Err(
-                <__JniErr as ::core::convert::From<
-                    String,
-                >>::from("Operation on a closed native handle.".to_string()),
-            );
-        } else {
-            Some(*std::boxed::Box::from_raw(*v as *mut zenoh_flat::KeyExpr))
-        }
-    })
-}
-#[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
 pub(crate) unsafe fn jlong_to_Option_ZBytes_e82c3945<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
@@ -9812,7 +9793,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -9850,7 +9831,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -9939,7 +9922,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     };
     let __out = match zenoh_flat::liveliness_declare_subscriber(
         &session,
-        __folded_key_expr,
+        &__folded_key_expr,
         history,
         callback,
         on_close,
@@ -10074,7 +10057,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -10112,7 +10095,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -10145,7 +10130,10 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __out = match zenoh_flat::liveliness_declare_token(&session, __folded_key_expr) {
+    let __out = match zenoh_flat::liveliness_declare_token(
+        &session,
+        &__folded_key_expr,
+    ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__de) => {
             let __eze0: jni::objects::JObject = {
@@ -10489,23 +10477,23 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_open<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
-    if config == 0 || (config & 1) == 1 {
-        let __zd = __ze_defaults(&mut env);
-        signal_error(
-            &mut env,
-            &__error_sink,
-            &__SINK_MID,
-            __SINK_FQN,
-            __SINK_DESCR,
-            ::core::option::Option::Some("Operation on a closed native handle."),
-            &__zd,
-        );
-        return 0 as jni::sys::jlong;
-    }
-    let config: zenoh_flat::Config = unsafe {
-        *std::boxed::Box::from_raw(config as *mut zenoh_flat::Config)
+    let config = match jlong_to_Config_d1f60c7d(&mut env, &config) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return 0 as jni::sys::jlong;
+        }
     };
-    let __out = match zenoh_flat::open(config) {
+    let __out = match zenoh_flat::open(&config) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__de) => {
             let __eze0: jni::objects::JObject = {
@@ -13729,7 +13717,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -13767,7 +13755,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -13965,7 +13955,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     const __CB_FQN: &str = "io/zenoh/jni/sample/SampleBuilderRaw";
     const __CB_DESCR: &str = "(JJJIILjava/lang/Long;ZIILjava/lang/Long;I[BIJ)Ljava/lang/Object;";
     let __out = zenoh_flat::sample_new_delete(
-        __folded_key_expr,
+        &__folded_key_expr,
         timestamp_ntp64,
         __folded_attachment,
         congestion_control,
@@ -14434,7 +14424,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -14472,7 +14462,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -14787,7 +14779,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     const __CB_FQN: &str = "io/zenoh/jni/sample/SampleBuilderRaw";
     const __CB_DESCR: &str = "(JJJIILjava/lang/Long;ZIILjava/lang/Long;I[BIJ)Ljava/lang/Object;";
     let __out = zenoh_flat::sample_new_put(
-        __folded_key_expr,
+        &__folded_key_expr,
         __folded_payload,
         __folded_encoding.as_ref(),
         timestamp_ntp64,
@@ -15530,7 +15522,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -15568,7 +15560,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -15693,7 +15687,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     };
     let __out = match zenoh_flat::session_declare_publisher(
         &session,
-        __folded_key_expr,
+        &__folded_key_expr,
         congestion_control,
         priority,
         express,
@@ -15843,7 +15837,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -15881,7 +15875,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -16072,7 +16068,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     };
     let __out = match zenoh_flat::session_declare_querier(
         &session,
-        __folded_key_expr,
+        &__folded_key_expr,
         target,
         consolidation,
         congestion_control,
@@ -16215,7 +16211,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -16253,7 +16249,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -16347,7 +16345,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     };
     let __out = match zenoh_flat::session_declare_queryable(
         &session,
-        __folded_key_expr,
+        &__folded_key_expr,
         complete,
         callback,
         on_close,
@@ -16484,7 +16482,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_f7eec5be(
+    let __exp_key_expr_1 = match jlong_to_Option_KeyExpr_d960fa7d(
         &mut env,
         &key_expr_1,
     ) {
@@ -16522,7 +16520,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
             }
             1i32 => {
                 match __exp_key_expr_1 {
-                    ::core::option::Option::Some(__v) => ::core::result::Result::Ok(__v),
+                    ::core::option::Option::Some(__v) => {
+                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
+                    }
                     ::core::option::Option::None => {
                         ::core::result::Result::Err(
                             ::std::string::String::from("identity variant value missing"),
@@ -16595,7 +16595,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     };
     let __out = match zenoh_flat::session_declare_subscriber(
         &session,
-        __folded_key_expr,
+        &__folded_key_expr,
         callback,
         on_close,
     ) {
