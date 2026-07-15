@@ -22,8 +22,7 @@ jobs:
         with:
           path: zenoh-flat-jni
 
-      # Cargo.toml uses sibling path dependencies during pre-publication
-      # development. Recreate the PREBINDGEN workspace layout in CI.
+      # zenoh-flat remains a sibling path dependency until it is published.
       - name: Check out zenoh-flat
         uses: actions/checkout@v4
         with:
@@ -31,12 +30,11 @@ jobs:
           ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
           path: zenoh-flat
 
-      - name: Check out prebindgen
-        uses: actions/checkout@v4
-        with:
-          repository: milyin/prebindgen
-          ref: 6a1a387695ce2f583bcb1942cf61d78a318d71ee
-          path: prebindgen
+      - name: Use prebindgen from GitHub main
+        shell: bash
+        run: |
+          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
+          rm Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -64,7 +62,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: zenoh-flat-jni/target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat/Cargo.lock', 'prebindgen/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat-jni/Cargo.lock', 'zenoh-flat/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-build-target-
 
@@ -95,12 +93,11 @@ jobs:
           ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
           path: zenoh-flat
 
-      - name: Check out prebindgen
-        uses: actions/checkout@v4
-        with:
-          repository: milyin/prebindgen
-          ref: 6a1a387695ce2f583bcb1942cf61d78a318d71ee
-          path: prebindgen
+      - name: Use prebindgen from GitHub main
+        shell: bash
+        run: |
+          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
+          rm Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -133,7 +130,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: zenoh-flat-jni/target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat/Cargo.lock', 'prebindgen/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat-jni/Cargo.lock', 'zenoh-flat/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-build-target-
 
@@ -161,12 +158,11 @@ jobs:
           ref: bb410ccb821d5eace0ec33dfb4d8f02dff977ea0
           path: zenoh-flat
 
-      - name: Check out prebindgen
-        uses: actions/checkout@v4
-        with:
-          repository: milyin/prebindgen
-          ref: 6a1a387695ce2f583bcb1942cf61d78a318d71ee
-          path: prebindgen
+      - name: Use prebindgen from GitHub main
+        shell: bash
+        run: |
+          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
+          rm Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -177,7 +173,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: zenoh-flat-jni/target
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat/Cargo.lock', 'prebindgen/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat-jni/Cargo.lock', 'zenoh-flat/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-build-target-
 
