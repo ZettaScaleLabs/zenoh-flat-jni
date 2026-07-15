@@ -81,10 +81,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_bytes_Encoding_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Encoding));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Encoding>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_bytes_ZBytes_freePtr(
@@ -92,10 +97,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_bytes_ZBytes_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::ZBytes));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::ZBytes>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_config_Config_freePtr(
@@ -103,21 +113,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_config_Config_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Config));
     }
 }
-#[no_mangle]
-#[allow(non_snake_case, unused_variables)]
-pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_errors_Error_freePtr(
-    _env: jni::JNIEnv,
-    _class: jni::objects::JClass,
-    ptr: jni::sys::jlong,
-) {
-    if ptr != 0 {
-        drop(Box::from_raw(ptr as *mut zenoh_flat::Error));
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Config>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
     }
-}
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_keyexpr_KeyExpr_freePtr(
@@ -125,10 +129,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_keyexpr_KeyExpr_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::KeyExpr));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::KeyExpr>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_liveliness_LivelinessToken_freePtr(
@@ -136,10 +145,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_liveliness_LivelinessToken_fre
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::LivelinessToken));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::LivelinessToken>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_pubsub_Publisher_freePtr(
@@ -147,10 +161,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_pubsub_Publisher_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Publisher));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Publisher>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_pubsub_Subscriber_freePtr(
@@ -158,10 +177,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_pubsub_Subscriber_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Subscriber));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Subscriber>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Querier_freePtr(
@@ -169,10 +193,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Querier_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Querier));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Querier>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Query_freePtr(
@@ -180,10 +209,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Query_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Query));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Query>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Queryable_freePtr(
@@ -191,10 +225,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Queryable_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Queryable));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Queryable>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_ReplyError_freePtr(
@@ -202,10 +241,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_ReplyError_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::ReplyError));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::ReplyError>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Reply_freePtr(
@@ -213,10 +257,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_query_Reply_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Reply));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Reply>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_sample_Sample_freePtr(
@@ -224,10 +273,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_sample_Sample_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Sample));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Sample>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_scouting_Hello_freePtr(
@@ -235,10 +289,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_scouting_Hello_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Hello));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Hello>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_scouting_Scout_freePtr(
@@ -246,10 +305,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_scouting_Scout_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Scout));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Scout>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_session_Session_freePtr(
@@ -257,10 +321,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_session_Session_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Session));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Session>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 #[no_mangle]
 #[allow(non_snake_case, unused_variables)]
 pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_time_Timestamp_freePtr(
@@ -268,10 +337,15 @@ pub(crate) unsafe extern "C" fn Java_io_zenoh_jni_time_Timestamp_freePtr(
     _class: jni::objects::JClass,
     ptr: jni::sys::jlong,
 ) {
-    if ptr != 0 {
+    if ptr != 0 && (ptr & 1) == 0 {
         drop(Box::from_raw(ptr as *mut zenoh_flat::Timestamp));
     }
 }
+const _: () = {
+    if ::core::mem::align_of::<zenoh_flat::Timestamp>() < 2 {
+        panic!("opaque handle types must have alignment >= 2 (bit 0 is the closed tag)");
+    }
+};
 const _: () = {
     const fn __assert_copy<T: ::core::marker::Copy>() {}
     __assert_copy::<zenoh_flat::ZenohId>();
@@ -4300,13 +4374,6 @@ pub(crate) unsafe fn Encoding_to_jlong_e0e31e0d<'a>(
     Ok(std::boxed::Box::into_raw(std::boxed::Box::new(v)) as i64)
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
-pub(crate) unsafe fn Error_to_jlong_0740464d<'a>(
-    env: &mut jni::JNIEnv<'a>,
-    v: zenoh_flat::Error,
-) -> ::core::result::Result<jni::sys::jlong, __JniErr> {
-    Ok(std::boxed::Box::into_raw(std::boxed::Box::new(v)) as i64)
-}
-#[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
 pub(crate) unsafe fn Hello_to_jlong_bbd3fc65<'a>(
     env: &mut jni::JNIEnv<'a>,
     v: zenoh_flat::Hello,
@@ -6727,6 +6794,13 @@ pub(crate) unsafe fn jlong_to_Config_d1f60c7d<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Config>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Config) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6734,20 +6808,27 @@ pub(crate) unsafe fn jlong_to_Encoding_e0e31e0d<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Encoding>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Encoding) })
-}
-#[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
-pub(crate) unsafe fn jlong_to_Error_0740464d<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::sys::jlong,
-) -> ::core::result::Result<OwnedObject<zenoh_flat::Error>, __JniErr> {
-    Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Error) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
 pub(crate) unsafe fn jlong_to_Hello_bbd3fc65<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Hello>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Hello) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6755,6 +6836,13 @@ pub(crate) unsafe fn jlong_to_KeyExpr_5d6bcc5b<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::KeyExpr>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::KeyExpr) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6762,6 +6850,13 @@ pub(crate) unsafe fn jlong_to_LivelinessToken_d3477f0e<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::LivelinessToken>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::LivelinessToken) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6793,6 +6888,12 @@ pub(crate) unsafe fn jlong_to_Option_KeyExpr_f7eec5be<'env, 'v>(
     Ok({
         if *v == 0 {
             None
+        } else if (*v & 1) == 1 {
+            return ::core::result::Result::Err(
+                <__JniErr as ::core::convert::From<
+                    String,
+                >>::from("Operation on a closed native handle.".to_string()),
+            );
         } else {
             Some(*std::boxed::Box::from_raw(*v as *mut zenoh_flat::KeyExpr))
         }
@@ -6806,6 +6907,12 @@ pub(crate) unsafe fn jlong_to_Option_ZBytes_e82c3945<'env, 'v>(
     Ok({
         if *v == 0 {
             None
+        } else if (*v & 1) == 1 {
+            return ::core::result::Result::Err(
+                <__JniErr as ::core::convert::From<
+                    String,
+                >>::from("Operation on a closed native handle.".to_string()),
+            );
         } else {
             Some(*std::boxed::Box::from_raw(*v as *mut zenoh_flat::ZBytes))
         }
@@ -6816,6 +6923,13 @@ pub(crate) unsafe fn jlong_to_Publisher_7bfc8296<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Publisher>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Publisher) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6823,6 +6937,13 @@ pub(crate) unsafe fn jlong_to_Querier_9db85a56<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Querier>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Querier) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6830,6 +6951,13 @@ pub(crate) unsafe fn jlong_to_Query_3af47090<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Query>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Query) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6837,6 +6965,13 @@ pub(crate) unsafe fn jlong_to_Queryable_f7f9bb6c<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Queryable>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Queryable) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6844,6 +6979,13 @@ pub(crate) unsafe fn jlong_to_ReplyError_9db9d1a6<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::ReplyError>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::ReplyError) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6851,6 +6993,13 @@ pub(crate) unsafe fn jlong_to_Reply_8e506ce5<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Reply>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Reply) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6858,6 +7007,13 @@ pub(crate) unsafe fn jlong_to_Sample_f8134321<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Sample>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Sample) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6865,6 +7021,13 @@ pub(crate) unsafe fn jlong_to_Scout_794eae84<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Scout>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Scout) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6872,6 +7035,13 @@ pub(crate) unsafe fn jlong_to_Session_4d3982f6<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Session>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Session) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6879,6 +7049,13 @@ pub(crate) unsafe fn jlong_to_Subscriber_73e1b4a2<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Subscriber>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Subscriber) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6886,6 +7063,13 @@ pub(crate) unsafe fn jlong_to_Timestamp_bfea2165<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::Timestamp>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::Timestamp) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6893,6 +7077,13 @@ pub(crate) unsafe fn jlong_to_ZBytes_141dc9e1<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::sys::jlong,
 ) -> ::core::result::Result<OwnedObject<zenoh_flat::ZBytes>, __JniErr> {
+    if *v == 0 || (*v & 1) == 1 {
+        return ::core::result::Result::Err(
+            <__JniErr as ::core::convert::From<
+                String,
+            >>::from("Operation on a closed native handle.".to_string()),
+        );
+    }
     Ok(unsafe { OwnedObject::from_raw(*v as *const zenoh_flat::ZBytes) })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
@@ -6955,7 +7146,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
@@ -7066,7 +7257,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let mut c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
@@ -7274,7 +7465,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromFile<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let path = match JString_to_String_c7f3ca43(&mut env, &path) {
         ::core::result::Result::Ok(__v) => __v,
@@ -7367,7 +7558,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
@@ -7460,7 +7651,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson5<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
@@ -7553,7 +7744,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromYaml<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
@@ -8034,56 +8225,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingToString<'a>(
         }
     };
     let __out = zenoh_flat::encoding_to_string(&e);
-    match String_to_JString_c7f3ca43(&mut env, __out) {
-        ::core::result::Result::Ok(__w) => __w,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            jni::objects::JObject::null().into()
-        }
-    }
-}
-#[no_mangle]
-#[allow(non_snake_case, unused_mut, unused_variables, dead_code)]
-pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_errorGetMessage<'a>(
-    mut env: jni::JNIEnv<'a>,
-    _class: jni::objects::JClass<'a>,
-    e: jni::sys::jlong,
-    __error_sink: jni::objects::JObject<'a>,
-) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
-    #[allow(non_upper_case_globals)]
-    static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let e = match jlong_to_Error_0740464d(&mut env, &e) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
-    };
-    let __out = zenoh_flat::error_get_message(&e);
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
@@ -8775,7 +8916,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewAutocanonize<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
@@ -8921,7 +9062,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
         ::core::result::Result::Ok(__v) => __v,
@@ -9119,7 +9260,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
         ::core::result::Result::Ok(__v) => __v,
@@ -9314,7 +9455,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewTryFrom<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
@@ -9618,7 +9759,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -9880,7 +10021,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -10085,7 +10226,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -10346,8 +10487,21 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_open<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    if config == 0 || (config & 1) == 1 {
+        let __zd = __ze_defaults(&mut env);
+        signal_error(
+            &mut env,
+            &__error_sink,
+            &__SINK_MID,
+            __SINK_FQN,
+            __SINK_DESCR,
+            ::core::option::Option::Some("Operation on a closed native handle."),
+            &__zd,
+        );
+        return 0 as jni::sys::jlong;
+    }
     let config: zenoh_flat::Config = unsafe {
         *std::boxed::Box::from_raw(config as *mut zenoh_flat::Config)
     };
@@ -10427,7 +10581,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let publisher = match jlong_to_Publisher_7bfc8296(&mut env, &publisher) {
         ::core::result::Result::Ok(__v) => __v,
@@ -10571,7 +10725,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let publisher = match jlong_to_Publisher_7bfc8296(&mut env, &publisher) {
         ::core::result::Result::Ok(__v) => __v,
@@ -10840,7 +10994,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let querier = match jlong_to_Querier_9db85a56(&mut env, &querier) {
         ::core::result::Result::Ok(__v) => __v,
@@ -11472,7 +11626,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
@@ -11774,7 +11928,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
@@ -11989,7 +12143,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
@@ -12007,6 +12161,19 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
             return ();
         }
     };
+    if sample == 0 || (sample & 1) == 1 {
+        let __zd = __ze_defaults(&mut env);
+        signal_error(
+            &mut env,
+            &__error_sink,
+            &__SINK_MID,
+            __SINK_FQN,
+            __SINK_DESCR,
+            ::core::option::Option::Some("Operation on a closed native handle."),
+            &__zd,
+        );
+        return ();
+    }
     let sample: zenoh_flat::Sample = unsafe {
         *std::boxed::Box::from_raw(sample as *mut zenoh_flat::Sample)
     };
@@ -12097,7 +12264,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15042,7 +15209,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let whatami = match jint_to_i32_a3e3b6ef(&mut env, &whatami) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15190,7 +15357,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareKeyexpr<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15310,7 +15477,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15623,7 +15790,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -15995,7 +16162,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -16264,7 +16431,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -16518,7 +16685,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -16888,7 +17055,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -17744,7 +17911,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -18209,7 +18376,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionUndeclareKeyexpr<'a>
     };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/errors/ErrorHandler";
+    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
@@ -18227,6 +18394,19 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionUndeclareKeyexpr<'a>
             return ();
         }
     };
+    if key_expr == 0 || (key_expr & 1) == 1 {
+        let __zd = __ze_defaults(&mut env);
+        signal_error(
+            &mut env,
+            &__error_sink,
+            &__SINK_MID,
+            __SINK_FQN,
+            __SINK_DESCR,
+            ::core::option::Option::Some("Operation on a closed native handle."),
+            &__zd,
+        );
+        return ();
+    }
     let key_expr: zenoh_flat::KeyExpr = unsafe {
         *std::boxed::Box::from_raw(key_expr as *mut zenoh_flat::KeyExpr)
     };

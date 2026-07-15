@@ -5,18 +5,32 @@ import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 
+/**
+ * Initialize Android-style logging (logcat on Android, standard
+ * output on non-Android systems) with an explicit filter.
+ *
+ * If the logger was already initialized, this call is a no-op.
+ *
+ * See <https://docs.rs/env_logger/latest/env_logger/index.html> for
+ * accepted filter format.
+ */
 public fun initAndroidLogs(filter: String, onError: JniErrorHandler<Unit>) {
     val __cap = JniErrorHandlerCapture.acquire()
     JNINative.initAndroidLogs(filter, __cap)
     if (__cap.failed) return onError.run(__cap.je)
 }
 
+/** Try to initialize zenoh logging from environment variables. */
 public fun tryInitZenohLogsFromEnv(onError: JniErrorHandler<Unit>) {
     val __cap = JniErrorHandlerCapture.acquire()
     JNINative.tryInitZenohLogsFromEnv(__cap)
     if (__cap.failed) return onError.run(__cap.je)
 }
 
+/**
+ * Initialize zenoh logging from environment variables, falling back to
+ * `fallback_filter` when the environment is unset.
+ */
 public fun initZenohLogsFromEnvOr(fallbackFilter: String, onError: JniErrorHandler<Unit>) {
     val __cap = JniErrorHandlerCapture.acquire()
     JNINative.initZenohLogsFromEnvOr(fallbackFilter, __cap)
