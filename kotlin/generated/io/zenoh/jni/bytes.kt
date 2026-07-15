@@ -25,7 +25,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return Encoding(p)
     }
 
-    /** Numeric id of the encoding (u16 widened to i32 for JVM). */
+    /** Return the numeric identifier of an encoding. */
     public fun id(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -37,7 +37,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Optional textual schema attached to the encoding. */
+    /** Return the schema associated with an encoding, when present. */
     public fun getSchema(onError: JniErrorHandler<String?>): String? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -49,7 +49,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Canonical display string for a [`Encoding`] (upstream `Display` impl). */
+    /** Return the standard textual representation of an encoding. */
     public fun toStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -61,10 +61,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * Clone an encoding into an owned handle (cheap; materializes an owned
-     * encoding from a borrowed/predefined one).
-     */
+    /** Create an independent copy of an encoding. */
     public fun newClone(onError: JniErrorHandler<Encoding>): Encoding {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -81,8 +78,10 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         external fun freePtr(ptr: Long)
 
         /**
-         * Return a copy of `e` with `schema` attached (upstream `with_schema`). Zenoh
-         * leaves schema semantics to the application (e.g. `utf-8` for `text/plain`).
+         * Create an encoding with the supplied schema.
+         *
+         * Schema interpretation is application-defined; for example, `utf-8` may
+         * accompany `text/plain`.
          *
          * Parameter `e` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `eId`, `eSchema`).
          */
@@ -98,11 +97,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
             return __ret
         }
 
-        /**
-         * Build a [`Encoding`] from its numeric id + optional schema (upstream
-         * `Encoding::new`) — the inverse of [`encoding_get_id`] / [`encoding_get_schema`],
-         * for adapters that carry encodings as `(id, schema)` pairs.
-         */
+        /** Create an encoding from its numeric identifier and optional schema. */
         public fun fromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
@@ -111,9 +106,10 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Parse a textual encoding into a [`Encoding`] (upstream `From<String>`:
-         * known names resolve to their canonical id; everything else is preserved
-         * under the custom-encoding id).
+         * Create an encoding from its textual representation.
+         *
+         * Known names resolve to their standard identifiers. Other names are
+         * preserved as custom encodings.
          */
         public fun fromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
             val __cap = JniErrorHandlerCapture.acquire()
@@ -142,10 +138,7 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         return ZBytes(p)
     }
 
-    /**
-     * Borrow the payload bytes carried by a native [`ZBytes`] — borrowed (no
-     * copy) when the underlying buffer is contiguous, owned otherwise.
-     */
+    /** Return the payload as a contiguous sequence of bytes. */
     public fun asBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -157,12 +150,7 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * Clone a payload into a new owned handle. Cheap: `ZBytes` is backed by
-     * reference-counted buffers, so this bumps a refcount rather than copying.
-     * Use it to hand the same payload to a consuming call repeatedly (e.g. a
-     * throughput publisher loop) without re-encoding from a buffer each time.
-     */
+    /** Create an independent copy of a payload. */
     public fun newClone(onError: JniErrorHandler<ZBytes>): ZBytes {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -178,11 +166,7 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         @JvmStatic
         external fun freePtr(ptr: Long)
 
-        /**
-         * Construct a native [`ZBytes`] from an owned byte buffer, taking ownership
-         * without copying. Not exported to the C layer — it exists for completeness
-         * and to accept zenoh-flat's `ZBytes` payload without cloning.
-         */
+        /** Create a payload from a byte sequence. */
         public fun fromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))

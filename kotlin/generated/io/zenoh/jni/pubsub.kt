@@ -56,11 +56,11 @@ public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /**
- * Publish a payload on the publisher's key expression — the flat port of
- * `zenoh::pubsub::Publisher::put`. `encoding` overrides the publisher's default
- * for this message only; `attachment` carries optional user metadata. The
- * publisher's configured QoS (priority, congestion control, express,
- * reliability) applies automatically.
+ * Publish data on the publisher's key expression.
+ *
+ * The encoding applies to this publication, while the publisher's configured
+ * delivery settings remain in effect. The attachment carries user-defined
+ * metadata.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
@@ -94,9 +94,10 @@ public fun publisherPut(
 }
 
 /**
- * Publish a delete (tombstone) on the publisher's key expression — the flat
- * port of `zenoh::pubsub::Publisher::delete`. Subscribers receive it as a
- * `SampleKind::Delete` sample. `attachment` carries optional user metadata.
+ * Publish a deletion notification on the publisher's key expression.
+ *
+ * Matching subscribers receive a DELETE sample. The attachment carries
+ * user-defined metadata.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).

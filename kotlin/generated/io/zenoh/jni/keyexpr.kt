@@ -10,10 +10,9 @@ import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
 /**
- * Mirrors `zenoh::key_expr::SetIntersectionLevel` with a stable FFI surface.
+ * The relationship between the sets of keys matched by two key expressions.
  *
- * Unstable: the underlying `zenoh::key_expr::SetIntersectionLevel` is
- * `#[cfg(feature = "unstable")]`. Returned by [`crate::keyexpr_relation_to`].
+ * This information is available only when unstable features are enabled.
  *
  * JVM-side surface for the native Rust `SetIntersectionLevel` enum.
  */
@@ -47,13 +46,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return KeyExpr(p)
     }
 
-    /**
-     * Borrowed canonical string form of a key expression — zero-copy `&str` into
-     * the key expression's own storage. Used as an output-expansion accessor
-     * (`expand_output`) so the JNI layer converts `&str → jstring` in a single
-     * copy (no intermediate owned `String`). The owned [`keyexpr_to_string`]
-     * twin remains for the C / owned-`char*` tier.
-     */
+    /** Return the canonical text of a key expression. */
     public fun getStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -65,11 +58,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * Clone a key-expression handle. Use this before passing a handle to a
-     * consuming call (e.g. `session_declare_publisher`) when the caller needs to
-     * keep the original. Cheap (Arc bump for owned key expressions).
-     */
+    /** Create an independent copy of a key expression. */
     public fun newClone(onError: JniErrorHandler<KeyExpr>): KeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -81,7 +70,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Canonical string form of a key expression (owned, NUL-terminated `char*`). */
+    /** Return the canonical text of a key expression. */
     public fun toStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -94,8 +83,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * Whether `a` and `b` share at least one key they both match (the flat port of
-     * `keyexpr::intersects`).
+     * Return whether the two key expressions can match at least one common key.
      *
      * Parameter `b` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `bSel`, `b0`, `b1`).
      */
@@ -123,8 +111,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * Whether every key matched by `b` is also matched by `a`, i.e. `a` includes
-     * `b` (the flat port of `keyexpr::includes`).
+     * Return whether every key matched by `b` is also matched by `a`.
      *
      * Parameter `b` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `bSel`, `b0`, `b1`).
      */
@@ -152,11 +139,9 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * The set relation of `a` to `b` (disjoint / intersects / includes / equals) —
-     * the flat port of `keyexpr::relation_to`, a finer-grained result than the
-     * boolean [`keyexpr_intersects`] / [`keyexpr_includes`] pair.
+     * Describe how the sets of keys matched by two expressions relate.
      *
-     * Unstable: `zenoh::key_expr::SetIntersectionLevel` is an `#[unstable]` zenoh API.
+     * This operation is available only when unstable features are enabled.
      *
      * Parameter `b` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `bSel`, `b0`, `b1`).
      */
@@ -190,9 +175,9 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         external fun freePtr(ptr: Long)
 
         /**
-         * Validate `s` as a key expression and build an owned handle, returning an
-         * error if it is not canonical (the flat port of `KeyExpr::try_from`). Use
-         * [`keyexpr_new_autocanonize`] to accept and canonicalize non-canonical input.
+         * Validate text as a canonical Zenoh key expression.
+         *
+         * Use [`keyexpr_new_autocanonize`] to canonicalize the text before validation.
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
@@ -204,10 +189,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Canonicalize `s` and build an owned key-expression handle (the flat port of
-         * `KeyExpr::autocanonize`). Unlike [`keyexpr_new_try_from`], this rewrites
-         * redundant wildcards into canonical form instead of rejecting them; it still
-         * errors on input that is not a valid key expression at all.
+         * Convert text to canonical key-expression form and validate the result.
+         *
+         * Unlike [`keyexpr_new_try_from`], this accepts valid non-canonical forms such
+         * as redundant wildcards and normalizes them.
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
@@ -219,9 +204,9 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Join `a` with `b` using `/` as separator, returning a new owned key
-         * expression (the flat port of `keyexpr::join`). Errors if the result is not a
-         * valid key expression.
+         * Join a key expression and a suffix with a `/` separator.
+         *
+         * Returns an error if the result is not a valid key expression.
          *
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -251,9 +236,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Concatenate `b` onto `a` verbatim (no separator inserted), returning a new
-         * owned key expression (the flat port of `keyexpr::concat`). Errors if the
-         * result is not a valid key expression.
+         * Append text directly to a key expression and validate the result.
+         *
+         * No separator is inserted. Prefer [`keyexpr_new_join`] when combining path
+         * segments.
          *
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).

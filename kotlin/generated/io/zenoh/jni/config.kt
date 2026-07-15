@@ -10,9 +10,7 @@ import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
 /**
- * Node type in a Zenoh network: router, peer, or client. The discriminant
- * values match upstream `zenoh::config::WhatAmI` (1, 2, 4) so an OR'd
- * bitfield of variants encodes a `WhatAmIMatcher` directly as `u8`.
+ * The role of a node in a Zenoh network.
  *
  * JVM-side surface for the native Rust `WhatAmI` enum.
  */
@@ -84,10 +82,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * Clone a configuration handle. Use this before passing a config to a
-     * consuming call (`open`) when the caller needs to keep the original.
-     */
+    /** Create an independent copy of a configuration. */
     public fun newClone(onError: JniErrorHandler<Config>): Config {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -103,7 +98,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         @JvmStatic
         external fun freePtr(ptr: Long)
 
-        /** Build a default configuration. */
+        /** Create a configuration with default settings. */
         public fun newDefault(onError: JniErrorHandler<Config>): Config {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewDefault(__cap))
@@ -125,8 +120,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Parse a configuration from a JSON-formatted string. JSON is a subset
-         * of JSON5, so routing through the JSON5 deserializer is sufficient.
+         * Parse a configuration from JSON text.
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */

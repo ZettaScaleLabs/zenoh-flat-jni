@@ -48,7 +48,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         return Session(p)
     }
 
-    /** This session's own Zenoh id (the flat port of `SessionInfo::zid`). */
+    /** Return the identifier of this session. */
     public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -67,9 +67,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /**
- * Open a session with the given configuration. The config is consumed by value
- * (matching native `zenoh::open`); C callers that need to keep it should
- * `config_new_clone` first.
+ * Open a session with the given configuration.
+ *
+ * The configuration is consumed by this operation.
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
@@ -89,11 +89,11 @@ public fun open(config: Config, onError: ErrorHandler<Session>): Session {
 }
 
 /**
- * Declare a publisher for `key_expr` with optional default QoS — the flat port
- * of `zenoh::Session::declare_publisher`. The returned handle publishes via
- * [`crate::publisher_put`] / [`crate::publisher_delete`]; the QoS set here
- * (congestion control, priority, express, and `reliability` when `unstable`)
- * becomes the per-message default.
+ * Declare a publisher for the given key expression.
+ *
+ * Optional delivery settings become defaults for publications made through
+ * the returned publisher. Reliability is available only when unstable
+ * features are enabled.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -150,9 +150,11 @@ public fun sessionDeclarePublisher(
 }
 
 /**
- * Publish `payload` on `key_expr` in one shot, without declaring a publisher —
- * the flat port of `zenoh::Session::put`. `encoding`, `attachment`, and the QoS
- * knobs are per-message overrides (`reliability` only with `unstable`).
+ * Publish data on a key expression.
+ *
+ * Matching subscribers receive a PUT sample. Optional arguments specify the
+ * payload format, delivery quality, and attachment. Reliability is available
+ * only when unstable features are enabled.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
@@ -214,10 +216,11 @@ public fun sessionPut(
 }
 
 /**
- * Publish a delete (tombstone) on `key_expr` in one shot — the flat port of
- * `zenoh::Session::delete`. Subscribers receive a `SampleKind::Delete` sample.
- * `attachment` and the QoS knobs are per-message overrides (`reliability` only
- * with `unstable`).
+ * Publish a deletion notification on a key expression.
+ *
+ * Matching subscribers receive a DELETE sample. Optional arguments specify
+ * delivery quality and attachment. Reliability is available only when
+ * unstable features are enabled.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
@@ -269,8 +272,10 @@ public fun sessionDelete(
 }
 
 /**
- * Declare a subscriber delivering each change as an opaque [`Sample`] handle
- * (thin surface). `on_close` fires when the subscriber is dropped.
+ * Subscribe to samples whose key expressions match the supplied expression.
+ *
+ * The callback is called for each sample. The close callback is called when
+ * the subscription ends.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -319,11 +324,10 @@ public fun sessionDeclareSubscriber(
 }
 
 /**
- * Declare a querier for `key_expr` with optional default query settings — the
- * flat port of `zenoh::Session::declare_querier`. A querier amortizes routing
- * across repeated GETs; issue them via [`crate::querier_get`]. The target,
- * consolidation, timeout, QoS, and reply-key-expr policy set here become the
- * per-GET defaults.
+ * Declare a reusable querier for the given key expression.
+ *
+ * Optional arguments set defaults for query targets, reply consolidation,
+ * delivery quality, timeout, and accepted reply key expressions.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -389,8 +393,11 @@ public fun sessionDeclareQuerier(
 }
 
 /**
- * Declare a queryable delivering each query as an opaque [`Query`] handle
- * (thin surface). `on_close` fires when the queryable is dropped.
+ * Declare a queryable for queries matching the supplied key expression.
+ *
+ * The callback is called for each query. A complete queryable indicates that
+ * it can provide every available result for matching queries. The close
+ * callback is called when the queryable ends.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -442,10 +449,9 @@ public fun sessionDeclareQueryable(
 }
 
 /**
- * Declare `key_expr` with the network, returning an optimized handle bound to
- * this session — the flat port of `zenoh::Session::declare_keyexpr`. Reusing
- * the returned handle lets the protocol elide the full string on the wire.
- * Release it with [`session_undeclare_keyexpr`].
+ * Register a key expression with the session for efficient repeated use.
+ *
+ * Release the registration with [`session_undeclare_keyexpr`].
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
@@ -465,8 +471,8 @@ public fun sessionDeclareKeyexpr(
 }
 
 /**
- * Undeclare a previously [`session_declare_keyexpr`]'d key expression, releasing
- * its network optimization. Consumes the handle.
+ * Release a key expression previously registered with
+ * [`session_declare_keyexpr`].
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
@@ -487,8 +493,12 @@ public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: 
 }
 
 /**
- * Query matching queryables, delivering each reply as an opaque [`Reply`]
- * handle (thin surface). `on_close` fires when the reply stream ends.
+ * Send a query to matching queryables.
+ *
+ * The callback is called for each reply. Optional arguments control selector
+ * parameters, timeout, targets, reply consolidation, accepted reply keys,
+ * delivery quality, payload metadata, and attachment. The close callback is
+ * called after the reply stream ends.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
@@ -564,10 +574,7 @@ public fun sessionGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-/**
- * Zenoh ids of the peers currently connected to this session (the flat port of
- * `SessionInfo::peers_zid`).
- */
+/** Return the identifiers of peers currently connected to this session. */
 public fun sessionGetPeersZid(
     session: Session,
     onError: JniErrorHandler<List<ZenohId>>,
@@ -582,10 +589,7 @@ public fun sessionGetPeersZid(
     return __ret
 }
 
-/**
- * Zenoh ids of the routers this session is connected to (the flat port of
- * `SessionInfo::routers_zid`).
- */
+/** Return the identifiers of routers currently connected to this session. */
 public fun sessionGetRoutersZid(
     session: Session,
     onError: JniErrorHandler<List<ZenohId>>,
@@ -601,8 +605,10 @@ public fun sessionGetRoutersZid(
 }
 
 /**
- * Declare a [`LivelinessToken`] on `key_expr`. The token keeps the liveliness
- * alive until its handle is dropped, which undeclares it.
+ * Declare a liveliness token on the supplied key expression.
+ *
+ * The token asserts that the associated application is alive until the token
+ * is undeclared.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -647,9 +653,10 @@ public fun livelinessDeclareToken(
 }
 
 /**
- * Query liveliness tokens matching `key_expr`, delivering each reply as an
- * opaque [`Reply`] handle (thin surface — cheap-FFI bindings pull fields via
- * the `reply_*` accessors). `on_close` fires when the reply stream ends.
+ * Query liveliness tokens matching the supplied key expression.
+ *
+ * The callback is called for each reply. The close callback is called after
+ * the reply stream ends.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -692,10 +699,11 @@ public fun livelinessGet(
 }
 
 /**
- * Declare a subscriber to liveliness changes matching `key_expr`, delivering
- * each change as an opaque [`Sample`] handle (thin surface). With `history`,
- * currently-alive tokens are delivered on declaration. `on_close` fires when
- * the returned subscriber is dropped.
+ * Subscribe to liveliness changes matching the supplied key expression.
+ *
+ * When history is enabled, tokens that are already alive are reported when
+ * the subscription starts. The close callback is called when the subscription
+ * ends.
  *
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
