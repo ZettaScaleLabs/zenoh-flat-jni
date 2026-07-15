@@ -33,8 +33,11 @@ jobs:
       - name: Use prebindgen from GitHub main
         shell: bash
         run: |
-          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
-          rm Cargo.toml.bak
+          sed -i.bak \
+            -e 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' \
+            -e 's|prebindgen-proc-macro = { path = "../prebindgen/prebindgen-proc-macro",|prebindgen-proc-macro = { git = "https://github.com/milyin/prebindgen.git", branch = "main",|g' \
+            Cargo.toml ../zenoh-flat/Cargo.toml
+          rm Cargo.toml.bak ../zenoh-flat/Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -96,8 +99,11 @@ jobs:
       - name: Use prebindgen from GitHub main
         shell: bash
         run: |
-          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
-          rm Cargo.toml.bak
+          sed -i.bak \
+            -e 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' \
+            -e 's|prebindgen-proc-macro = { path = "../prebindgen/prebindgen-proc-macro",|prebindgen-proc-macro = { git = "https://github.com/milyin/prebindgen.git", branch = "main",|g' \
+            Cargo.toml ../zenoh-flat/Cargo.toml
+          rm Cargo.toml.bak ../zenoh-flat/Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -161,8 +167,11 @@ jobs:
       - name: Use prebindgen from GitHub main
         shell: bash
         run: |
-          sed -i.bak 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' Cargo.toml
-          rm Cargo.toml.bak
+          sed -i.bak \
+            -e 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' \
+            -e 's|prebindgen-proc-macro = { path = "../prebindgen/prebindgen-proc-macro",|prebindgen-proc-macro = { git = "https://github.com/milyin/prebindgen.git", branch = "main",|g' \
+            Cargo.toml ../zenoh-flat/Cargo.toml
+          rm Cargo.toml.bak ../zenoh-flat/Cargo.toml.bak
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
