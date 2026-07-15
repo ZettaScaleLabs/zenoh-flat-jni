@@ -37,9 +37,12 @@
 //! (`KeyExpr`, `Session`, `keyexpr_new_try_from`, `open`, …); the Kotlin-side
 //! names are derived from them automatically.
 
-use prebindgen::core::Registry;
-use prebindgen::lang::{ConstDecl, FunctionDecl, JniGen};
-use prebindgen::{enum_class, expand_param, expand_return, fun, package, ptr_class, value_class};
+use prebindgen::{
+    core::Registry,
+    enum_class, expand_param, expand_return, fun,
+    lang::{ConstDecl, FunctionDecl, JniGen},
+    package, ptr_class, value_class,
+};
 use syn::parse_quote as pq;
 
 fn fail(context: &str, err: impl std::fmt::Display) -> ! {
