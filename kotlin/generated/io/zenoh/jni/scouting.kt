@@ -14,7 +14,7 @@ import io.zenoh.jni.config.WhatAmI
 import io.zenoh.jni.config.ZenohId
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `Hello`. */
+/** Typed handle for a native Zenoh `ZHello`. */
 public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -38,7 +38,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            WhatAmI.fromInt(JNINative.helloGetWhatami(this_ptr, __cap))
+            WhatAmI.fromInt(JNINative.helloWhatami(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -50,7 +50,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZenohId(JNINative.helloGetZid(this_ptr, __cap))
+            ZenohId(JNINative.helloZid(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -62,7 +62,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.helloGetLocators(this_ptr, ArrayList<String>(), __StringFolderHolder.instance, __cap) as List<String>)
+            (JNINative.helloLocators(this_ptr, ArrayList<String>(), __StringFolderHolder.instance, __cap) as List<String>)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -74,7 +74,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-/** Typed handle for a native Zenoh `Scout`. */
+/** Typed handle for a native Zenoh `ZScout`. */
 public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -98,16 +98,16 @@ public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun interface HelloCallback {
+public fun interface ZHelloCallback {
     public fun run(whatami: Int, zid: ZenohId, locators: List<String>)
 }
 
-public fun interface HelloCallbackRaw {
+public fun interface ZHelloCallbackRaw {
     public fun run(whatami: Int, zid: ByteArray, locators: List<String>)
 }
 
-public fun HelloCallback.asRaw(): HelloCallbackRaw =
-    HelloCallbackRaw {
+public fun ZHelloCallback.asRaw(): ZHelloCallbackRaw =
+    ZHelloCallbackRaw {
         whatami,
         zid,
         locators ->
@@ -128,7 +128,7 @@ public fun HelloCallback.asRaw(): HelloCallbackRaw =
  * used.
  *
  * `on_close` is dropped — and therefore invoked — when the returned
- * [`Scout`] is dropped: callers wanting to be notified of scout
+ * [`ZScout`] is dropped: callers wanting to be notified of scout
  * teardown should attach behavior to that drop.
  *
  * Returns an opaque scout handle whose lifetime owns the running scout;
@@ -139,7 +139,7 @@ public fun HelloCallback.asRaw(): HelloCallbackRaw =
 public fun scout(
     whatami: Int,
     config: Config?,
-    callback: HelloCallback,
+    callback: ZHelloCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Scout>,
 ): Scout {

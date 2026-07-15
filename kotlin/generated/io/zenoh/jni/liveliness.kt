@@ -3,7 +3,7 @@ package io.zenoh.jni.liveliness
 
 import io.zenoh.jni.NativeHandle
 
-/** Typed handle for a native Zenoh `LivelinessToken`. */
+/** Typed handle for a native Zenoh `ZLivelinessToken`. */
 public class LivelinessToken(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {

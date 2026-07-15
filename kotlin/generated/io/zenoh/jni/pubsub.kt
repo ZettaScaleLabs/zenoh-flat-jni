@@ -7,7 +7,7 @@ import io.zenoh.jni.JNINative
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `Publisher`. */
+/** Typed handle for a native Zenoh `ZPublisher`. */
 public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -31,7 +31,7 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-/** Typed handle for a native Zenoh `Subscriber`. */
+/** Typed handle for a native Zenoh `ZSubscriber`. */
 public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -56,15 +56,9 @@ public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /**
- * Publish a payload on the publisher's key expression — the flat port of
- * `zenoh::pubsub::Publisher::put`. `encoding` overrides the publisher's default
- * for this message only; `attachment` carries optional user metadata. The
- * publisher's configured QoS (priority, congestion control, express,
- * reliability) applies automatically.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+ * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+ * Parameter `encoding` is the Rust `ZEncoding` argument, expanded: its `z_encoding_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+ * Parameter `payload` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `payload`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun publisherPut(
@@ -94,11 +88,7 @@ public fun publisherPut(
 }
 
 /**
- * Publish a delete (tombstone) on the publisher's key expression — the flat
- * port of `zenoh::pubsub::Publisher::delete`. Subscribers receive it as a
- * `SampleKind::Delete` sample. `attachment` carries optional user metadata.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+ * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun publisherDelete(

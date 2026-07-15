@@ -10,7 +10,7 @@ import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
 import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.ZenohId
-import io.zenoh.jni.config.__ZenohIdFolderRawHolder
+import io.zenoh.jni.config.__ZZenohIdFolderRawHolder
 import io.zenoh.jni.keyexpr.KeyExpr
 import io.zenoh.jni.liveliness.LivelinessToken
 import io.zenoh.jni.pubsub.Publisher
@@ -20,17 +20,17 @@ import io.zenoh.jni.qos.Priority
 import io.zenoh.jni.qos.Reliability
 import io.zenoh.jni.query.ConsolidationMode
 import io.zenoh.jni.query.Querier
-import io.zenoh.jni.query.QueryCallback
 import io.zenoh.jni.query.QueryTarget
 import io.zenoh.jni.query.Queryable
-import io.zenoh.jni.query.ReplyCallback
 import io.zenoh.jni.query.ReplyKeyExpr
+import io.zenoh.jni.query.ZQueryCallback
+import io.zenoh.jni.query.ZReplyCallback
 import io.zenoh.jni.query.asRaw
-import io.zenoh.jni.sample.SampleCallback
+import io.zenoh.jni.sample.ZSampleCallback
 import io.zenoh.jni.sample.asRaw
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `Session`. */
+/** Typed handle for a native Zenoh `ZSession`. */
 public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -48,13 +48,12 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         return Session(p)
     }
 
-    /** This session's own Zenoh id (the flat port of `SessionInfo::zid`). */
     public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZenohId(JNINative.sessionGetZid(this_ptr, __cap))
+            ZenohId(JNINative.sessionZid(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -67,9 +66,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /**
- * Open a session with the given configuration. The configuration is borrowed;
- * the flat layer clones it for zenoh's consuming `open` operation so callers
- * can reuse the same handle without a separate FFI clone call.
+ * Open a session with the given configuration. The config is consumed by value
+ * (matching native `zenoh::open`); C callers that need to keep it should
+ * `z_config_clone` first.
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
@@ -78,7 +77,11 @@ public fun open(config: Config, onError: ErrorHandler<Session>): Session {
     val __cap = ErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(config) {
         val config_ptr = config.ptr
-        Session(JNINative.open(config_ptr, __cap))
+        try {
+            Session(JNINative.open(config_ptr, __cap))
+        } finally {
+            config.ptr = config.ptr or 1L
+        }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
@@ -105,13 +108,7 @@ public fun sessionDeclarePublisher(
 ): Publisher = sessionDeclarePublisher(session, 1, null, keyExpr, congestionControl, priority, express, reliability, onError)
 
 /**
- * Declare a publisher for `key_expr` with optional default QoS — the flat port
- * of `zenoh::Session::declare_publisher`. The returned handle publishes via
- * [`crate::publisher_put`] / [`crate::publisher_delete`]; the QoS set here
- * (congestion control, priority, express, and `reliability` when `unstable`)
- * becomes the per-message default.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionDeclarePublisher(
@@ -138,23 +135,27 @@ public fun sessionDeclarePublisher(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            Publisher(
-                JNINative.sessionDeclarePublisher(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    congestionControl != null,
-                    congestionControl?.value ?: 0,
-                    priority != null,
-                    priority?.value ?: 0,
-                    express != null,
-                    express ?: false,
-                    reliability != null,
-                    reliability?.value ?: 0,
-                    __cap,
-                ),
-            )
+            try {
+                Publisher(
+                    JNINative.sessionDeclarePublisher(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        reliability != null,
+                        reliability?.value ?: 0,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -192,14 +193,10 @@ public fun sessionPut(
 ) = sessionPut(session, 1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
 
 /**
- * Publish `payload` on `key_expr` in one shot, without declaring a publisher —
- * the flat port of `zenoh::Session::put`. `encoding`, `attachment`, and the QoS
- * knobs are per-message overrides (`reliability` only with `unstable`).
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+ * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+ * Parameter `encoding` is the Rust `ZEncoding` argument, expanded: its `z_encoding_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `payload` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `payload`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionPut(
@@ -278,13 +275,8 @@ public fun sessionDelete(
 ) = sessionDelete(session, 1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
 
 /**
- * Publish a delete (tombstone) on `key_expr` in one shot — the flat port of
- * `zenoh::Session::delete`. Subscribers receive a `SampleKind::Delete` sample.
- * `attachment` and the QoS knobs are per-message overrides (`reliability` only
- * with `unstable`).
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionDelete(
@@ -335,7 +327,7 @@ public fun sessionDelete(
 public fun sessionDeclareSubscriber(
     session: Session,
     s: String,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber = sessionDeclareSubscriber(session, 0, s, null, callback, onClose, onError)
@@ -343,16 +335,16 @@ public fun sessionDeclareSubscriber(
 public fun sessionDeclareSubscriber(
     session: Session,
     keyExpr: KeyExpr,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber = sessionDeclareSubscriber(session, 1, null, keyExpr, callback, onClose, onError)
 
 /**
- * Declare a subscriber delivering each change as an opaque [`Sample`] handle
+ * Declare a subscriber delivering each change as an opaque [`ZSample`] handle
  * (thin surface). `on_close` fires when the subscriber is dropped.
  *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionDeclareSubscriber(
@@ -360,7 +352,7 @@ public fun sessionDeclareSubscriber(
     keyExprSel: Int,
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber {
@@ -377,17 +369,21 @@ public fun sessionDeclareSubscriber(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            Subscriber(
-                JNINative.sessionDeclareSubscriber(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    callback.asRaw(),
-                    onClose,
-                    __cap,
-                ),
-            )
+            try {
+                Subscriber(
+                    JNINative.sessionDeclareSubscriber(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        callback.asRaw(),
+                        onClose,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -421,13 +417,7 @@ public fun sessionDeclareQuerier(
 ): Querier = sessionDeclareQuerier(session, 1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
 
 /**
- * Declare a querier for `key_expr` with optional default query settings — the
- * flat port of `zenoh::Session::declare_querier`. A querier amortizes routing
- * across repeated GETs; issue them via [`crate::querier_get`]. The target,
- * consolidation, timeout, QoS, and reply-key-expr policy set here become the
- * per-GET defaults.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionDeclareQuerier(
@@ -457,29 +447,33 @@ public fun sessionDeclareQuerier(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            Querier(
-                JNINative.sessionDeclareQuerier(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    target != null,
-                    target?.value ?: 0,
-                    consolidation != null,
-                    consolidation?.value ?: 0,
-                    congestionControl != null,
-                    congestionControl?.value ?: 0,
-                    priority != null,
-                    priority?.value ?: 0,
-                    express != null,
-                    express ?: false,
-                    timeoutMs != null,
-                    timeoutMs ?: 0L,
-                    acceptReplies != null,
-                    acceptReplies?.value ?: 0,
-                    __cap,
-                ),
-            )
+            try {
+                Querier(
+                    JNINative.sessionDeclareQuerier(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        target != null,
+                        target?.value ?: 0,
+                        consolidation != null,
+                        consolidation?.value ?: 0,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        timeoutMs != null,
+                        timeoutMs ?: 0L,
+                        acceptReplies != null,
+                        acceptReplies?.value ?: 0,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -490,7 +484,7 @@ public fun sessionDeclareQueryable(
     session: Session,
     s: String,
     complete: Boolean?,
-    callback: QueryCallback,
+    callback: ZQueryCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Queryable>,
 ): Queryable = sessionDeclareQueryable(session, 0, s, null, complete, callback, onClose, onError)
@@ -499,16 +493,16 @@ public fun sessionDeclareQueryable(
     session: Session,
     keyExpr: KeyExpr,
     complete: Boolean?,
-    callback: QueryCallback,
+    callback: ZQueryCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Queryable>,
 ): Queryable = sessionDeclareQueryable(session, 1, null, keyExpr, complete, callback, onClose, onError)
 
 /**
- * Declare a queryable delivering each query as an opaque [`Query`] handle
+ * Declare a queryable delivering each query as an opaque [`ZQuery`] handle
  * (thin surface). `on_close` fires when the queryable is dropped.
  *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionDeclareQueryable(
@@ -517,7 +511,7 @@ public fun sessionDeclareQueryable(
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
     complete: Boolean?,
-    callback: QueryCallback,
+    callback: ZQueryCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Queryable>,
 ): Queryable {
@@ -534,33 +528,30 @@ public fun sessionDeclareQueryable(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            Queryable(
-                JNINative.sessionDeclareQueryable(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    complete != null,
-                    complete ?: false,
-                    callback.asRaw(),
-                    onClose,
-                    __cap,
-                ),
-            )
+            try {
+                Queryable(
+                    JNINative.sessionDeclareQueryable(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        complete != null,
+                        complete ?: false,
+                        callback.asRaw(),
+                        onClose,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
 
-/**
- * Declare `key_expr` with the network, returning an optimized handle bound to
- * this session — the flat port of `zenoh::Session::declare_keyexpr`. Reusing
- * the returned handle lets the protocol elide the full string on the wire.
- * Release it with [`session_undeclare_keyexpr`].
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
+/** On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`). */
 public fun sessionDeclareKeyexpr(
     session: Session,
     keyExpr: String,
@@ -576,12 +567,7 @@ public fun sessionDeclareKeyexpr(
     return __ret
 }
 
-/**
- * Undeclare a previously [`session_declare_keyexpr`]'d key expression, releasing
- * its network optimization. Consumes the handle.
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
+/** On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`). */
 public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: ErrorHandler<Unit>) {
     if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
     if (keyExpr.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
@@ -614,7 +600,7 @@ public fun sessionGet(
     encodingId: Int,
     encodingSchema: String?,
     attachment: ByteArray?,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) = sessionGet(session, 0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
@@ -635,19 +621,19 @@ public fun sessionGet(
     encodingId: Int,
     encodingSchema: String?,
     attachment: ByteArray?,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) = sessionGet(session, 1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
 
 /**
- * Query matching queryables, delivering each reply as an opaque [`Reply`]
+ * Query matching queryables, delivering each reply as an opaque [`ZReply`]
  * handle (thin surface). `on_close` fires when the reply stream ends.
  *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+ * Parameter `attachment` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `attachment`).
+ * Parameter `encoding` is the Rust `ZEncoding` argument, expanded: its `z_encoding_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `payload` is the Rust `ZZBytes` argument, expanded: its `z_zbytes_from_vec` inputs (crosses as `payload`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun sessionGet(
@@ -668,7 +654,7 @@ public fun sessionGet(
     encodingId: Int,
     encodingSchema: String?,
     attachment: ByteArray?,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) {
@@ -718,10 +704,6 @@ public fun sessionGet(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
-/**
- * Zenoh ids of the peers currently connected to this session (the flat port of
- * `SessionInfo::peers_zid`).
- */
 public fun sessionGetPeersZid(
     session: Session,
     onError: JniErrorHandler<List<ZenohId>>,
@@ -730,16 +712,12 @@ public fun sessionGetPeersZid(
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        (JNINative.sessionGetPeersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+        (JNINative.sessionPeersZid(session_ptr, ArrayList<ZenohId>(), __ZZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
 }
 
-/**
- * Zenoh ids of the routers this session is connected to (the flat port of
- * `SessionInfo::routers_zid`).
- */
 public fun sessionGetRoutersZid(
     session: Session,
     onError: JniErrorHandler<List<ZenohId>>,
@@ -748,7 +726,7 @@ public fun sessionGetRoutersZid(
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = withSortedHandleLocks(session) {
         val session_ptr = session.ptr
-        (JNINative.sessionGetRoutersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+        (JNINative.sessionRoutersZid(session_ptr, ArrayList<ZenohId>(), __ZZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
     }
     if (__cap.failed) return onError.run(__cap.je)
     return __ret
@@ -767,10 +745,10 @@ public fun livelinessDeclareToken(
 ): LivelinessToken = livelinessDeclareToken(session, 1, null, keyExpr, onError)
 
 /**
- * Declare a [`LivelinessToken`] on `key_expr`. The token keeps the liveliness
+ * Declare a [`ZLivelinessToken`] on `key_expr`. The token keeps the liveliness
  * alive until its handle is dropped, which undeclares it.
  *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun livelinessDeclareToken(
@@ -793,15 +771,19 @@ public fun livelinessDeclareToken(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            LivelinessToken(
-                JNINative.livelinessDeclareToken(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    __cap,
-                ),
-            )
+            try {
+                LivelinessToken(
+                    JNINative.livelinessDeclareToken(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -812,7 +794,7 @@ public fun livelinessGet(
     session: Session,
     s: String,
     timeoutMs: Long,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) = livelinessGet(session, 0, s, null, timeoutMs, callback, onClose, onError)
@@ -821,17 +803,17 @@ public fun livelinessGet(
     session: Session,
     keyExpr: KeyExpr,
     timeoutMs: Long,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) = livelinessGet(session, 1, null, keyExpr, timeoutMs, callback, onClose, onError)
 
 /**
  * Query liveliness tokens matching `key_expr`, delivering each reply as an
- * opaque [`Reply`] handle (thin surface — cheap-FFI bindings pull fields via
- * the `reply_*` accessors). `on_close` fires when the reply stream ends.
+ * opaque [`ZReply`] handle (thin surface — cheap-FFI bindings pull fields via
+ * the `z_reply_*` accessors). `on_close` fires when the reply stream ends.
  *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun livelinessGet(
@@ -840,7 +822,7 @@ public fun livelinessGet(
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
     timeoutMs: Long,
-    callback: ReplyCallback,
+    callback: ZReplyCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Unit>,
 ) {
@@ -875,7 +857,7 @@ public fun livelinessDeclareSubscriber(
     session: Session,
     s: String,
     history: Boolean,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber = livelinessDeclareSubscriber(session, 0, s, null, history, callback, onClose, onError)
@@ -884,18 +866,18 @@ public fun livelinessDeclareSubscriber(
     session: Session,
     keyExpr: KeyExpr,
     history: Boolean,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber = livelinessDeclareSubscriber(session, 1, null, keyExpr, history, callback, onClose, onError)
 
 /**
  * Declare a subscriber to liveliness changes matching `key_expr`, delivering
- * each change as an opaque [`Sample`] handle (thin surface). With `history`,
+ * each change as an opaque [`ZSample`] handle (thin surface). With `history`,
  * currently-alive tokens are delivered on declaration. `on_close` fires when
  * the returned subscriber is dropped.
  *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+ * Parameter `key_expr` is the Rust `ZKeyExpr` argument, expanded: pass EITHER its `z_keyexpr_try_from` inputs OR an existing `ZKeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */
 public fun livelinessDeclareSubscriber(
@@ -904,7 +886,7 @@ public fun livelinessDeclareSubscriber(
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
     history: Boolean,
-    callback: SampleCallback,
+    callback: ZSampleCallback,
     onClose: VoidCallback,
     onError: ErrorHandler<Subscriber>,
 ): Subscriber {
@@ -921,18 +903,22 @@ public fun livelinessDeclareSubscriber(
         withSortedHandleLocks(__locks) {
             val session_ptr = session.ptr
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            Subscriber(
-                JNINative.livelinessDeclareSubscriber(
-                    session_ptr,
-                    keyExprSel,
-                    keyExpr0,
-                    keyExpr1_ptr,
-                    history,
-                    callback.asRaw(),
-                    onClose,
-                    __cap,
-                ),
-            )
+            try {
+                Subscriber(
+                    JNINative.livelinessDeclareSubscriber(
+                        session_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        history,
+                        callback.asRaw(),
+                        onClose,
+                        __cap,
+                    ),
+                )
+            } finally {
+                keyExpr1?.let { it.ptr = it.ptr or 1L }
+            }
         }
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)

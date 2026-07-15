@@ -30,7 +30,7 @@ public enum class SampleKind(public val value: Int) {
     }
 }
 
-/** Typed handle for a native Zenoh `Sample`. */
+/** Typed handle for a native Zenoh `ZSample`. */
 public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -54,7 +54,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.sampleGetKeyExpr(this_ptr, __cap))
+            KeyExpr(JNINative.sampleKeyExpr(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -66,7 +66,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZBytes(JNINative.sampleGetPayload(this_ptr, __cap))
+            ZBytes(JNINative.samplePayload(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -78,7 +78,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Encoding(JNINative.sampleGetEncoding(this_ptr, __cap))
+            Encoding(JNINative.sampleEncoding(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -90,7 +90,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            SampleKind.fromInt(JNINative.sampleGetKind(this_ptr, __cap))
+            SampleKind.fromInt(JNINative.sampleKind(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -102,9 +102,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetTimestamp(this_ptr, __cap).let {
-                if (it == 0L) null else Timestamp(it)
-            }
+            JNINative.sampleTimestamp(this_ptr, __cap).let { if (it == 0L) null else Timestamp(it) }
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -116,7 +114,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetExpress(this_ptr, __cap)
+            JNINative.sampleExpress(this_ptr, __cap)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -128,7 +126,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Priority.fromInt(JNINative.sampleGetPriority(this_ptr, __cap))
+            Priority.fromInt(JNINative.samplePriority(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -140,7 +138,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            CongestionControl.fromInt(JNINative.sampleGetCongestionControl(this_ptr, __cap))
+            CongestionControl.fromInt(JNINative.sampleCongestionControl(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -152,75 +150,55 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetAttachment(this_ptr, __cap).let {
-                if (it == 0L) null else ZBytes(it)
-            }
+            JNINative.sampleAttachment(this_ptr, __cap).let { if (it == 0L) null else ZBytes(it) }
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
 
-    /**
-     * Reliability policy the sample was delivered with.
-     *
-     * Unstable: `zenoh::sample::Sample::reliability` is an `#[unstable]` zenoh API.
-     */
+    /** Reliability policy the sample was delivered with. */
     public fun reliability(onError: JniErrorHandler<Reliability>): Reliability {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Reliability.fromInt(JNINative.sampleGetReliability(this_ptr, __cap))
+            Reliability.fromInt(JNINative.sampleReliability(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
 
-    /**
-     * Zenoh id of the source entity that produced the sample, or `None` when the
-     * sample carries no source info (owned handle).
-     *
-     * Unstable: `zenoh::sample::Sample::source_info` is an `#[unstable]` zenoh API.
-     */
+    /** Zenoh id of the sample's source, or `None` when source information is absent. */
     public fun sourceZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceZid(this_ptr, __cap)?.let { ZenohId(it) }
+            JNINative.sampleSourceZid(this_ptr, __cap)?.let { ZenohId(it) }
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
 
-    /**
-     * Entity id of the sample's source (0 when the sample carries no source info).
-     *
-     * Unstable: `zenoh::sample::Sample::source_info` is an `#[unstable]` zenoh API.
-     */
+    /** Entity id of the sample's source, or zero when source information is absent. */
     public fun sourceEid(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceEid(this_ptr, __cap)
+            JNINative.sampleSourceEid(this_ptr, __cap)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
 
-    /**
-     * Source sequence number of the sample (0 when the sample carries no source
-     * info).
-     *
-     * Unstable: `zenoh::sample::Sample::source_info` is an `#[unstable]` zenoh API.
-     */
+    /** Source sequence number, or zero when source information is absent. */
     public fun sourceSn(onError: JniErrorHandler<Long>): Long {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceSn(this_ptr, __cap)
+            JNINative.sampleSourceSn(this_ptr, __cap)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -232,7 +210,7 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 }
 
-public fun interface SampleCallback {
+public fun interface ZSampleCallback {
     public fun run(
         keyExpr: KeyExpr,
         payload: ZBytes,
@@ -251,7 +229,7 @@ public fun interface SampleCallback {
     )
 }
 
-public fun interface SampleCallbackRaw {
+public fun interface ZSampleCallbackRaw {
     public fun run(
         keyExpr: Long,
         payload: Long,
@@ -270,8 +248,8 @@ public fun interface SampleCallbackRaw {
     )
 }
 
-public fun SampleCallback.asRaw(): SampleCallbackRaw =
-    SampleCallbackRaw {
+public fun ZSampleCallback.asRaw(): ZSampleCallbackRaw =
+    ZSampleCallbackRaw {
         keyExpr,
         payload,
         encoding,
@@ -303,168 +281,3 @@ public fun SampleCallback.asRaw(): SampleCallbackRaw =
             sourceSn
         )
     }
-
-public fun interface SampleBuilder<out R> {
-    public fun run(
-        keyExpr: KeyExpr,
-        payload: ZBytes,
-        encoding: Encoding,
-        encoding__id: Int,
-        kind: Int,
-        timestamp__ntp64: Long?,
-        express: Boolean,
-        priority: Int,
-        congestionControl: Int,
-        attachment: ZBytes?,
-        reliability: Int,
-        sourceZid: ZenohId?,
-        sourceEid: Int,
-        sourceSn: Long,
-    ): R
-}
-
-public fun interface SampleBuilderRaw<out R> {
-    public fun run(
-        keyExpr: Long,
-        payload: Long,
-        encoding: Long,
-        encoding__id: Int,
-        kind: Int,
-        timestamp__ntp64: Long?,
-        express: Boolean,
-        priority: Int,
-        congestionControl: Int,
-        attachment: Long?,
-        reliability: Int,
-        sourceZid: ByteArray?,
-        sourceEid: Int,
-        sourceSn: Long,
-    ): R
-}
-
-public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
-    SampleBuilderRaw<R> {
-        keyExpr,
-        payload,
-        encoding,
-        encoding__id,
-        kind,
-        timestamp__ntp64,
-        express,
-        priority,
-        congestionControl,
-        attachment,
-        reliability,
-        sourceZid,
-        sourceEid,
-        sourceSn ->
-        run(
-            KeyExpr(keyExpr),
-            ZBytes(payload),
-            Encoding(encoding),
-            encoding__id,
-            kind,
-            timestamp__ntp64,
-            express,
-            priority,
-            congestionControl,
-            attachment?.let { ZBytes(it) },
-            reliability,
-            sourceZid?.let { ZenohId(it) },
-            sourceEid,
-            sourceSn
-        )
-    }
-
-/**
- * Build a **Put** [`Sample`] from its key expression, payload, and optional
- * metadata — the flat port of zenoh's `SampleBuilder::put`. The required
- * `key_expr`/`payload` are themselves `ptr_class` types, so wiring this as the
- * `ptr_class_input` for `Sample` exercises **recursive input**: a `Sample`
- * parameter expands to this constructor's params, each of which expands per its
- * own canonical input (key-expr String|handle, bytes ByteArray, encoding String,
- * etc.).
- *
- * Optional fields mirror the builder: `encoding` (default when `None`),
- * `timestamp_ntp64` (the NTP64 component; reconstructed with a random
- * [`TimestampId`], matching `query_reply_success`), `attachment`, and the QoS
- * knobs. `reliability` is unstable and only present with the `unstable` feature.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`keyExpr`, `payload`, `encoding`, `encoding__id`, `kind`, `timestamp__ntp64`, `express`, `priority`, `congestionControl`, `attachment`, `reliability`, `sourceZid`, `sourceEid`, `sourceSn`).
- */
-@Suppress("UNCHECKED_CAST")
-public fun <R> sampleNewPut(
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    timestampNtp64: Long?,
-    attachment: ByteArray?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    reliability: Reliability?,
-    onError: JniErrorHandler<R>,
-    build: SampleBuilder<R>,
-): R {
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-    )
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-/**
- * Build a **Delete** [`Sample`] from its key expression and optional metadata —
- * the flat port of zenoh's `SampleBuilder::delete`. A delete sample carries no
- * payload or encoding; the remaining fields mirror [`sample_new_put`].
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`keyExpr`, `payload`, `encoding`, `encoding__id`, `kind`, `timestamp__ntp64`, `express`, `priority`, `congestionControl`, `attachment`, `reliability`, `sourceZid`, `sourceEid`, `sourceSn`).
- */
-@Suppress("UNCHECKED_CAST")
-public fun <R> sampleNewDelete(
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    timestampNtp64: Long?,
-    attachment: ByteArray?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    reliability: Reliability?,
-    onError: JniErrorHandler<R>,
-    build: SampleBuilder<R>,
-): R {
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-    )
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}

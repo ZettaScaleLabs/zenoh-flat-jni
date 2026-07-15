@@ -28,7 +28,7 @@ public enum class WhatAmI(public val value: Int) {
 }
 
 /**
- * Typed by-value wrapper for the native Rust `ZenohId` (a `Copy` blob carried
+ * Typed by-value wrapper for the native Rust `ZZenohId` (a `Copy` blob carried
  * as its raw bytes; `@JvmInline`-erased to `ByteArray` at the JNI boundary).
  */
 @JvmInline
@@ -50,7 +50,7 @@ public value class ZenohId(public val bytes: ByteArray) {
     }
 }
 
-/** Typed handle for a native Zenoh `Config`. */
+/** Typed handle for a native Zenoh `ZConfig`. */
 public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -86,14 +86,14 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
 
     /**
      * Clone a configuration handle. Use this before passing a config to a
-     * consuming call (`open`) when the caller needs to keep the original.
+     * consuming call (`z_open`) when the caller needs to keep the original.
      */
     public fun newClone(onError: JniErrorHandler<Config>): Config {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Config(JNINative.configNewClone(this_ptr, __cap))
+            Config(JNINative.configClone(this_ptr, __cap))
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -106,7 +106,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         /** Build a default configuration. */
         public fun newDefault(onError: JniErrorHandler<Config>): Config {
             val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewDefault(__cap))
+            val __ret = Config(JNINative.configDefault(__cap))
             if (__cap.failed) return onError.run(__cap.je)
             return __ret
         }
@@ -119,7 +119,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          */
         public fun fromFile(path: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromFile(path, __cap))
+            val __ret = Config(JNINative.configFromFile(path, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
@@ -132,7 +132,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          */
         public fun fromJson(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson(s, __cap))
+            val __ret = Config(JNINative.configFromJson(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
@@ -144,7 +144,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          */
         public fun fromJson5(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson5(s, __cap))
+            val __ret = Config(JNINative.configFromJson5(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
@@ -156,23 +156,23 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          */
         public fun fromYaml(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromYaml(s, __cap))
+            val __ret = Config(JNINative.configFromYaml(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
     }
 }
 
-public fun interface ZenohIdFolder<A> {
+public fun interface ZZenohIdFolder<A> {
     public fun run(acc: A, element: ZenohId): A
 }
 
-public fun interface ZenohIdFolderRaw<A> {
+public fun interface ZZenohIdFolderRaw<A> {
     public fun run(acc: A, element: ByteArray): A
 }
 
-public fun <A> ZenohIdFolder<A>.asRaw(): ZenohIdFolderRaw<A> =
-    ZenohIdFolderRaw<A> {
+public fun <A> ZZenohIdFolder<A>.asRaw(): ZZenohIdFolderRaw<A> =
+    ZZenohIdFolderRaw<A> {
         acc,
         element ->
         run(
@@ -181,10 +181,10 @@ public fun <A> ZenohIdFolder<A>.asRaw(): ZenohIdFolderRaw<A> =
         )
     }
 
-internal object __ZenohIdFolderRawHolder {
+internal object __ZZenohIdFolderRawHolder {
     @JvmField
-    val instance: ZenohIdFolderRaw<ArrayList<ZenohId>> =
-    ZenohIdFolderRaw { acc, element -> acc.add(ZenohId(element)); acc }
+    val instance: ZZenohIdFolderRaw<ArrayList<ZenohId>> =
+    ZZenohIdFolderRaw { acc, element -> acc.add(ZenohId(element)); acc }
 }
 
 /**

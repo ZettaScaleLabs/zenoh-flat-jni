@@ -7,7 +7,7 @@ import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
-/** Typed handle for a native Zenoh `Timestamp`. */
+/** Typed handle for a native Zenoh `ZTimestamp`. */
 public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     @Synchronized
     override fun close() {
@@ -31,7 +31,7 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.timestampGetNtp64(this_ptr, __cap)
+            JNINative.timestampNtp64(this_ptr, __cap)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
@@ -43,7 +43,7 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.timestampGetId(this_ptr, __cap)
+            JNINative.timestampId(this_ptr, __cap)
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
