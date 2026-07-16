@@ -236,6 +236,7 @@ public fun interface SampleCallback {
         getPayload: ZBytes,
         getEncoding__getId: Int,
         getEncoding__getSchema: String?,
+        getEncoding: Encoding,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -255,6 +256,7 @@ public fun interface SampleCallbackRaw {
         getPayload: Long,
         getEncoding__getId: Int,
         getEncoding__getSchema: String?,
+        getEncoding: Long,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -274,6 +276,7 @@ public fun SampleCallback.asRaw(): SampleCallbackRaw =
         getPayload,
         getEncoding__getId,
         getEncoding__getSchema,
+        getEncoding,
         getKind,
         getTimestamp__getNtp64,
         getExpress,
@@ -289,6 +292,7 @@ public fun SampleCallback.asRaw(): SampleCallbackRaw =
             ZBytes(getPayload),
             getEncoding__getId,
             getEncoding__getSchema,
+            Encoding(getEncoding),
             getKind,
             getTimestamp__getNtp64,
             getExpress,
@@ -308,6 +312,7 @@ public fun interface SampleBuilder<out R> {
         getPayload: ZBytes,
         getEncoding__getId: Int,
         getEncoding__getSchema: String?,
+        getEncoding: Encoding,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -327,6 +332,7 @@ public fun interface SampleBuilderRaw<out R> {
         getPayload: Long,
         getEncoding__getId: Int,
         getEncoding__getSchema: String?,
+        getEncoding: Long,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -346,6 +352,7 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
         getPayload,
         getEncoding__getId,
         getEncoding__getSchema,
+        getEncoding,
         getKind,
         getTimestamp__getNtp64,
         getExpress,
@@ -361,6 +368,7 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
             ZBytes(getPayload),
             getEncoding__getId,
             getEncoding__getSchema,
+            Encoding(getEncoding),
             getKind,
             getTimestamp__getNtp64,
             getExpress,
@@ -382,10 +390,10 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
  * enabled.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+ * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
+ * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getEncoding`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
  */
 @Suppress("UNCHECKED_CAST")
 public fun <R> sampleNewPut(
@@ -393,9 +401,10 @@ public fun <R> sampleNewPut(
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
     payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
+    encodingSel: Int,
+    encoding00: Int?,
+    encoding01: String?,
+    encoding1: Encoding?,
     timestampNtp64: Long?,
     attachment: ByteArray?,
     congestionControl: CongestionControl?,
@@ -408,16 +417,21 @@ public fun <R> sampleNewPut(
     if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
         "Operation on a closed native handle.",
     )
+    if (encoding1 != null && encoding1.isClosed()) return onError.run(
+        "Operation on a closed native handle.",
+    )
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         keyExpr1?.let { __locks.add(it) }
+        encoding1?.let { __locks.add(it) }
         withSortedHandleLocks(__locks) {
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+            val encoding1_ptr = encoding1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingSel, encoding00 != null, encoding00 ?: 0, encoding01, encoding1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
+                keyExpr1?.markConsumed()
             }
         }
     }
@@ -433,7 +447,7 @@ public fun <R> sampleNewPut(
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
+ * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getEncoding`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
  */
 @Suppress("UNCHECKED_CAST")
 public fun <R> sampleNewDelete(
@@ -461,7 +475,7 @@ public fun <R> sampleNewDelete(
             try {
                 (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
+                keyExpr1?.markConsumed()
             }
         }
     }

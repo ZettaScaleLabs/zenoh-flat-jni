@@ -3,6 +3,7 @@ package io.zenoh.jni.scouting
 
 import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
+import io.zenoh.jni.GcNativeHandle
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
@@ -12,6 +13,8 @@ import io.zenoh.jni.__StringFolderHolder
 import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.WhatAmI
 import io.zenoh.jni.config.ZenohId
+import io.zenoh.jni.registerGcHandle
+import io.zenoh.jni.releaseCell
 import io.zenoh.jni.withSortedHandleLocks
 
 /** Typed handle for a native Zenoh `Hello`. */
@@ -75,21 +78,21 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /** Typed handle for a native Zenoh `Scout`. */
-public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Scout(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Scout {
-        val p = ptr
-        ptr = p or 1L
-        return Scout(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Scout(if (p != 0L) p else cell.get())
     }
 
     public companion object {

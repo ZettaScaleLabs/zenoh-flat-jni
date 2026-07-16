@@ -111,7 +111,12 @@ fn main() {
     // — cheap primitives, no per-call String parse, no native handle.
     // Canonical output: the handle (identity) + id (raw jint), both free
     // jvalue slots; schema and the canonical string stay on-demand accessors.
+    // `.gc_managed()`: an Encoding handle lives inside a non-closeable SDK
+    // value (zenoh-java/zenoh-kotlin `Encoding`) that nobody will ever
+    // close — the shared Cleaner frees it when the value becomes
+    // unreachable; explicit close/take/consumption settle the ticket first.
     let encoding = ptr_class!(Encoding)
+        .gc_managed()
         .method(fun!(encoding_get_id))
         .method(fun!(encoding_get_schema))
         .method(fun!(encoding_to_string).name("toStr"))
@@ -321,7 +326,13 @@ fn main() {
                         .method(fun!(hello_get_zid)) // ZenohId value class -> ByteArray
                         .method(fun!(hello_get_locators)), // Vec<String> -> List<String>
                 )
-                .class(ptr_class!(Scout))
+                // Semantic resources (Scout, and Session/Publisher/… below)
+                // are `.gc_managed()` as a LEAK BACKSTOP: explicit
+                // close/undeclare stays the primary path (it settles the
+                // release ticket), and the shared Cleaner only frees a
+                // resource whose owner forgot — replacing the SDKs'
+                // deprecated-for-removal `finalize()` nets (JEP 421).
+                .class(ptr_class!(Scout).gc_managed())
                 .fun(fun!(scout)),
         )
         .expand(
@@ -351,20 +362,33 @@ fn main() {
         // on demand via `zbytesAsBytes` (one borrow-copy).
         .expand(expand_param!(ZBytes).variant(fun!(zbytes_new_from_vec)))
         .expand(expand_return!(ZBytes).field_self())
-        // Encoding crosses **by value in both directions**: an encoding IS its
-        // decomposed `(id, schema?)` pair (Zenoh core semantics — the string
-        // form is derived from a fixed table), so no native handle needs to
-        // cross or be retained. Default input: built via `fromId` — cheap
-        // primitives; on `Option<&_>` params a leading present flag encodes
-        // absence, letting the publisher's declare-time default apply. Default
-        // output: the same `(id, schema?)` leaves; the JVM tier reconstructs
-        // its own value type from them (no per-message handle allocation,
-        // nothing to close).
-        .expand(expand_param!(Encoding).variant(fun!(encoding_new_from_id)))
+        // Encoding INPUT: value or handle, minimizing JNI crossings. An
+        // encoding IS its decomposed `(id, schema?)` pair (Zenoh core
+        // semantics — the string form is derived from a fixed table), so the
+        // default build arm crosses those cheap primitives via `fromId`
+        // INSIDE the send call itself: a predefined encoding costs one Int,
+        // no handle, no extra crossing. The `variant_self()` arm additionally
+        // accepts an existing handle for encodings that already own one
+        // (custom-created and received ones) — a bare jlong instead of
+        // re-decoding the schema string each call; every encoding param is
+        // `Option<&Encoding>`, so the handle is borrowed and reusable
+        // forever. No `.split_on_param`: neither arm alone covers the
+        // value-or-handle send dichotomy, so consumers drive the selector
+        // block directly.
+        // OUTPUT: the `(id, schema?)` leaves for JVM-side identity PLUS the
+        // owned handle (`field_self`, a cheap clone) — a received encoding
+        // arrives send-ready in the same single crossing, so re-sending it
+        // never rebuilds the native value.
+        .expand(
+            expand_param!(Encoding)
+                .variant(fun!(encoding_new_from_id))
+                .variant_self(),
+        )
         .expand(
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
-                .field(fun!(encoding_get_schema)),
+                .field(fun!(encoding_get_schema))
+                .field_self(),
         )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`
@@ -441,22 +465,27 @@ fn main() {
                 // `publisher.put(...)` / `publisher.delete(...)` — receiver-style.
                 .class(
                     ptr_class!(Publisher)
+                        .gc_managed()
                         .method(fun!(publisher_put))
                         .method(fun!(publisher_delete)),
                 )
-                .class(ptr_class!(Subscriber)),
+                .class(ptr_class!(Subscriber).gc_managed()),
         )
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
-                .class(ptr_class!(Queryable))
+                .class(ptr_class!(Queryable).gc_managed())
                 // `querier.get(...)` — receiver-style method on Querier.
-                .class(ptr_class!(Querier).method(fun!(querier_get)))
+                .class(ptr_class!(Querier).gc_managed().method(fun!(querier_get)))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
                 .class(
                     ptr_class!(Query)
+                        // gc_managed: an abandoned Query's backstop close also
+                        // finalizes the reply stream (same as the SDKs' former
+                        // finalize()), so the querier's get completes.
+                        .gc_managed()
                         .method(fun!(query_get_keyexpr))
                         .method(fun!(query_get_parameters))
                         .method(fun!(query_get_payload))
@@ -533,7 +562,7 @@ fn main() {
         // `LivelinessToken` is just an opaque handle; the liveliness operations
         // (`liveliness_*`) are declared under the `session` package below,
         // alongside the session API they extend.
-        .package(package!("liveliness").class(ptr_class!(LivelinessToken)))
+        .package(package!("liveliness").class(ptr_class!(LivelinessToken).gc_managed()))
         .package(
             package!("session").class(
                 // Every session operation is a RECEIVER-STYLE instance method on
@@ -541,6 +570,7 @@ fn main() {
                 // Kotlin surface reads `session.put(...)` / `session.declarePublisher(...)`.
                 // `open` has no receiver (it creates a Session) → companion factory.
                 ptr_class!(Session)
+                    .gc_managed()
                     .constructor(fun!(open))
                     .method(fun!(session_get_zid))
                     .method(fun!(session_declare_publisher).split_on_param("key_expr"))
