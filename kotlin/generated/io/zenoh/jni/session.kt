@@ -62,24 +62,30 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     public fun declarePublisher(
-        keyExprS: String,
-        encoding: Encoding?,
+        s: String,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(0, keyExprS, null, if (encoding != null) 1 else -1, null, null, encoding, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(0, s, null, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
 
     public fun declarePublisher(
         keyExpr: KeyExpr,
-        encoding: Encoding?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(1, null, keyExpr, if (encoding != null) 1 else -1, null, null, encoding, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(1, null, keyExpr, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
 
     /**
      * Declare a publisher for the given key expression.
@@ -160,28 +166,34 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     public fun put(
-        keyExprS: String,
+        s: String,
         payload: ByteArray,
-        encoding: Encoding?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
         onError: ErrorHandler<Unit>,
-    ) = put(0, keyExprS, null, payload, if (encoding != null) 1 else -1, null, null, encoding, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(0, s, null, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
 
     public fun put(
         keyExpr: KeyExpr,
         payload: ByteArray,
-        encoding: Encoding?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
         onError: ErrorHandler<Unit>,
-    ) = put(1, null, keyExpr, payload, if (encoding != null) 1 else -1, null, null, encoding, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(1, null, keyExpr, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
 
     /**
      * Publish data on a key expression.
@@ -600,7 +612,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     public fun get(
-        keyExprS: String,
+        s: String,
         parameters: String?,
         timeoutMs: Long?,
         target: QueryTarget?,
@@ -610,12 +622,15 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         payload: ByteArray?,
-        encoding: Encoding?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
         onError: ErrorHandler<Unit>,
-    ) = get(0, keyExprS, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, if (encoding != null) 1 else -1, null, null, encoding, attachment, callback, onClose, onError)
+    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
 
     public fun get(
         keyExpr: KeyExpr,
@@ -628,12 +643,15 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         payload: ByteArray?,
-        encoding: Encoding?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
         onError: ErrorHandler<Unit>,
-    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, if (encoding != null) 1 else -1, null, null, encoding, attachment, callback, onClose, onError)
+    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
 
     /**
      * Send a query to matching queryables.

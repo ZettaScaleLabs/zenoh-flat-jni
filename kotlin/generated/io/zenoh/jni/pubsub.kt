@@ -26,13 +26,6 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
         return Publisher(p)
     }
 
-    public fun put(
-        payload: ByteArray,
-        encoding: Encoding?,
-        attachment: ByteArray?,
-        onError: ErrorHandler<Unit>,
-    ) = put(payload, if (encoding != null) 1 else -1, null, null, encoding, attachment, onError)
-
     /**
      * Publish data on the publisher's key expression.
      *
