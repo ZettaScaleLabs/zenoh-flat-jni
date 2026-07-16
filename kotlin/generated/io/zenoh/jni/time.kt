@@ -26,7 +26,7 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** NTP64 time component of the timestamp. */
-    public fun ntp64(onError: JniErrorHandler<Long>): Long {
+    public fun getNtp64(onError: JniErrorHandler<Long>): Long {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {

@@ -4,10 +4,6 @@ package io.zenoh.jni.qos
 /**
  * Congestion control policy used when routing data.
  *
- * `BlockFirst` mirrors `zenoh::qos::CongestionControl::BlockFirst`, which is
- * `#[cfg(feature = "unstable")]`; prebindgen honors per-variant `#[cfg]`, so the
- * generated C enum gains/loses `BlockFirst` with the `unstable` feature.
- *
  * JVM-side surface for the native Rust `CongestionControl` enum.
  */
 public enum class CongestionControl(public val value: Int) {
@@ -22,7 +18,7 @@ public enum class CongestionControl(public val value: Int) {
 }
 
 /**
- * Message priority policy. Lower numeric value means higher priority.
+ * The delivery priority of a message, from real-time to background traffic.
  *
  * JVM-side surface for the native Rust `Priority` enum.
  */
@@ -42,10 +38,9 @@ public enum class Priority(public val value: Int) {
 }
 
 /**
- * Reliability policy for publications/subscriptions.
+ * The requested delivery reliability for publications and subscriptions.
  *
- * Unstable: mirrors `zenoh::qos::Reliability` (an `#[unstable]` zenoh API), so
- * the captured item carries the `feature = "unstable"` cfg for consumers.
+ * This policy is available only when unstable features are enabled.
  *
  * JVM-side surface for the native Rust `Reliability` enum.
  */

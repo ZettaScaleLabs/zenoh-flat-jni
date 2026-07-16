@@ -16,8 +16,7 @@ import io.zenoh.jni.sample.Sample
 import io.zenoh.jni.withSortedHandleLocks
 
 /**
- * The kind of consolidation applied to query replies. Mirrors
- * `zenoh::query::ConsolidationMode`.
+ * The policy used to combine replies from multiple queryables.
  *
  * JVM-side surface for the native Rust `ConsolidationMode` enum.
  */
@@ -34,8 +33,7 @@ public enum class ConsolidationMode(public val value: Int) {
 }
 
 /**
- * The queryables that should be targeted by a GET. Mirrors
- * `zenoh::query::QueryTarget`.
+ * The set of queryables that should receive a query.
  *
  * JVM-side surface for the native Rust `QueryTarget` enum.
  */
@@ -51,8 +49,7 @@ public enum class QueryTarget(public val value: Int) {
 }
 
 /**
- * Whether a query accepts replies whose key expression may not match the
- * query's. Mirrors `zenoh::query::ReplyKeyExpr`.
+ * Whether replies may use key expressions that do not match the query.
  *
  * JVM-side surface for the native Rust `ReplyKeyExpr` enum.
  */
@@ -84,6 +81,49 @@ public class Querier(initialPtr: Long) : NativeHandle(initialPtr) {
         return Querier(p)
     }
 
+    /**
+     * Send a query through a reusable querier.
+     *
+     * The callback is called for each reply. Optional arguments specify selector
+     * parameters, payload metadata, and attachment. The close callback is called
+     * after the reply stream ends.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun get(
+        parameters: String?,
+        payload: ByteArray?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.querierGet(
+                this_ptr,
+                parameters,
+                payload,
+                encodingPresent,
+                encodingId,
+                encodingSchema,
+                attachment,
+                callback.asRaw(),
+                onClose,
+                __cap,
+            )
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -108,8 +148,8 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return Query(p)
     }
 
-    /** Key expression the query targets (borrowed; valid while `q` lives). */
-    public fun keyExpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
+    /** Return the key expression targeted by the query. */
+    public fun getKeyexpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -120,8 +160,8 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Query selector parameters as an owned string (empty when none). */
-    public fun parameters(onError: JniErrorHandler<String>): String {
+    /** Return the parameters that refine the query selector. */
+    public fun getParameters(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -132,8 +172,8 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Query payload (borrowed bytes), or `None` when the query carries none. */
-    public fun payload(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+    /** Return the query payload, when present. */
+    public fun getPayload(onError: JniErrorHandler<ZBytes?>): ZBytes? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -144,8 +184,8 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Encoding of the query payload (borrowed), or `None`. */
-    public fun encoding(onError: JniErrorHandler<Encoding?>): Encoding? {
+    /** Return format information for the query payload, when present. */
+    public fun getEncoding(onError: JniErrorHandler<Encoding?>): Encoding? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -156,8 +196,8 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Attachment carried by the query (borrowed bytes), or `None`. */
-    public fun attachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+    /** Return user-defined metadata associated with the query, when present. */
+    public fun getAttachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -169,10 +209,11 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * The [`crate::ReplyKeyExpr`] policy the querier accepts for replies.
-     * Unstable: `zenoh::query::Query::accepts_replies` is `#[cfg(feature = "unstable")]`.
+     * Return the policy for accepted reply key expressions.
+     *
+     * This information is available only when unstable features are enabled.
      */
-    public fun acceptsReplies(onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
+    public fun getAcceptsReplies(onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -181,6 +222,208 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         }
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
+    }
+
+    public fun replySuccess(
+        s: String,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replySuccess(0, s, null, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
+    public fun replySuccess(
+        keyExpr: KeyExpr,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replySuccess(1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
+    /**
+     * Reply to a query with a value.
+     *
+     * Optional arguments specify the payload format, timestamp, attachment, and
+     * express delivery. When no timestamp is supplied, Zenoh assigns one. Use
+     * [`query_reply_sample`] to send a complete sample instead.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun replySuccess(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.queryReplySuccess(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    payload,
+                    encodingPresent,
+                    encodingId,
+                    encodingSchema,
+                    timestampNtp64 != null,
+                    timestampNtp64 ?: 0L,
+                    attachment,
+                    express != null,
+                    express ?: false,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    /**
+     * Reply to a query with an application error.
+     *
+     * The payload and its format describe the error returned to the querier.
+     *
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun replyError(
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.queryReplyError(
+                this_ptr,
+                payload,
+                encodingPresent,
+                encodingId,
+                encodingSchema,
+                __cap,
+            )
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    public fun replyDelete(
+        s: String,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replyDelete(0, s, null, timestampNtp64, attachment, express, onError)
+
+    public fun replyDelete(
+        keyExpr: KeyExpr,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replyDelete(1, null, keyExpr, timestampNtp64, attachment, express, onError)
+
+    /**
+     * Reply to a query with a deletion notification.
+     *
+     * Optional arguments specify the timestamp, attachment, and express delivery.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun replyDelete(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.queryReplyDelete(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    timestampNtp64 != null,
+                    timestampNtp64 ?: 0L,
+                    attachment,
+                    express != null,
+                    express ?: false,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    /**
+     * Reply to a query with a complete sample.
+     *
+     * The sample's kind, payload, encoding, timestamp, attachment, delivery
+     * quality, and source information are preserved.
+     *
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun replySample(sample: Sample, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (sample.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this, sample) {
+            val this_ptr = this.ptr
+            val sample_ptr = sample.ptr
+            try {
+                JNINative.queryReplySample(this_ptr, sample_ptr, __cap)
+            } finally {
+                sample.ptr = sample.ptr or 1L
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     }
 
     public companion object {
@@ -232,11 +475,11 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * Zenoh id of the node that answered, or `None` when unknown (owned handle).
+     * Return the identifier of the node that answered, when known.
      *
-     * Unstable: `Reply::replier_id` is an `#[unstable]` zenoh API.
+     * This information is available only when unstable features are enabled.
      */
-    public fun replierZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
+    public fun getReplierZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -248,11 +491,11 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /**
-     * Entity id of the replier (0 when the replier is unknown).
+     * Return the answering entity's identifier, or `0` when unknown.
      *
-     * Unstable: `Reply::replier_id` is an `#[unstable]` zenoh API.
+     * This information is available only when unstable features are enabled.
      */
-    public fun replierEid(onError: JniErrorHandler<Int>): Int {
+    public fun getReplierEid(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -263,7 +506,7 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** `true` if this reply is a success (carries a sample), `false` if an error. */
+    /** Return whether this reply contains a sample rather than an error. */
     public fun isOk(onError: JniErrorHandler<Boolean>): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -275,8 +518,8 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** The reply's sample on success (borrowed; valid while `r` lives), `None` on error. */
-    public fun sample(onError: JniErrorHandler<Sample?>): Sample? {
+    /** Return the sample carried by a successful reply. */
+    public fun getSample(onError: JniErrorHandler<Sample?>): Sample? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -287,11 +530,8 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * The reply's error on failure (borrowed; valid while `r` lives), `None` on
-     * success.
-     */
-    public fun err(onError: JniErrorHandler<ReplyError?>): ReplyError? {
+    /** Return the application error carried by an unsuccessful reply. */
+    public fun getErr(onError: JniErrorHandler<ReplyError?>): ReplyError? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -326,8 +566,8 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
         return ReplyError(p)
     }
 
-    /** The error's payload (borrowed bytes). */
-    public fun payload(onError: JniErrorHandler<ZBytes>): ZBytes {
+    /** Return the error payload. */
+    public fun getPayload(onError: JniErrorHandler<ZBytes>): ZBytes {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -338,8 +578,8 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /** The error's encoding (borrowed). */
-    public fun encoding(onError: JniErrorHandler<Encoding>): Encoding {
+    /** Return format information associated with the error payload. */
+    public fun getEncoding(onError: JniErrorHandler<Encoding>): Encoding {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -358,355 +598,144 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
 
 public fun interface QueryCallback {
     public fun run(
-        keyExpr: KeyExpr,
-        parameters: String,
-        payload: ZBytes?,
-        encoding: Encoding?,
-        encoding__id: Int?,
-        attachment: ZBytes?,
-        acceptsReplies: Int,
+        getKeyexpr: KeyExpr,
+        getParameters: String,
+        getPayload: ZBytes?,
+        getEncoding: Encoding?,
+        getEncoding__getId: Int?,
+        getAttachment: ZBytes?,
+        getAcceptsReplies: Int,
         handle: Query,
     )
 }
 
 public fun interface QueryCallbackRaw {
     public fun run(
-        keyExpr: Long,
-        parameters: String,
-        payload: Long?,
-        encoding: Long?,
-        encoding__id: Int?,
-        attachment: Long?,
-        acceptsReplies: Int,
+        getKeyexpr: Long,
+        getParameters: String,
+        getPayload: Long?,
+        getEncoding: Long?,
+        getEncoding__getId: Int?,
+        getAttachment: Long?,
+        getAcceptsReplies: Int,
         handle: Long,
     )
 }
 
 public fun QueryCallback.asRaw(): QueryCallbackRaw =
     QueryCallbackRaw {
-        keyExpr,
-        parameters,
-        payload,
-        encoding,
-        encoding__id,
-        attachment,
-        acceptsReplies,
+        getKeyexpr,
+        getParameters,
+        getPayload,
+        getEncoding,
+        getEncoding__getId,
+        getAttachment,
+        getAcceptsReplies,
         handle ->
         run(
-            KeyExpr(keyExpr),
-            parameters,
-            payload?.let { ZBytes(it) },
-            encoding?.let { Encoding(it) },
-            encoding__id,
-            attachment?.let { ZBytes(it) },
-            acceptsReplies,
+            KeyExpr(getKeyexpr),
+            getParameters,
+            getPayload?.let { ZBytes(it) },
+            getEncoding?.let { Encoding(it) },
+            getEncoding__getId,
+            getAttachment?.let { ZBytes(it) },
+            getAcceptsReplies,
             Query(handle)
         )
     }
 
 public fun interface ReplyCallback {
     public fun run(
-        replierZid: ZenohId?,
-        replierEid: Int,
+        getReplierZid: ZenohId?,
+        getReplierEid: Int,
         isOk: Boolean,
-        sample__keyExpr: KeyExpr?,
-        sample__payload: ZBytes?,
-        sample__encoding: Encoding?,
-        sample__encoding__id: Int?,
-        sample__kind: Int?,
-        sample__timestamp__ntp64: Long?,
-        sample__express: Boolean?,
-        sample__priority: Int?,
-        sample__congestionControl: Int?,
-        sample__attachment: ZBytes?,
-        sample__reliability: Int?,
-        sample__sourceZid: ZenohId?,
-        sample__sourceEid: Int?,
-        sample__sourceSn: Long?,
-        err__payload: ZBytes?,
-        err__encoding: Encoding?,
-        err__encoding__id: Int?,
+        getSample__getKeyExpr: KeyExpr?,
+        getSample__getPayload: ZBytes?,
+        getSample__getEncoding: Encoding?,
+        getSample__getEncoding__getId: Int?,
+        getSample__getKind: Int?,
+        getSample__getTimestamp__getNtp64: Long?,
+        getSample__getExpress: Boolean?,
+        getSample__getPriority: Int?,
+        getSample__getCongestionControl: Int?,
+        getSample__getAttachment: ZBytes?,
+        getSample__getReliability: Int?,
+        getSample__getSourceZid: ZenohId?,
+        getSample__getSourceEid: Int?,
+        getSample__getSourceSn: Long?,
+        getErr__getPayload: ZBytes?,
+        getErr__getEncoding: Encoding?,
+        getErr__getEncoding__getId: Int?,
     )
 }
 
 public fun interface ReplyCallbackRaw {
     public fun run(
-        replierZid: ByteArray?,
-        replierEid: Int,
+        getReplierZid: ByteArray?,
+        getReplierEid: Int,
         isOk: Boolean,
-        sample__keyExpr: Long?,
-        sample__payload: Long?,
-        sample__encoding: Long?,
-        sample__encoding__id: Int?,
-        sample__kind: Int?,
-        sample__timestamp__ntp64: Long?,
-        sample__express: Boolean?,
-        sample__priority: Int?,
-        sample__congestionControl: Int?,
-        sample__attachment: Long?,
-        sample__reliability: Int?,
-        sample__sourceZid: ByteArray?,
-        sample__sourceEid: Int?,
-        sample__sourceSn: Long?,
-        err__payload: Long?,
-        err__encoding: Long?,
-        err__encoding__id: Int?,
+        getSample__getKeyExpr: Long?,
+        getSample__getPayload: Long?,
+        getSample__getEncoding: Long?,
+        getSample__getEncoding__getId: Int?,
+        getSample__getKind: Int?,
+        getSample__getTimestamp__getNtp64: Long?,
+        getSample__getExpress: Boolean?,
+        getSample__getPriority: Int?,
+        getSample__getCongestionControl: Int?,
+        getSample__getAttachment: Long?,
+        getSample__getReliability: Int?,
+        getSample__getSourceZid: ByteArray?,
+        getSample__getSourceEid: Int?,
+        getSample__getSourceSn: Long?,
+        getErr__getPayload: Long?,
+        getErr__getEncoding: Long?,
+        getErr__getEncoding__getId: Int?,
     )
 }
 
 public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
     ReplyCallbackRaw {
-        replierZid,
-        replierEid,
+        getReplierZid,
+        getReplierEid,
         isOk,
-        sample__keyExpr,
-        sample__payload,
-        sample__encoding,
-        sample__encoding__id,
-        sample__kind,
-        sample__timestamp__ntp64,
-        sample__express,
-        sample__priority,
-        sample__congestionControl,
-        sample__attachment,
-        sample__reliability,
-        sample__sourceZid,
-        sample__sourceEid,
-        sample__sourceSn,
-        err__payload,
-        err__encoding,
-        err__encoding__id ->
+        getSample__getKeyExpr,
+        getSample__getPayload,
+        getSample__getEncoding,
+        getSample__getEncoding__getId,
+        getSample__getKind,
+        getSample__getTimestamp__getNtp64,
+        getSample__getExpress,
+        getSample__getPriority,
+        getSample__getCongestionControl,
+        getSample__getAttachment,
+        getSample__getReliability,
+        getSample__getSourceZid,
+        getSample__getSourceEid,
+        getSample__getSourceSn,
+        getErr__getPayload,
+        getErr__getEncoding,
+        getErr__getEncoding__getId ->
         run(
-            replierZid?.let { ZenohId(it) },
-            replierEid,
+            getReplierZid?.let { ZenohId(it) },
+            getReplierEid,
             isOk,
-            sample__keyExpr?.let { KeyExpr(it) },
-            sample__payload?.let { ZBytes(it) },
-            sample__encoding?.let { Encoding(it) },
-            sample__encoding__id,
-            sample__kind,
-            sample__timestamp__ntp64,
-            sample__express,
-            sample__priority,
-            sample__congestionControl,
-            sample__attachment?.let { ZBytes(it) },
-            sample__reliability,
-            sample__sourceZid?.let { ZenohId(it) },
-            sample__sourceEid,
-            sample__sourceSn,
-            err__payload?.let { ZBytes(it) },
-            err__encoding?.let { Encoding(it) },
-            err__encoding__id
+            getSample__getKeyExpr?.let { KeyExpr(it) },
+            getSample__getPayload?.let { ZBytes(it) },
+            getSample__getEncoding?.let { Encoding(it) },
+            getSample__getEncoding__getId,
+            getSample__getKind,
+            getSample__getTimestamp__getNtp64,
+            getSample__getExpress,
+            getSample__getPriority,
+            getSample__getCongestionControl,
+            getSample__getAttachment?.let { ZBytes(it) },
+            getSample__getReliability,
+            getSample__getSourceZid?.let { ZenohId(it) },
+            getSample__getSourceEid,
+            getSample__getSourceSn,
+            getErr__getPayload?.let { ZBytes(it) },
+            getErr__getEncoding?.let { Encoding(it) },
+            getErr__getEncoding__getId
         )
     }
-
-/**
- * Perform a GET through a querier, delivering each reply as an opaque
- * [`Reply`] handle (thin surface — cheap-FFI bindings pull fields via the
- * `reply_*` accessors). `on_close` fires when the reply stream ends.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun querierGet(
-    querier: Querier,
-    parameters: String?,
-    payload: ByteArray?,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) {
-    if (querier.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(querier) {
-        val querier_ptr = querier.ptr
-        JNINative.querierGet(
-            querier_ptr,
-            parameters,
-            payload,
-            encodingPresent,
-            encodingId,
-            encodingSchema,
-            attachment,
-            callback.asRaw(),
-            onClose,
-            __cap,
-        )
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Reply to a query with a successful PUT sample built from its parts — the flat
- * port of `zenoh::query::Query::reply`. `encoding`, `timestamp_ntp64`,
- * `attachment`, and `express` are optional; omitting `timestamp_ntp64` lets the
- * network assign one. Use [`query_reply_sample`] to forward a ready-made
- * [`Sample`] instead.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun queryReplySuccess(
-    query: Query,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    timestampNtp64: Long?,
-    attachment: ByteArray?,
-    express: Boolean?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (query.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(query)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val query_ptr = query.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.queryReplySuccess(
-                query_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                payload,
-                encodingPresent,
-                encodingId,
-                encodingSchema,
-                timestampNtp64 != null,
-                timestampNtp64 ?: 0L,
-                attachment,
-                express != null,
-                express ?: false,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Reply to a query with an error instead of a sample — the flat port of
- * `zenoh::query::Query::reply_err`. The `payload`/`encoding` carry the error
- * value the querier sees as a [`crate::ReplyError`].
- *
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun queryReplyError(
-    query: Query,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (query.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(query) {
-        val query_ptr = query.ptr
-        JNINative.queryReplyError(
-            query_ptr,
-            payload,
-            encodingPresent,
-            encodingId,
-            encodingSchema,
-            __cap,
-        )
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Reply to a query with a DELETE sample (tombstone) on `key_expr` — the flat
- * port of `zenoh::query::Query::reply_del`. `timestamp_ntp64`, `attachment`,
- * and `express` are optional.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun queryReplyDelete(
-    query: Query,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    timestampNtp64: Long?,
-    attachment: ByteArray?,
-    express: Boolean?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (query.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(query)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val query_ptr = query.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.queryReplyDelete(
-                query_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                timestampNtp64 != null,
-                timestampNtp64 ?: 0L,
-                attachment,
-                express != null,
-                express ?: false,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Reply to a query with a fully-formed [`Sample`] — the flat port of zenoh's
- * `Query::reply_sample`. The sample is sent as-is, preserving its kind (Put or
- * Delete) and all carried metadata (payload, encoding, timestamp, attachment,
- * QoS, source info).
- *
- * The flat consumer of `sample_new_put`: its `sample` parameter is a by-value
- * `Sample`, so its canonical input (`sample_new_put`) recursively expands at the
- * binding boundary — the recursive-input demonstration.
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun queryReplySample(query: Query, sample: Sample, onError: ErrorHandler<Unit>) {
-    if (query.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (sample.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(query, sample) {
-        val query_ptr = query.ptr
-        val sample_ptr = sample.ptr
-        try {
-            JNINative.queryReplySample(query_ptr, sample_ptr, __cap)
-        } finally {
-            sample.ptr = sample.ptr or 1L
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}

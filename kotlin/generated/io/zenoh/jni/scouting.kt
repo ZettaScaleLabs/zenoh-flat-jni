@@ -33,7 +33,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Node type that emitted this hello message. */
-    public fun whatami(onError: JniErrorHandler<WhatAmI>): WhatAmI {
+    public fun getWhatami(onError: JniErrorHandler<WhatAmI>): WhatAmI {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -45,7 +45,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Zenoh id of the node that emitted this hello message. */
-    public fun zid(onError: JniErrorHandler<ZenohId>): ZenohId {
+    public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -57,7 +57,7 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Locators advertised in this hello message. */
-    public fun locators(onError: JniErrorHandler<List<String>>): List<String> {
+    public fun getLocators(onError: JniErrorHandler<List<String>>): List<String> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -99,40 +99,33 @@ public class Scout(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 public fun interface HelloCallback {
-    public fun run(whatami: Int, zid: ZenohId, locators: List<String>)
+    public fun run(getWhatami: Int, getZid: ZenohId, getLocators: List<String>)
 }
 
 public fun interface HelloCallbackRaw {
-    public fun run(whatami: Int, zid: ByteArray, locators: List<String>)
+    public fun run(getWhatami: Int, getZid: ByteArray, getLocators: List<String>)
 }
 
 public fun HelloCallback.asRaw(): HelloCallbackRaw =
     HelloCallbackRaw {
-        whatami,
-        zid,
-        locators ->
+        getWhatami,
+        getZid,
+        getLocators ->
         run(
-            whatami,
-            ZenohId(zid),
-            locators
+            getWhatami,
+            ZenohId(getZid),
+            getLocators
         )
     }
 
 /**
- * Start a scout, invoking `callback` for each hello message received.
+ * Discover Zenoh nodes and report each received hello message.
  *
- * `whatami` is a bitfield over the [`crate::WhatAmI`] variants
- * (`Router=1 | Peer=2 | Client=4`); only the low 3 bits are
- * significant, the wider type matches the JVM/`Int` matcher
- * representation. When `config` is `None` the default configuration is
- * used.
+ * `whatami` combines the node kinds to discover: router (`1`), peer (`2`),
+ * and client (`4`). When no configuration is supplied, the default scouting
+ * configuration is used.
  *
- * `on_close` is dropped — and therefore invoked — when the returned
- * [`Scout`] is dropped: callers wanting to be notified of scout
- * teardown should attach behavior to that drop.
- *
- * Returns an opaque scout handle whose lifetime owns the running scout;
- * dropping it stops the scout and triggers `on_close`.
+ * The close callback is called when scouting ends.
  *
  * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
  */

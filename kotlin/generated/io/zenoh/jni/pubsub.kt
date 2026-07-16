@@ -25,6 +25,62 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
         return Publisher(p)
     }
 
+    /**
+     * Publish data on the publisher's key expression.
+     *
+     * The encoding applies to this publication, while the publisher's configured
+     * delivery settings remain in effect. The attachment carries user-defined
+     * metadata.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun put(
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.publisherPut(
+                this_ptr,
+                payload,
+                encodingPresent,
+                encodingId,
+                encodingSchema,
+                attachment,
+                __cap,
+            )
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    /**
+     * Publish a deletion notification on the publisher's key expression.
+     *
+     * Matching subscribers receive a DELETE sample. The attachment carries
+     * user-defined metadata.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun delete(attachment: ByteArray?, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.publisherDelete(this_ptr, attachment, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
@@ -53,64 +109,4 @@ public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
         @JvmStatic
         external fun freePtr(ptr: Long)
     }
-}
-
-/**
- * Publish a payload on the publisher's key expression — the flat port of
- * `zenoh::pubsub::Publisher::put`. `encoding` overrides the publisher's default
- * for this message only; `attachment` carries optional user metadata. The
- * publisher's configured QoS (priority, congestion control, express,
- * reliability) applies automatically.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun publisherPut(
-    publisher: Publisher,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (publisher.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(publisher) {
-        val publisher_ptr = publisher.ptr
-        JNINative.publisherPut(
-            publisher_ptr,
-            payload,
-            encodingPresent,
-            encodingId,
-            encodingSchema,
-            attachment,
-            __cap,
-        )
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/**
- * Publish a delete (tombstone) on the publisher's key expression — the flat
- * port of `zenoh::pubsub::Publisher::delete`. Subscribers receive it as a
- * `SampleKind::Delete` sample. `attachment` carries optional user metadata.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun publisherDelete(
-    publisher: Publisher,
-    attachment: ByteArray?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (publisher.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(publisher) {
-        val publisher_ptr = publisher.ptr
-        JNINative.publisherDelete(publisher_ptr, attachment, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }

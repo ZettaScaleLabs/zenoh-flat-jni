@@ -10,9 +10,7 @@ import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.withSortedHandleLocks
 
 /**
- * Node type in a Zenoh network: router, peer, or client. The discriminant
- * values match upstream `zenoh::config::WhatAmI` (1, 2, 4) so an OR'd
- * bitfield of variants encodes a `WhatAmIMatcher` directly as `u8`.
+ * The role of a node in a Zenoh network.
  *
  * JVM-side surface for the native Rust `WhatAmI` enum.
  */
@@ -84,10 +82,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
-    /**
-     * Clone a configuration handle. Use this before passing a config to a
-     * consuming call (`open`) when the caller needs to keep the original.
-     */
+    /** Create an independent copy of a configuration. */
     public fun newClone(onError: JniErrorHandler<Config>): Config {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -99,11 +94,26 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    /**
+     * Insert a JSON5-formatted value at `key` in the configuration.
+     *
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun insertJson5(key: String, value: String, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.configInsertJson5(this_ptr, key, value, __cap)
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
 
-        /** Build a default configuration. */
+        /** Create a configuration with default settings. */
         public fun newDefault(onError: JniErrorHandler<Config>): Config {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewDefault(__cap))
@@ -117,7 +127,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromFile(path: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromFile(path: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromFile(path, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -125,12 +135,11 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /**
-         * Parse a configuration from a JSON-formatted string. JSON is a subset
-         * of JSON5, so routing through the JSON5 deserializer is sufficient.
+         * Parse a configuration from JSON text.
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromJson(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromJson(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromJson(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -142,7 +151,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromJson5(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromJson5(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromJson5(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -154,7 +163,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromYaml(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromYaml(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromYaml(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -185,19 +194,4 @@ internal object __ZenohIdFolderRawHolder {
     @JvmField
     val instance: ZenohIdFolderRaw<ArrayList<ZenohId>> =
     ZenohIdFolderRaw { acc, element -> acc.add(ZenohId(element)); acc }
-}
-
-/**
- * Insert a JSON5-formatted value at `key` in the configuration.
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun configInsertJson5(c: Config, key: String, value: String, onError: ErrorHandler<Unit>) {
-    if (c.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(c) {
-        val c_ptr = c.ptr
-        JNINative.configInsertJson5(c_ptr, key, value, __cap)
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }

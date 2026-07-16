@@ -21,12 +21,24 @@
 //! `.expand(expand_return!(T).field(fun!(acc)).field_self())` (an
 //! AND-set, one crossing). A `.field(fun!(acc))` inherits its Kotlin name from
 //! the class member declaration of the same fn. Class members are declared
-//! with `.fun(fun!(f).name(..))` (instance methods) and
-//! `.constructor(fun!(f).name(..))` (companion factories), and the per-fn
-//! `.expand_param(name, …)` / `.expand_return(…)` overrides (chained on
-//! the `fun!` decl, taking the same expand-decl objects) replace them — an
-//! identity-only set (`.variant_self()` / `.field_self()` alone) is the plain
-//! raw-handle form.
+//! with `.method(fun!(f))` (instance methods) and `.constructor(fun!(f))`
+//! (companion factories); the per-fn `.expand_param(name, …)` /
+//! `.expand_return(…)` overrides (chained on the `fun!` decl, taking the same
+//! expand-decl objects) replace the defaults — an identity-only set
+//! (`.variant_self()` / `.field_self()` alone) is the plain raw-handle form.
+//!
+//! Kotlin **method names are derived automatically** by the
+//! `set_method_name_mangle` hook ([`strip_flat_class_prefix`], which strips the
+//! class-name prefix): `sample_get_payload` → `getPayload`, `keyexpr_get_str`
+//! → `getStr`, `keyexpr_new_join` → `newJoin`. An explicit `.name(...)` is
+//! used only where absolutely necessary: `toStr` (a derived `toString` would
+//! clash with Kotlin's `Any.toString()`) and the `message` field label of the
+//! class-less rust-side-only `Error` decomposition.
+//!
+//! Where a multi-variant param crosses as the string-or-handle `KeyExpr`
+//! idiom, `.split_on_param("key_expr")` emits idiomatic typed overloads
+//! (`f(keyExpr: String, …)` / `f(keyExpr: KeyExpr, …)`) over the selector form,
+//! so callers pass a value directly instead of a `(selector, …)` tuple.
 //!
 //! Errors are delivered through the per-call `onError` callback (no Rust-side
 //! JVM throw): `Error` (zenoh's native error) is the `E` of every fallible
@@ -48,6 +60,27 @@ use syn::parse_quote as pq;
 fn fail(context: &str, err: impl std::fmt::Display) -> ! {
     eprintln!("error: prebindgen jnigen {context}: {err}");
     std::process::exit(1);
+}
+
+/// Namespace-relative member naming: strip the (case-insensitive) class-name
+/// prefix from a class method's derived name so the flat crate's
+/// `keyexpr_get_str` surfaces as `getStr` on `KeyExpr`, `zbytes_as_bytes` as
+/// `asBytes` on `ZBytes`, etc. Registered via
+/// [`JniGen::set_method_name_mangle`] — the generator's default method mangle
+/// is identity (full camelCase), so this hook restores the de-prefixed API.
+/// Members with an explicit `.name(...)` bypass the hook.
+fn strip_flat_class_prefix(class: &str, name: &str) -> String {
+    if name
+        .get(..class.len())
+        .is_some_and(|prefix| prefix.eq_ignore_ascii_case(class))
+    {
+        let rest = &name[class.len()..];
+        let mut chars = rest.chars();
+        if let Some(first) = chars.next() {
+            return first.to_lowercase().chain(chars).collect();
+        }
+    }
+    name.to_string()
 }
 
 /// The two expression constants for one predefined encoding, composed from
@@ -79,24 +112,20 @@ fn main() {
     // Canonical output: the handle (identity) + id (raw jint), both free
     // jvalue slots; schema and the canonical string stay on-demand accessors.
     let encoding = ptr_class!(Encoding)
-        .fun(fun!(encoding_get_id).name("id"))
-        .fun(fun!(encoding_get_schema))
-        .fun(fun!(encoding_to_string).name("toStr"))
+        .method(fun!(encoding_get_id))
+        .method(fun!(encoding_get_schema))
+        .method(fun!(encoding_to_string).name("toStr"))
         // Whole-handle clone return — see KeyExpr's `newClone`.
-        .fun(
-            fun!(encoding_new_clone)
-                .name("newClone")
-                .expand_return(expand_return!(Encoding).field_self()),
-        )
+        .method(fun!(encoding_new_clone).expand_return(expand_return!(Encoding).field_self()))
         // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
         // Encoding — a companion factory returning a raw handle (a constructor
         // never return-field-decomposes, so the result stays a usable handle rather than
         // a decomposed builder).
-        .constructor(fun!(encoding_new_with_schema).name("withSchema"))
+        .constructor(fun!(encoding_new_with_schema))
         // Factories → companion members; `fromId` is also the input variant
         // (see the `expand_param!(Encoding)` declaration below).
-        .constructor(fun!(encoding_new_from_id).name("fromId"))
-        .constructor(fun!(encoding_new_from_string).name("fromString"));
+        .constructor(fun!(encoding_new_from_id))
+        .constructor(fun!(encoding_new_from_string));
 
     // ── Bytes package: ZBytes + Encoding + predefined-encoding consts ────
     // ZBytes canonical input: `payload`/`attachment` params accept a `ByteArray`
@@ -117,19 +146,15 @@ fn main() {
     let mut bytes = package!("bytes")
         .class(
             ptr_class!(ZBytes)
-                .fun(fun!(zbytes_as_bytes))
+                .method(fun!(zbytes_as_bytes))
                 // Whole-handle clone return — see KeyExpr's `newClone`.
-                .fun(
-                    fun!(zbytes_new_clone)
-                        .name("newClone")
-                        .expand_return(expand_return!(ZBytes).field_self()),
-                )
+                .method(fun!(zbytes_new_clone).expand_return(expand_return!(ZBytes).field_self()))
                 // `fromVec` builds a ZBytes from a `ByteArray` — both the
                 // param-variant build arm (see `expand_param!(ZBytes)` below)
                 // AND a companion factory (a constructor never
                 // return-field-decomposes, so the factory keeps its
                 // raw-handle return).
-                .constructor(fun!(zbytes_new_from_vec).name("fromVec")),
+                .constructor(fun!(zbytes_new_from_vec)),
         )
         .class(encoding);
     for lower in [
@@ -198,6 +223,10 @@ fn main() {
         // loader from its static initializer so the native library is loaded
         // transparently before any extern resolves (consumers never load it).
         .set_jni_native_init("io.zenoh.jni.NativeLibrary.ensureLoaded()")
+        // De-prefix class-method names (`keyexpr_get_str` -> `getStr`): the
+        // generator's default method mangle is identity, so restore the
+        // namespace-relative naming this binding's Kotlin API expects.
+        .set_method_name_mangle(|_, class, n| strip_flat_class_prefix(class, n))
         // ── Errors ────────────────────────────────────────────────────────
         // `Error` is the `E` of every fallible `Result<_, Error>` — a
         // RUST-SIDE-ONLY type: no class declaration, so no Kotlin `Error`
@@ -220,25 +249,26 @@ fn main() {
                         // override the class's default return fields (identity via
                         // the owned converter) so the borrowed-opaque clone path
                         // applies instead.
-                        .fun(fun!(keyexpr_get_str))
-                        .fun(
+                        .method(fun!(keyexpr_get_str))
+                        .method(
                             fun!(keyexpr_new_clone)
-                                .name("newClone")
                                 .expand_return(expand_return!(KeyExpr).field_self()),
                         )
-                        .fun(fun!(keyexpr_to_string).name("toStr"))
+                        .method(fun!(keyexpr_to_string).name("toStr"))
                         // Constructors → companion factories returning `Result<KeyExpr, Error>`;
                         // `tryFrom` is also the build-from-String input variant
                         // (see `expand_param!(KeyExpr)` below).
-                        .constructor(fun!(keyexpr_new_try_from).name("tryFrom"))
-                        .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
-                        .constructor(fun!(keyexpr_new_join).name("join"))
-                        .constructor(fun!(keyexpr_new_concat).name("concat"))
+                        .constructor(fun!(keyexpr_new_try_from))
+                        .constructor(fun!(keyexpr_new_autocanonize))
+                        // `a` is a `&KeyExpr` (string-or-handle); split it so
+                        // `join(a: KeyExpr, b: String)` is an idiomatic overload.
+                        .constructor(fun!(keyexpr_new_join).split_on_param("a"))
+                        .constructor(fun!(keyexpr_new_concat).split_on_param("a"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
-                        .fun(fun!(keyexpr_intersects))
-                        .fun(fun!(keyexpr_includes))
-                        .fun(fun!(keyexpr_relation_to)),
+                        .method(fun!(keyexpr_intersects).split_on_param("b"))
+                        .method(fun!(keyexpr_includes).split_on_param("b"))
+                        .method(fun!(keyexpr_relation_to).split_on_param("b")),
                 )
                 .class(enum_class!(SetIntersectionLevel)),
         )
@@ -256,16 +286,17 @@ fn main() {
             package!("config")
                 .class(
                     ptr_class!(Config)
-                        .fun(fun!(config_get_json))
-                        .fun(fun!(config_new_clone))
+                        .method(fun!(config_get_json))
+                        .method(fun!(config_new_clone))
+                        // `config.insertJson5(...)` — receiver-style mutator.
+                        .method(fun!(config_insert_json5))
                         // Factories → Config companion-object members.
                         .constructor(fun!(config_new_default))
-                        .constructor(fun!(config_new_from_file).name("fromFile"))
-                        .constructor(fun!(config_new_from_json).name("fromJson"))
-                        .constructor(fun!(config_new_from_json5).name("fromJson5"))
-                        .constructor(fun!(config_new_from_yaml).name("fromYaml")),
+                        .constructor(fun!(config_new_from_file))
+                        .constructor(fun!(config_new_from_json))
+                        .constructor(fun!(config_new_from_json5))
+                        .constructor(fun!(config_new_from_yaml)),
                 )
-                .fun(fun!(config_insert_json5))
                 .class(enum_class!(WhatAmI))
                 // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
                 // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
@@ -274,8 +305,8 @@ fn main() {
                 // on the value class (receiver = `this.bytes`).
                 .class(
                     value_class!(ZenohId)
-                        .fun(fun!(zenoh_id_to_bytes))
-                        .fun(fun!(zenoh_id_to_string).name("toStr")),
+                        .method(fun!(zenoh_id_to_bytes))
+                        .method(fun!(zenoh_id_to_string).name("toStr")),
                 ),
         )
         // ── Scouting ──────────────────────────────────────────────────────
@@ -286,9 +317,9 @@ fn main() {
             package!("scouting")
                 .class(
                     ptr_class!(Hello)
-                        .fun(fun!(hello_get_whatami).name("whatami")) // WhatAmI enum -> Int
-                        .fun(fun!(hello_get_zid).name("zid")) // ZenohId value class -> ByteArray
-                        .fun(fun!(hello_get_locators).name("locators")), // Vec<String> -> List<String>
+                        .method(fun!(hello_get_whatami)) // WhatAmI enum -> Int
+                        .method(fun!(hello_get_zid)) // ZenohId value class -> ByteArray
+                        .method(fun!(hello_get_locators)), // Vec<String> -> List<String>
                 )
                 .class(ptr_class!(Scout))
                 .fun(fun!(scout)),
@@ -336,8 +367,8 @@ fn main() {
         .package(
             package!("time").class(
                 ptr_class!(Timestamp)
-                    .fun(fun!(timestamp_get_ntp64).name("ntp64"))
-                    .fun(fun!(timestamp_get_id)),
+                    .method(fun!(timestamp_get_ntp64))
+                    .method(fun!(timestamp_get_id)),
             ),
         )
         .expand(expand_return!(Timestamp).field(fun!(timestamp_get_ntp64)))
@@ -360,19 +391,19 @@ fn main() {
                         // All sample getters are record sources AND instance methods on
                         // the Sample class; decomposition happens via the canonical
                         // output below.
-                        .fun(fun!(sample_get_key_expr).name("keyExpr"))
-                        .fun(fun!(sample_get_payload).name("payload"))
-                        .fun(fun!(sample_get_encoding).name("encoding"))
-                        .fun(fun!(sample_get_kind).name("kind"))
-                        .fun(fun!(sample_get_timestamp).name("timestamp"))
-                        .fun(fun!(sample_get_express).name("express"))
-                        .fun(fun!(sample_get_priority).name("priority"))
-                        .fun(fun!(sample_get_congestion_control).name("congestionControl"))
-                        .fun(fun!(sample_get_attachment).name("attachment"))
-                        .fun(fun!(sample_get_reliability).name("reliability"))
-                        .fun(fun!(sample_get_source_zid).name("sourceZid"))
-                        .fun(fun!(sample_get_source_eid).name("sourceEid"))
-                        .fun(fun!(sample_get_source_sn).name("sourceSn")),
+                        .method(fun!(sample_get_key_expr))
+                        .method(fun!(sample_get_payload))
+                        .method(fun!(sample_get_encoding))
+                        .method(fun!(sample_get_kind))
+                        .method(fun!(sample_get_timestamp))
+                        .method(fun!(sample_get_express))
+                        .method(fun!(sample_get_priority))
+                        .method(fun!(sample_get_congestion_control))
+                        .method(fun!(sample_get_attachment))
+                        .method(fun!(sample_get_reliability))
+                        .method(fun!(sample_get_source_zid))
+                        .method(fun!(sample_get_source_eid))
+                        .method(fun!(sample_get_source_sn)),
                 )
                 // Standalone sample constructors (callable from Kotlin); consumed by handle.
                 .fun(fun!(sample_new_put))
@@ -402,51 +433,55 @@ fn main() {
         // by their types' canonical inputs (no per-fn calls).
         .package(
             package!("pubsub")
-                .class(ptr_class!(Publisher))
-                .fun(fun!(publisher_put))
-                .fun(fun!(publisher_delete))
+                // `publisher.put(...)` / `publisher.delete(...)` — receiver-style.
+                .class(
+                    ptr_class!(Publisher)
+                        .method(fun!(publisher_put))
+                        .method(fun!(publisher_delete)),
+                )
                 .class(ptr_class!(Subscriber)),
         )
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
                 .class(ptr_class!(Queryable))
-                .class(ptr_class!(Querier))
-                .fun(fun!(querier_get))
+                // `querier.get(...)` — receiver-style method on Querier.
+                .class(ptr_class!(Querier).method(fun!(querier_get)))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
                 .class(
                     ptr_class!(Query)
-                        .fun(fun!(query_get_keyexpr).name("keyExpr"))
-                        .fun(fun!(query_get_parameters).name("parameters"))
-                        .fun(fun!(query_get_payload).name("payload"))
-                        .fun(fun!(query_get_encoding).name("encoding"))
-                        .fun(fun!(query_get_attachment).name("attachment"))
-                        .fun(fun!(query_get_accepts_replies).name("acceptsReplies")),
+                        .method(fun!(query_get_keyexpr))
+                        .method(fun!(query_get_parameters))
+                        .method(fun!(query_get_payload))
+                        .method(fun!(query_get_encoding))
+                        .method(fun!(query_get_attachment))
+                        .method(fun!(query_get_accepts_replies))
+                        // Reply ops on the owned/borrowed query handle →
+                        // `query.replySuccess(...)` / `replyError` / `replyDelete`.
+                        .method(fun!(query_reply_success).split_on_param("key_expr"))
+                        .method(fun!(query_reply_error))
+                        .method(fun!(query_reply_delete).split_on_param("key_expr"))
+                        // `query_reply_sample` takes the sample by owned handle
+                        // (Sample's canonical input is identity).
+                        .method(fun!(query_reply_sample)),
                 )
-                // Reply ops on the owned/borrowed query handle.
-                .fun(fun!(query_reply_success))
-                .fun(fun!(query_reply_error))
-                .fun(fun!(query_reply_delete))
-                // `query_reply_sample` takes the sample by owned handle (Sample's
-                // canonical input is identity — see the sample package above).
-                .fun(fun!(query_reply_sample))
                 // ── Reply / ReplyError ────────────────────────────────────────
                 .class(
                     ptr_class!(ReplyError)
-                        .fun(fun!(reply_error_get_payload).name("payload"))
-                        .fun(fun!(reply_error_get_encoding).name("encoding")),
+                        .method(fun!(reply_error_get_payload))
+                        .method(fun!(reply_error_get_encoding)),
                 )
                 .class(
                     ptr_class!(Reply)
                         // Record sources are class methods — `reply.sample()`'s
                         // standalone export is therefore the cloned-handle form.
-                        .fun(fun!(reply_get_replier_zid).name("replierZid"))
-                        .fun(fun!(reply_get_replier_eid).name("replierEid"))
-                        .fun(fun!(reply_is_ok))
-                        .fun(fun!(reply_get_sample).name("sample"))
-                        .fun(fun!(reply_get_err).name("err")),
+                        .method(fun!(reply_get_replier_zid))
+                        .method(fun!(reply_get_replier_eid))
+                        .method(fun!(reply_is_ok))
+                        .method(fun!(reply_get_sample))
+                        .method(fun!(reply_get_err)),
                 ),
         )
         // Canonical output: the queryable callback decomposes a `Query` into
@@ -495,31 +530,38 @@ fn main() {
         // alongside the session API they extend.
         .package(package!("liveliness").class(ptr_class!(LivelinessToken)))
         .package(
-            package!("session")
-                .class(ptr_class!(Session).fun(fun!(session_get_zid)))
-                .fun(fun!(open))
-                .fun(fun!(session_declare_publisher))
-                .fun(fun!(session_put))
-                .fun(fun!(session_delete))
-                .fun(fun!(session_declare_subscriber))
-                .fun(fun!(session_declare_querier))
-                .fun(fun!(session_declare_queryable))
-                .fun(fun!(session_declare_keyexpr))
-                // Undeclaring needs the declared handle, not a string — opt its
-                // key_expr param out of the (String-building) default param variants.
-                .fun(
-                    fun!(session_undeclare_keyexpr)
-                        .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
-                )
-                .fun(fun!(session_get))
-                // `Vec<ZenohId>`: ZenohId is a value class, so these return
-                // `List<ZenohId>` via the normal Vec converter.
-                .fun(fun!(session_get_peers_zid))
-                .fun(fun!(session_get_routers_zid))
-                // Liveliness ops (key_expr params auto-constructed by the canonical input).
-                .fun(fun!(liveliness_declare_token))
-                .fun(fun!(liveliness_get))
-                .fun(fun!(liveliness_declare_subscriber)),
+            package!("session").class(
+                // Every session operation is a RECEIVER-STYLE instance method on
+                // `Session` (its `&Session` first param binds to `this`), so the
+                // Kotlin surface reads `session.put(...)` / `session.declarePublisher(...)`.
+                // `open` has no receiver (it creates a Session) → companion factory.
+                ptr_class!(Session)
+                    .constructor(fun!(open))
+                    .method(fun!(session_get_zid))
+                    .method(fun!(session_declare_publisher).split_on_param("key_expr"))
+                    .method(fun!(session_put).split_on_param("key_expr"))
+                    .method(fun!(session_delete).split_on_param("key_expr"))
+                    .method(fun!(session_declare_subscriber).split_on_param("key_expr"))
+                    .method(fun!(session_declare_querier).split_on_param("key_expr"))
+                    .method(fun!(session_declare_queryable).split_on_param("key_expr"))
+                    .method(fun!(session_declare_keyexpr))
+                    // Undeclaring needs the declared handle, not a string — opt its
+                    // key_expr param out of the (String-building) default param variants.
+                    .method(
+                        fun!(session_undeclare_keyexpr)
+                            .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
+                    )
+                    .method(fun!(session_get).split_on_param("key_expr"))
+                    // `Vec<ZenohId>`: ZenohId is a value class, so these return
+                    // `List<ZenohId>` via the normal Vec converter. Named to drop
+                    // the `get` prefix (`peersZid` / `routersZid`).
+                    .method(fun!(session_get_peers_zid))
+                    .method(fun!(session_get_routers_zid))
+                    // Liveliness ops also take `&Session` first → Session methods.
+                    .method(fun!(liveliness_declare_token).split_on_param("key_expr"))
+                    .method(fun!(liveliness_get).split_on_param("key_expr"))
+                    .method(fun!(liveliness_declare_subscriber).split_on_param("key_expr")),
+            ),
         );
 
     // zenoh-flat's `encoding_const_*` `&'static Encoding` loaning factories
