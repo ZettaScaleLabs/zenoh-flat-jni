@@ -224,6 +224,30 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun replySuccess(
+        s: String,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replySuccess(0, s, null, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
+    public fun replySuccess(
+        keyExpr: KeyExpr,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replySuccess(1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64, attachment, express, onError)
+
     /**
      * Reply to a query with a value.
      *
@@ -314,6 +338,22 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
         }
         if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     }
+
+    public fun replyDelete(
+        s: String,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replyDelete(0, s, null, timestampNtp64, attachment, express, onError)
+
+    public fun replyDelete(
+        keyExpr: KeyExpr,
+        timestampNtp64: Long?,
+        attachment: ByteArray?,
+        express: Boolean?,
+        onError: ErrorHandler<Unit>,
+    ) = replyDelete(1, null, keyExpr, timestampNtp64, attachment, express, onError)
 
     /**
      * Reply to a query with a deletion notification.

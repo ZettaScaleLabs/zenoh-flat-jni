@@ -458,9 +458,9 @@ fn main() {
                         .method(fun!(query_get_accepts_replies))
                         // Reply ops on the owned/borrowed query handle →
                         // `query.replySuccess(...)` / `replyError` / `replyDelete`.
-                        .method(fun!(query_reply_success))
+                        .method(fun!(query_reply_success).split_on_param("key_expr"))
                         .method(fun!(query_reply_error))
-                        .method(fun!(query_reply_delete))
+                        .method(fun!(query_reply_delete).split_on_param("key_expr"))
                         // `query_reply_sample` takes the sample by owned handle
                         // (Sample's canonical input is identity).
                         .method(fun!(query_reply_sample)),
