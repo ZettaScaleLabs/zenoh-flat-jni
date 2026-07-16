@@ -601,8 +601,8 @@ public fun interface QueryCallback {
         getKeyexpr: KeyExpr,
         getParameters: String,
         getPayload: ZBytes?,
-        getEncoding: Encoding?,
         getEncoding__getId: Int?,
+        getEncoding__getSchema: String?,
         getAttachment: ZBytes?,
         getAcceptsReplies: Int,
         handle: Query,
@@ -614,8 +614,8 @@ public fun interface QueryCallbackRaw {
         getKeyexpr: Long,
         getParameters: String,
         getPayload: Long?,
-        getEncoding: Long?,
         getEncoding__getId: Int?,
+        getEncoding__getSchema: String?,
         getAttachment: Long?,
         getAcceptsReplies: Int,
         handle: Long,
@@ -627,8 +627,8 @@ public fun QueryCallback.asRaw(): QueryCallbackRaw =
         getKeyexpr,
         getParameters,
         getPayload,
-        getEncoding,
         getEncoding__getId,
+        getEncoding__getSchema,
         getAttachment,
         getAcceptsReplies,
         handle ->
@@ -636,8 +636,8 @@ public fun QueryCallback.asRaw(): QueryCallbackRaw =
             KeyExpr(getKeyexpr),
             getParameters,
             getPayload?.let { ZBytes(it) },
-            getEncoding?.let { Encoding(it) },
             getEncoding__getId,
+            getEncoding__getSchema,
             getAttachment?.let { ZBytes(it) },
             getAcceptsReplies,
             Query(handle)
@@ -651,8 +651,8 @@ public fun interface ReplyCallback {
         isOk: Boolean,
         getSample__getKeyExpr: KeyExpr?,
         getSample__getPayload: ZBytes?,
-        getSample__getEncoding: Encoding?,
         getSample__getEncoding__getId: Int?,
+        getSample__getEncoding__getSchema: String?,
         getSample__getKind: Int?,
         getSample__getTimestamp__getNtp64: Long?,
         getSample__getExpress: Boolean?,
@@ -664,8 +664,8 @@ public fun interface ReplyCallback {
         getSample__getSourceEid: Int?,
         getSample__getSourceSn: Long?,
         getErr__getPayload: ZBytes?,
-        getErr__getEncoding: Encoding?,
         getErr__getEncoding__getId: Int?,
+        getErr__getEncoding__getSchema: String?,
     )
 }
 
@@ -676,8 +676,8 @@ public fun interface ReplyCallbackRaw {
         isOk: Boolean,
         getSample__getKeyExpr: Long?,
         getSample__getPayload: Long?,
-        getSample__getEncoding: Long?,
         getSample__getEncoding__getId: Int?,
+        getSample__getEncoding__getSchema: String?,
         getSample__getKind: Int?,
         getSample__getTimestamp__getNtp64: Long?,
         getSample__getExpress: Boolean?,
@@ -689,8 +689,8 @@ public fun interface ReplyCallbackRaw {
         getSample__getSourceEid: Int?,
         getSample__getSourceSn: Long?,
         getErr__getPayload: Long?,
-        getErr__getEncoding: Long?,
         getErr__getEncoding__getId: Int?,
+        getErr__getEncoding__getSchema: String?,
     )
 }
 
@@ -701,8 +701,8 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
         isOk,
         getSample__getKeyExpr,
         getSample__getPayload,
-        getSample__getEncoding,
         getSample__getEncoding__getId,
+        getSample__getEncoding__getSchema,
         getSample__getKind,
         getSample__getTimestamp__getNtp64,
         getSample__getExpress,
@@ -714,16 +714,16 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
         getSample__getSourceEid,
         getSample__getSourceSn,
         getErr__getPayload,
-        getErr__getEncoding,
-        getErr__getEncoding__getId ->
+        getErr__getEncoding__getId,
+        getErr__getEncoding__getSchema ->
         run(
             getReplierZid?.let { ZenohId(it) },
             getReplierEid,
             isOk,
             getSample__getKeyExpr?.let { KeyExpr(it) },
             getSample__getPayload?.let { ZBytes(it) },
-            getSample__getEncoding?.let { Encoding(it) },
             getSample__getEncoding__getId,
+            getSample__getEncoding__getSchema,
             getSample__getKind,
             getSample__getTimestamp__getNtp64,
             getSample__getExpress,
@@ -735,7 +735,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getSample__getSourceEid,
             getSample__getSourceSn,
             getErr__getPayload?.let { ZBytes(it) },
-            getErr__getEncoding?.let { Encoding(it) },
-            getErr__getEncoding__getId
+            getErr__getEncoding__getId,
+            getErr__getEncoding__getSchema
         )
     }
