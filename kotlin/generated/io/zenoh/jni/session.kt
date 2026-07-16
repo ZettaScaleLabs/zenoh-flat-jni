@@ -3,6 +3,7 @@ package io.zenoh.jni.session
 
 import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
+import io.zenoh.jni.GcNativeHandle
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
@@ -27,26 +28,28 @@ import io.zenoh.jni.query.Queryable
 import io.zenoh.jni.query.ReplyCallback
 import io.zenoh.jni.query.ReplyKeyExpr
 import io.zenoh.jni.query.asRaw
+import io.zenoh.jni.registerGcHandle
+import io.zenoh.jni.releaseCell
 import io.zenoh.jni.sample.SampleCallback
 import io.zenoh.jni.sample.asRaw
 import io.zenoh.jni.withSortedHandleLocks
 
 /** Typed handle for a native Zenoh `Session`. */
-public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Session {
-        val p = ptr
-        ptr = p or 1L
-        return Session(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Session(if (p != 0L) p else cell.get())
     }
 
     /** Return the identifier of this session. */
@@ -157,7 +160,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -400,7 +403,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -492,7 +495,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -563,7 +566,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -605,7 +608,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
             try {
                 JNINative.sessionUndeclareKeyexpr(this_ptr, keyExpr_ptr, __cap)
             } finally {
-                keyExpr.ptr = keyExpr.ptr or 1L
+                keyExpr.markConsumed()
             }
         }
         if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -815,7 +818,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -946,7 +949,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                         ),
                     )
                 } finally {
-                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                    keyExpr1?.markConsumed()
                 }
             }
         }
@@ -973,7 +976,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                 try {
                     Session(JNINative.open(config_ptr, __cap))
                 } finally {
-                    config.ptr = config.ptr or 1L
+                    config.markConsumed()
                 }
             }
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)

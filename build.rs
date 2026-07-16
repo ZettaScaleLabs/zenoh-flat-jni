@@ -111,7 +111,12 @@ fn main() {
     // — cheap primitives, no per-call String parse, no native handle.
     // Canonical output: the handle (identity) + id (raw jint), both free
     // jvalue slots; schema and the canonical string stay on-demand accessors.
+    // `.gc_managed()`: an Encoding handle lives inside a non-closeable SDK
+    // value (zenoh-java/zenoh-kotlin `Encoding`) that nobody will ever
+    // close — the shared Cleaner frees it when the value becomes
+    // unreachable; explicit close/take/consumption settle the ticket first.
     let encoding = ptr_class!(Encoding)
+        .gc_managed()
         .method(fun!(encoding_get_id))
         .method(fun!(encoding_get_schema))
         .method(fun!(encoding_to_string).name("toStr"))
@@ -321,7 +326,13 @@ fn main() {
                         .method(fun!(hello_get_zid)) // ZenohId value class -> ByteArray
                         .method(fun!(hello_get_locators)), // Vec<String> -> List<String>
                 )
-                .class(ptr_class!(Scout))
+                // Semantic resources (Scout, and Session/Publisher/… below)
+                // are `.gc_managed()` as a LEAK BACKSTOP: explicit
+                // close/undeclare stays the primary path (it settles the
+                // release ticket), and the shared Cleaner only frees a
+                // resource whose owner forgot — replacing the SDKs'
+                // deprecated-for-removal `finalize()` nets (JEP 421).
+                .class(ptr_class!(Scout).gc_managed())
                 .fun(fun!(scout)),
         )
         .expand(
@@ -454,22 +465,27 @@ fn main() {
                 // `publisher.put(...)` / `publisher.delete(...)` — receiver-style.
                 .class(
                     ptr_class!(Publisher)
+                        .gc_managed()
                         .method(fun!(publisher_put))
                         .method(fun!(publisher_delete)),
                 )
-                .class(ptr_class!(Subscriber)),
+                .class(ptr_class!(Subscriber).gc_managed()),
         )
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
-                .class(ptr_class!(Queryable))
+                .class(ptr_class!(Queryable).gc_managed())
                 // `querier.get(...)` — receiver-style method on Querier.
-                .class(ptr_class!(Querier).method(fun!(querier_get)))
+                .class(ptr_class!(Querier).gc_managed().method(fun!(querier_get)))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
                 .class(
                     ptr_class!(Query)
+                        // gc_managed: an abandoned Query's backstop close also
+                        // finalizes the reply stream (same as the SDKs' former
+                        // finalize()), so the querier's get completes.
+                        .gc_managed()
                         .method(fun!(query_get_keyexpr))
                         .method(fun!(query_get_parameters))
                         .method(fun!(query_get_payload))
@@ -546,7 +562,7 @@ fn main() {
         // `LivelinessToken` is just an opaque handle; the liveliness operations
         // (`liveliness_*`) are declared under the `session` package below,
         // alongside the session API they extend.
-        .package(package!("liveliness").class(ptr_class!(LivelinessToken)))
+        .package(package!("liveliness").class(ptr_class!(LivelinessToken).gc_managed()))
         .package(
             package!("session").class(
                 // Every session operation is a RECEIVER-STYLE instance method on
@@ -554,6 +570,7 @@ fn main() {
                 // Kotlin surface reads `session.put(...)` / `session.declarePublisher(...)`.
                 // `open` has no receiver (it creates a Session) → companion factory.
                 ptr_class!(Session)
+                    .gc_managed()
                     .constructor(fun!(open))
                     .method(fun!(session_get_zid))
                     .method(fun!(session_declare_publisher).split_on_param("key_expr"))

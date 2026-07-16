@@ -3,6 +3,7 @@ package io.zenoh.jni.query
 
 import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
+import io.zenoh.jni.GcNativeHandle
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
@@ -12,6 +13,8 @@ import io.zenoh.jni.bytes.Encoding
 import io.zenoh.jni.bytes.ZBytes
 import io.zenoh.jni.config.ZenohId
 import io.zenoh.jni.keyexpr.KeyExpr
+import io.zenoh.jni.registerGcHandle
+import io.zenoh.jni.releaseCell
 import io.zenoh.jni.sample.Sample
 import io.zenoh.jni.withSortedHandleLocks
 
@@ -64,21 +67,21 @@ public enum class ReplyKeyExpr(public val value: Int) {
 }
 
 /** Typed handle for a native Zenoh `Querier`. */
-public class Querier(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Querier(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Querier {
-        val p = ptr
-        ptr = p or 1L
-        return Querier(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Querier(if (p != 0L) p else cell.get())
     }
 
     /**
@@ -143,21 +146,21 @@ public class Querier(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /** Typed handle for a native Zenoh `Query`. */
-public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Query(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Query {
-        val p = ptr
-        ptr = p or 1L
-        return Query(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Query(if (p != 0L) p else cell.get())
     }
 
     /** Return the key expression targeted by the query. */
@@ -454,7 +457,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
             try {
                 JNINative.queryReplySample(this_ptr, sample_ptr, __cap)
             } finally {
-                sample.ptr = sample.ptr or 1L
+                sample.markConsumed()
             }
         }
         if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -467,21 +470,21 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /** Typed handle for a native Zenoh `Queryable`. */
-public class Queryable(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Queryable(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Queryable {
-        val p = ptr
-        ptr = p or 1L
-        return Queryable(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Queryable(if (p != 0L) p else cell.get())
     }
 
     public companion object {

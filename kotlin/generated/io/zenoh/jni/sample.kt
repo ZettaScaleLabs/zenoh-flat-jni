@@ -431,7 +431,7 @@ public fun <R> sampleNewPut(
             try {
                 (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingSel, encoding00 != null, encoding00 ?: 0, encoding01, encoding1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
+                keyExpr1?.markConsumed()
             }
         }
     }
@@ -475,7 +475,7 @@ public fun <R> sampleNewDelete(
             try {
                 (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
+                keyExpr1?.markConsumed()
             }
         }
     }

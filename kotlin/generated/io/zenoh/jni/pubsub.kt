@@ -3,27 +3,30 @@ package io.zenoh.jni.pubsub
 
 import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
+import io.zenoh.jni.GcNativeHandle
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.bytes.Encoding
+import io.zenoh.jni.registerGcHandle
+import io.zenoh.jni.releaseCell
 import io.zenoh.jni.withSortedHandleLocks
 
 /** Typed handle for a native Zenoh `Publisher`. */
-public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Publisher {
-        val p = ptr
-        ptr = p or 1L
-        return Publisher(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Publisher(if (p != 0L) p else cell.get())
     }
 
     /**
@@ -101,21 +104,21 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
 }
 
 /** Typed handle for a native Zenoh `Subscriber`. */
-public class Subscriber(initialPtr: Long) : NativeHandle(initialPtr) {
+public class Subscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
     @Synchronized
     override fun close() {
-        val p = ptr
-        if (p != 0L && (p and 1L) == 0L) {
-            ptr = p or 1L
-            freePtr(p)
-        }
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
     }
 
     @Synchronized
     public fun take(): Subscriber {
-        val p = ptr
-        ptr = p or 1L
-        return Subscriber(p)
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return Subscriber(if (p != 0L) p else cell.get())
     }
 
     public companion object {
