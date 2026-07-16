@@ -351,16 +351,25 @@ fn main() {
         // on demand via `zbytesAsBytes` (one borrow-copy).
         .expand(expand_param!(ZBytes).variant(fun!(zbytes_new_from_vec)))
         .expand(expand_return!(ZBytes).field_self())
-        // Encoding crosses **by value in both directions**: an encoding IS its
-        // decomposed `(id, schema?)` pair (Zenoh core semantics — the string
-        // form is derived from a fixed table), so no native handle needs to
-        // cross or be retained. Default input: built via `fromId` — cheap
-        // primitives; on `Option<&_>` params a leading present flag encodes
-        // absence, letting the publisher's declare-time default apply. Default
-        // output: the same `(id, schema?)` leaves; the JVM tier reconstructs
+        // Encoding INPUT: value or handle. An encoding IS its decomposed
+        // `(id, schema?)` pair (Zenoh core semantics — the string form is
+        // derived from a fixed table), so the default build arm crosses those
+        // cheap primitives via `fromId`. The `variant_self()` arm additionally
+        // accepts an existing handle, so a JVM-tier value that caches one
+        // (e.g. a saved received encoding re-sent repeatedly) crosses as a
+        // bare jlong instead of re-decoding the schema string each call —
+        // every encoding param is `Option<&Encoding>`, so the handle is
+        // borrowed and reusable. Send-side functions `.split_on_param`
+        // this into a typed `encoding: Encoding?` overload (null = absent,
+        // letting the publisher's declare-time default apply).
+        // OUTPUT: the same `(id, schema?)` leaves; the JVM tier reconstructs
         // its own value type from them (no per-message handle allocation,
         // nothing to close).
-        .expand(expand_param!(Encoding).variant(fun!(encoding_new_from_id)))
+        .expand(
+            expand_param!(Encoding)
+                .variant(fun!(encoding_new_from_id))
+                .variant_self(),
+        )
         .expand(
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
@@ -441,7 +450,7 @@ fn main() {
                 // `publisher.put(...)` / `publisher.delete(...)` — receiver-style.
                 .class(
                     ptr_class!(Publisher)
-                        .method(fun!(publisher_put))
+                        .method(fun!(publisher_put).split_on_param("encoding"))
                         .method(fun!(publisher_delete)),
                 )
                 .class(ptr_class!(Subscriber)),
@@ -451,7 +460,7 @@ fn main() {
             package!("query")
                 .class(ptr_class!(Queryable))
                 // `querier.get(...)` — receiver-style method on Querier.
-                .class(ptr_class!(Querier).method(fun!(querier_get)))
+                .class(ptr_class!(Querier).method(fun!(querier_get).split_on_param("encoding")))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
@@ -465,8 +474,12 @@ fn main() {
                         .method(fun!(query_get_accepts_replies))
                         // Reply ops on the owned/borrowed query handle →
                         // `query.replySuccess(...)` / `replyError` / `replyDelete`.
-                        .method(fun!(query_reply_success).split_on_param("key_expr"))
-                        .method(fun!(query_reply_error))
+                        .method(
+                            fun!(query_reply_success)
+                                .split_on_param("key_expr")
+                                .split_on_param("encoding"),
+                        )
+                        .method(fun!(query_reply_error).split_on_param("encoding"))
                         .method(fun!(query_reply_delete).split_on_param("key_expr"))
                         // `query_reply_sample` takes the sample by owned handle
                         // (Sample's canonical input is identity).
@@ -543,8 +556,16 @@ fn main() {
                 ptr_class!(Session)
                     .constructor(fun!(open))
                     .method(fun!(session_get_zid))
-                    .method(fun!(session_declare_publisher).split_on_param("key_expr"))
-                    .method(fun!(session_put).split_on_param("key_expr"))
+                    .method(
+                        fun!(session_declare_publisher)
+                            .split_on_param("key_expr")
+                            .split_on_param("encoding"),
+                    )
+                    .method(
+                        fun!(session_put)
+                            .split_on_param("key_expr")
+                            .split_on_param("encoding"),
+                    )
                     .method(fun!(session_delete).split_on_param("key_expr"))
                     .method(fun!(session_declare_subscriber).split_on_param("key_expr"))
                     .method(fun!(session_declare_querier).split_on_param("key_expr"))
@@ -556,7 +577,11 @@ fn main() {
                         fun!(session_undeclare_keyexpr)
                             .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
                     )
-                    .method(fun!(session_get).split_on_param("key_expr"))
+                    .method(
+                        fun!(session_get)
+                            .split_on_param("key_expr")
+                            .split_on_param("encoding"),
+                    )
                     // `Vec<ZenohId>`: ZenohId is a value class, so these return
                     // `List<ZenohId>` via the normal Vec converter. Named to drop
                     // the `get` prefix (`peersZid` / `routersZid`).

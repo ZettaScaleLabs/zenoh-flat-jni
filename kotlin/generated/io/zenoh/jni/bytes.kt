@@ -83,16 +83,38 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
          * Schema interpretation is application-defined; for example, `utf-8` may
          * accompany `text/plain`.
          *
-         * Parameter `e` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `eId`, `eSchema`).
+         * Parameter `e` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm (crosses as `eSel`, `e00`, `e01`, `e1`).
          */
         public fun newWithSchema(
-            eId: Int,
-            eSchema: String?,
+            eSel: Int,
+            e00: Int?,
+            e01: String?,
+            e1: Encoding?,
             schema: String,
             onError: JniErrorHandler<Encoding>,
         ): Encoding {
+            if (e1 != null && e1.isClosed()) return onError.run(
+                "Operation on a closed native handle.",
+            )
             val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingNewWithSchema(eId, eSchema, schema, __cap))
+            val __ret = run {
+                val __locks = ArrayList<NativeHandle>()
+                e1?.let { __locks.add(it) }
+                withSortedHandleLocks(__locks) {
+                    val e1_ptr = e1?.ptr ?: 0L
+                    Encoding(
+                        JNINative.encodingNewWithSchema(
+                            eSel,
+                            e00 != null,
+                            e00 ?: 0,
+                            e01,
+                            e1_ptr,
+                            schema,
+                            __cap,
+                        ),
+                    )
+                }
+            }
             if (__cap.failed) return onError.run(__cap.je)
             return __ret
         }

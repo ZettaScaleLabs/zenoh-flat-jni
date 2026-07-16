@@ -5,6 +5,7 @@ import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
 import io.zenoh.jni.JNINative
 import io.zenoh.jni.NativeHandle
+import io.zenoh.jni.bytes.Encoding
 import io.zenoh.jni.withSortedHandleLocks
 
 /** Typed handle for a native Zenoh `Publisher`. */
@@ -25,6 +26,13 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
         return Publisher(p)
     }
 
+    public fun put(
+        payload: ByteArray,
+        encoding: Encoding?,
+        attachment: ByteArray?,
+        onError: ErrorHandler<Unit>,
+    ) = put(payload, if (encoding != null) 1 else -1, null, null, encoding, attachment, onError)
+
     /**
      * Publish data on the publisher's key expression.
      *
@@ -33,31 +41,43 @@ public class Publisher(initialPtr: Long) : NativeHandle(initialPtr) {
      * metadata.
      *
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
-     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
      * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
      */
     public fun put(
         payload: ByteArray,
-        encodingPresent: Boolean,
-        encodingId: Int,
-        encodingSchema: String?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
         attachment: ByteArray?,
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (encoding1 != null && encoding1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
         val __cap = ErrorHandlerCapture.acquire()
-        withSortedHandleLocks(this) {
-            val this_ptr = this.ptr
-            JNINative.publisherPut(
-                this_ptr,
-                payload,
-                encodingPresent,
-                encodingId,
-                encodingSchema,
-                attachment,
-                __cap,
-            )
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            encoding1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val encoding1_ptr = encoding1?.ptr ?: 0L
+                JNINative.publisherPut(
+                    this_ptr,
+                    payload,
+                    encodingSel,
+                    encoding00 != null,
+                    encoding00 ?: 0,
+                    encoding01,
+                    encoding1_ptr,
+                    attachment,
+                    __cap,
+                )
+            }
         }
         if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     }
