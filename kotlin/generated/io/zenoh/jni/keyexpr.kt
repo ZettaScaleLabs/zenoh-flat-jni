@@ -82,6 +82,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun intersects(s: String, onError: JniErrorHandler<Boolean>): Boolean = intersects(0, s, null, onError)
+
+    public fun intersects(b: KeyExpr, onError: JniErrorHandler<Boolean>): Boolean = intersects(1, null, b, onError)
+
     /**
      * Return whether the two key expressions can match at least one common key.
      *
@@ -110,6 +114,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun includes(s: String, onError: JniErrorHandler<Boolean>): Boolean = includes(0, s, null, onError)
+
+    public fun includes(b: KeyExpr, onError: JniErrorHandler<Boolean>): Boolean = includes(1, null, b, onError)
+
     /**
      * Return whether every key matched by `b` is also matched by `a`.
      *
@@ -137,6 +145,16 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
         if (__cap.failed) return onError.run(__cap.je)
         return __ret
     }
+
+    public fun relationTo(
+        s: String,
+        onError: JniErrorHandler<SetIntersectionLevel>,
+    ): SetIntersectionLevel = relationTo(0, s, null, onError)
+
+    public fun relationTo(
+        b: KeyExpr,
+        onError: JniErrorHandler<SetIntersectionLevel>,
+    ): SetIntersectionLevel = relationTo(1, null, b, onError)
 
     /**
      * Describe how the sets of keys matched by two expressions relate.

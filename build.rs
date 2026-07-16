@@ -21,12 +21,22 @@
 //! `.expand(expand_return!(T).field(fun!(acc)).field_self())` (an
 //! AND-set, one crossing). A `.field(fun!(acc))` inherits its Kotlin name from
 //! the class member declaration of the same fn. Class members are declared
-//! with `.method(fun!(f).name(..))` (instance methods) and
-//! `.constructor(fun!(f).name(..))` (companion factories), and the per-fn
-//! `.expand_param(name, …)` / `.expand_return(…)` overrides (chained on
-//! the `fun!` decl, taking the same expand-decl objects) replace them — an
-//! identity-only set (`.variant_self()` / `.field_self()` alone) is the plain
-//! raw-handle form.
+//! with `.method(fun!(f))` (instance methods) and `.constructor(fun!(f))`
+//! (companion factories); the per-fn `.expand_param(name, …)` /
+//! `.expand_return(…)` overrides (chained on the `fun!` decl, taking the same
+//! expand-decl objects) replace the defaults — an identity-only set
+//! (`.variant_self()` / `.field_self()` alone) is the plain raw-handle form.
+//!
+//! Kotlin **method names are derived automatically** by the
+//! `set_method_name_mangle` hook ([`strip_flat_class_prefix`], which strips the
+//! class-name prefix): `sample_get_payload` → `getPayload`, `keyexpr_get_str`
+//! → `getStr`. Only irregular names (factory names like `tryFrom`/`join`, the
+//! abbreviated `toStr`) carry an explicit `.name(...)`.
+//!
+//! Where a multi-variant param crosses as the string-or-handle `KeyExpr`
+//! idiom, `.split_on_param("key_expr")` emits idiomatic typed overloads
+//! (`f(keyExpr: String, …)` / `f(keyExpr: KeyExpr, …)`) over the selector form,
+//! so callers pass a value directly instead of a `(selector, …)` tuple.
 //!
 //! Errors are delivered through the per-call `onError` callback (no Rust-side
 //! JVM throw): `Error` (zenoh's native error) is the `E` of every fallible
@@ -100,15 +110,11 @@ fn main() {
     // Canonical output: the handle (identity) + id (raw jint), both free
     // jvalue slots; schema and the canonical string stay on-demand accessors.
     let encoding = ptr_class!(Encoding)
-        .method(fun!(encoding_get_id).name("id"))
+        .method(fun!(encoding_get_id))
         .method(fun!(encoding_get_schema))
         .method(fun!(encoding_to_string).name("toStr"))
         // Whole-handle clone return — see KeyExpr's `newClone`.
-        .method(
-            fun!(encoding_new_clone)
-                .name("newClone")
-                .expand_return(expand_return!(Encoding).field_self()),
-        )
+        .method(fun!(encoding_new_clone).expand_return(expand_return!(Encoding).field_self()))
         // `encoding_new_with_schema(&Encoding, schema) -> Encoding` derives a new
         // Encoding — a companion factory returning a raw handle (a constructor
         // never return-field-decomposes, so the result stays a usable handle rather than
@@ -140,11 +146,7 @@ fn main() {
             ptr_class!(ZBytes)
                 .method(fun!(zbytes_as_bytes))
                 // Whole-handle clone return — see KeyExpr's `newClone`.
-                .method(
-                    fun!(zbytes_new_clone)
-                        .name("newClone")
-                        .expand_return(expand_return!(ZBytes).field_self()),
-                )
+                .method(fun!(zbytes_new_clone).expand_return(expand_return!(ZBytes).field_self()))
                 // `fromVec` builds a ZBytes from a `ByteArray` — both the
                 // param-variant build arm (see `expand_param!(ZBytes)` below)
                 // AND a companion factory (a constructor never
@@ -248,7 +250,6 @@ fn main() {
                         .method(fun!(keyexpr_get_str))
                         .method(
                             fun!(keyexpr_new_clone)
-                                .name("newClone")
                                 .expand_return(expand_return!(KeyExpr).field_self()),
                         )
                         .method(fun!(keyexpr_to_string).name("toStr"))
@@ -261,9 +262,9 @@ fn main() {
                         .constructor(fun!(keyexpr_new_concat).name("concat"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
-                        .method(fun!(keyexpr_intersects))
-                        .method(fun!(keyexpr_includes))
-                        .method(fun!(keyexpr_relation_to)),
+                        .method(fun!(keyexpr_intersects).split_on_param("b"))
+                        .method(fun!(keyexpr_includes).split_on_param("b"))
+                        .method(fun!(keyexpr_relation_to).split_on_param("b")),
                 )
                 .class(enum_class!(SetIntersectionLevel)),
         )
@@ -311,9 +312,9 @@ fn main() {
             package!("scouting")
                 .class(
                     ptr_class!(Hello)
-                        .method(fun!(hello_get_whatami).name("whatami")) // WhatAmI enum -> Int
-                        .method(fun!(hello_get_zid).name("zid")) // ZenohId value class -> ByteArray
-                        .method(fun!(hello_get_locators).name("locators")), // Vec<String> -> List<String>
+                        .method(fun!(hello_get_whatami)) // WhatAmI enum -> Int
+                        .method(fun!(hello_get_zid)) // ZenohId value class -> ByteArray
+                        .method(fun!(hello_get_locators)), // Vec<String> -> List<String>
                 )
                 .class(ptr_class!(Scout))
                 .fun(fun!(scout)),
@@ -361,7 +362,7 @@ fn main() {
         .package(
             package!("time").class(
                 ptr_class!(Timestamp)
-                    .method(fun!(timestamp_get_ntp64).name("ntp64"))
+                    .method(fun!(timestamp_get_ntp64))
                     .method(fun!(timestamp_get_id)),
             ),
         )
@@ -385,19 +386,19 @@ fn main() {
                         // All sample getters are record sources AND instance methods on
                         // the Sample class; decomposition happens via the canonical
                         // output below.
-                        .method(fun!(sample_get_key_expr).name("keyExpr"))
-                        .method(fun!(sample_get_payload).name("payload"))
-                        .method(fun!(sample_get_encoding).name("encoding"))
-                        .method(fun!(sample_get_kind).name("kind"))
-                        .method(fun!(sample_get_timestamp).name("timestamp"))
-                        .method(fun!(sample_get_express).name("express"))
-                        .method(fun!(sample_get_priority).name("priority"))
-                        .method(fun!(sample_get_congestion_control).name("congestionControl"))
-                        .method(fun!(sample_get_attachment).name("attachment"))
-                        .method(fun!(sample_get_reliability).name("reliability"))
-                        .method(fun!(sample_get_source_zid).name("sourceZid"))
-                        .method(fun!(sample_get_source_eid).name("sourceEid"))
-                        .method(fun!(sample_get_source_sn).name("sourceSn")),
+                        .method(fun!(sample_get_key_expr))
+                        .method(fun!(sample_get_payload))
+                        .method(fun!(sample_get_encoding))
+                        .method(fun!(sample_get_kind))
+                        .method(fun!(sample_get_timestamp))
+                        .method(fun!(sample_get_express))
+                        .method(fun!(sample_get_priority))
+                        .method(fun!(sample_get_congestion_control))
+                        .method(fun!(sample_get_attachment))
+                        .method(fun!(sample_get_reliability))
+                        .method(fun!(sample_get_source_zid))
+                        .method(fun!(sample_get_source_eid))
+                        .method(fun!(sample_get_source_sn)),
                 )
                 // Standalone sample constructors (callable from Kotlin); consumed by handle.
                 .fun(fun!(sample_new_put))
@@ -443,12 +444,12 @@ fn main() {
                 .class(enum_class!(ConsolidationMode))
                 .class(
                     ptr_class!(Query)
-                        .method(fun!(query_get_keyexpr).name("keyExpr"))
-                        .method(fun!(query_get_parameters).name("parameters"))
-                        .method(fun!(query_get_payload).name("payload"))
-                        .method(fun!(query_get_encoding).name("encoding"))
-                        .method(fun!(query_get_attachment).name("attachment"))
-                        .method(fun!(query_get_accepts_replies).name("acceptsReplies")),
+                        .method(fun!(query_get_keyexpr))
+                        .method(fun!(query_get_parameters))
+                        .method(fun!(query_get_payload))
+                        .method(fun!(query_get_encoding))
+                        .method(fun!(query_get_attachment))
+                        .method(fun!(query_get_accepts_replies)),
                 )
                 // Reply ops on the owned/borrowed query handle.
                 .fun(fun!(query_reply_success))
@@ -460,18 +461,18 @@ fn main() {
                 // ── Reply / ReplyError ────────────────────────────────────────
                 .class(
                     ptr_class!(ReplyError)
-                        .method(fun!(reply_error_get_payload).name("payload"))
-                        .method(fun!(reply_error_get_encoding).name("encoding")),
+                        .method(fun!(reply_error_get_payload))
+                        .method(fun!(reply_error_get_encoding)),
                 )
                 .class(
                     ptr_class!(Reply)
                         // Record sources are class methods — `reply.sample()`'s
                         // standalone export is therefore the cloned-handle form.
-                        .method(fun!(reply_get_replier_zid).name("replierZid"))
-                        .method(fun!(reply_get_replier_eid).name("replierEid"))
+                        .method(fun!(reply_get_replier_zid))
+                        .method(fun!(reply_get_replier_eid))
                         .method(fun!(reply_is_ok))
-                        .method(fun!(reply_get_sample).name("sample"))
-                        .method(fun!(reply_get_err).name("err")),
+                        .method(fun!(reply_get_sample))
+                        .method(fun!(reply_get_err)),
                 ),
         )
         // Canonical output: the queryable callback decomposes a `Query` into
@@ -523,12 +524,12 @@ fn main() {
             package!("session")
                 .class(ptr_class!(Session).method(fun!(session_get_zid)))
                 .fun(fun!(open))
-                .fun(fun!(session_declare_publisher))
-                .fun(fun!(session_put))
-                .fun(fun!(session_delete))
-                .fun(fun!(session_declare_subscriber))
-                .fun(fun!(session_declare_querier))
-                .fun(fun!(session_declare_queryable))
+                .fun(fun!(session_declare_publisher).split_on_param("key_expr"))
+                .fun(fun!(session_put).split_on_param("key_expr"))
+                .fun(fun!(session_delete).split_on_param("key_expr"))
+                .fun(fun!(session_declare_subscriber).split_on_param("key_expr"))
+                .fun(fun!(session_declare_querier).split_on_param("key_expr"))
+                .fun(fun!(session_declare_queryable).split_on_param("key_expr"))
                 .fun(fun!(session_declare_keyexpr))
                 // Undeclaring needs the declared handle, not a string — opt its
                 // key_expr param out of the (String-building) default param variants.
@@ -536,15 +537,15 @@ fn main() {
                     fun!(session_undeclare_keyexpr)
                         .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
                 )
-                .fun(fun!(session_get))
+                .fun(fun!(session_get).split_on_param("key_expr"))
                 // `Vec<ZenohId>`: ZenohId is a value class, so these return
                 // `List<ZenohId>` via the normal Vec converter.
                 .fun(fun!(session_get_peers_zid))
                 .fun(fun!(session_get_routers_zid))
                 // Liveliness ops (key_expr params auto-constructed by the canonical input).
-                .fun(fun!(liveliness_declare_token))
-                .fun(fun!(liveliness_get))
-                .fun(fun!(liveliness_declare_subscriber)),
+                .fun(fun!(liveliness_declare_token).split_on_param("key_expr"))
+                .fun(fun!(liveliness_get).split_on_param("key_expr"))
+                .fun(fun!(liveliness_declare_subscriber).split_on_param("key_expr")),
         );
 
     // zenoh-flat's `encoding_const_*` `&'static Encoding` loaning factories

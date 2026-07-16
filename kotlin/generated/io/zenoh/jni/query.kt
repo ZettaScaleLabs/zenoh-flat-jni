@@ -106,7 +106,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the key expression targeted by the query. */
-    public fun keyExpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
+    public fun getKeyexpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -118,7 +118,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the parameters that refine the query selector. */
-    public fun parameters(onError: JniErrorHandler<String>): String {
+    public fun getParameters(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -130,7 +130,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the query payload, when present. */
-    public fun payload(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+    public fun getPayload(onError: JniErrorHandler<ZBytes?>): ZBytes? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -142,7 +142,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return format information for the query payload, when present. */
-    public fun encoding(onError: JniErrorHandler<Encoding?>): Encoding? {
+    public fun getEncoding(onError: JniErrorHandler<Encoding?>): Encoding? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -154,7 +154,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return user-defined metadata associated with the query, when present. */
-    public fun attachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
+    public fun getAttachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -170,7 +170,7 @@ public class Query(initialPtr: Long) : NativeHandle(initialPtr) {
      *
      * This information is available only when unstable features are enabled.
      */
-    public fun acceptsReplies(onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
+    public fun getAcceptsReplies(onError: JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -234,7 +234,7 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
      *
      * This information is available only when unstable features are enabled.
      */
-    public fun replierZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
+    public fun getReplierZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -250,7 +250,7 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
      *
      * This information is available only when unstable features are enabled.
      */
-    public fun replierEid(onError: JniErrorHandler<Int>): Int {
+    public fun getReplierEid(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -274,7 +274,7 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the sample carried by a successful reply. */
-    public fun sample(onError: JniErrorHandler<Sample?>): Sample? {
+    public fun getSample(onError: JniErrorHandler<Sample?>): Sample? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -286,7 +286,7 @@ public class Reply(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the application error carried by an unsuccessful reply. */
-    public fun err(onError: JniErrorHandler<ReplyError?>): ReplyError? {
+    public fun getErr(onError: JniErrorHandler<ReplyError?>): ReplyError? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -322,7 +322,7 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the error payload. */
-    public fun payload(onError: JniErrorHandler<ZBytes>): ZBytes {
+    public fun getPayload(onError: JniErrorHandler<ZBytes>): ZBytes {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -334,7 +334,7 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return format information associated with the error payload. */
-    public fun encoding(onError: JniErrorHandler<Encoding>): Encoding {
+    public fun getEncoding(onError: JniErrorHandler<Encoding>): Encoding {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -353,145 +353,145 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
 
 public fun interface QueryCallback {
     public fun run(
-        keyExpr: KeyExpr,
-        parameters: String,
-        payload: ZBytes?,
-        encoding: Encoding?,
-        encoding__id: Int?,
-        attachment: ZBytes?,
-        acceptsReplies: Int,
+        getKeyexpr: KeyExpr,
+        getParameters: String,
+        getPayload: ZBytes?,
+        getEncoding: Encoding?,
+        getEncoding__getId: Int?,
+        getAttachment: ZBytes?,
+        getAcceptsReplies: Int,
         handle: Query,
     )
 }
 
 public fun interface QueryCallbackRaw {
     public fun run(
-        keyExpr: Long,
-        parameters: String,
-        payload: Long?,
-        encoding: Long?,
-        encoding__id: Int?,
-        attachment: Long?,
-        acceptsReplies: Int,
+        getKeyexpr: Long,
+        getParameters: String,
+        getPayload: Long?,
+        getEncoding: Long?,
+        getEncoding__getId: Int?,
+        getAttachment: Long?,
+        getAcceptsReplies: Int,
         handle: Long,
     )
 }
 
 public fun QueryCallback.asRaw(): QueryCallbackRaw =
     QueryCallbackRaw {
-        keyExpr,
-        parameters,
-        payload,
-        encoding,
-        encoding__id,
-        attachment,
-        acceptsReplies,
+        getKeyexpr,
+        getParameters,
+        getPayload,
+        getEncoding,
+        getEncoding__getId,
+        getAttachment,
+        getAcceptsReplies,
         handle ->
         run(
-            KeyExpr(keyExpr),
-            parameters,
-            payload?.let { ZBytes(it) },
-            encoding?.let { Encoding(it) },
-            encoding__id,
-            attachment?.let { ZBytes(it) },
-            acceptsReplies,
+            KeyExpr(getKeyexpr),
+            getParameters,
+            getPayload?.let { ZBytes(it) },
+            getEncoding?.let { Encoding(it) },
+            getEncoding__getId,
+            getAttachment?.let { ZBytes(it) },
+            getAcceptsReplies,
             Query(handle)
         )
     }
 
 public fun interface ReplyCallback {
     public fun run(
-        replierZid: ZenohId?,
-        replierEid: Int,
+        getReplierZid: ZenohId?,
+        getReplierEid: Int,
         isOk: Boolean,
-        sample__keyExpr: KeyExpr?,
-        sample__payload: ZBytes?,
-        sample__encoding: Encoding?,
-        sample__encoding__id: Int?,
-        sample__kind: Int?,
-        sample__timestamp__ntp64: Long?,
-        sample__express: Boolean?,
-        sample__priority: Int?,
-        sample__congestionControl: Int?,
-        sample__attachment: ZBytes?,
-        sample__reliability: Int?,
-        sample__sourceZid: ZenohId?,
-        sample__sourceEid: Int?,
-        sample__sourceSn: Long?,
-        err__payload: ZBytes?,
-        err__encoding: Encoding?,
-        err__encoding__id: Int?,
+        getSample__getKeyExpr: KeyExpr?,
+        getSample__getPayload: ZBytes?,
+        getSample__getEncoding: Encoding?,
+        getSample__getEncoding__getId: Int?,
+        getSample__getKind: Int?,
+        getSample__getTimestamp__getNtp64: Long?,
+        getSample__getExpress: Boolean?,
+        getSample__getPriority: Int?,
+        getSample__getCongestionControl: Int?,
+        getSample__getAttachment: ZBytes?,
+        getSample__getReliability: Int?,
+        getSample__getSourceZid: ZenohId?,
+        getSample__getSourceEid: Int?,
+        getSample__getSourceSn: Long?,
+        getErr__getPayload: ZBytes?,
+        getErr__getEncoding: Encoding?,
+        getErr__getEncoding__getId: Int?,
     )
 }
 
 public fun interface ReplyCallbackRaw {
     public fun run(
-        replierZid: ByteArray?,
-        replierEid: Int,
+        getReplierZid: ByteArray?,
+        getReplierEid: Int,
         isOk: Boolean,
-        sample__keyExpr: Long?,
-        sample__payload: Long?,
-        sample__encoding: Long?,
-        sample__encoding__id: Int?,
-        sample__kind: Int?,
-        sample__timestamp__ntp64: Long?,
-        sample__express: Boolean?,
-        sample__priority: Int?,
-        sample__congestionControl: Int?,
-        sample__attachment: Long?,
-        sample__reliability: Int?,
-        sample__sourceZid: ByteArray?,
-        sample__sourceEid: Int?,
-        sample__sourceSn: Long?,
-        err__payload: Long?,
-        err__encoding: Long?,
-        err__encoding__id: Int?,
+        getSample__getKeyExpr: Long?,
+        getSample__getPayload: Long?,
+        getSample__getEncoding: Long?,
+        getSample__getEncoding__getId: Int?,
+        getSample__getKind: Int?,
+        getSample__getTimestamp__getNtp64: Long?,
+        getSample__getExpress: Boolean?,
+        getSample__getPriority: Int?,
+        getSample__getCongestionControl: Int?,
+        getSample__getAttachment: Long?,
+        getSample__getReliability: Int?,
+        getSample__getSourceZid: ByteArray?,
+        getSample__getSourceEid: Int?,
+        getSample__getSourceSn: Long?,
+        getErr__getPayload: Long?,
+        getErr__getEncoding: Long?,
+        getErr__getEncoding__getId: Int?,
     )
 }
 
 public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
     ReplyCallbackRaw {
-        replierZid,
-        replierEid,
+        getReplierZid,
+        getReplierEid,
         isOk,
-        sample__keyExpr,
-        sample__payload,
-        sample__encoding,
-        sample__encoding__id,
-        sample__kind,
-        sample__timestamp__ntp64,
-        sample__express,
-        sample__priority,
-        sample__congestionControl,
-        sample__attachment,
-        sample__reliability,
-        sample__sourceZid,
-        sample__sourceEid,
-        sample__sourceSn,
-        err__payload,
-        err__encoding,
-        err__encoding__id ->
+        getSample__getKeyExpr,
+        getSample__getPayload,
+        getSample__getEncoding,
+        getSample__getEncoding__getId,
+        getSample__getKind,
+        getSample__getTimestamp__getNtp64,
+        getSample__getExpress,
+        getSample__getPriority,
+        getSample__getCongestionControl,
+        getSample__getAttachment,
+        getSample__getReliability,
+        getSample__getSourceZid,
+        getSample__getSourceEid,
+        getSample__getSourceSn,
+        getErr__getPayload,
+        getErr__getEncoding,
+        getErr__getEncoding__getId ->
         run(
-            replierZid?.let { ZenohId(it) },
-            replierEid,
+            getReplierZid?.let { ZenohId(it) },
+            getReplierEid,
             isOk,
-            sample__keyExpr?.let { KeyExpr(it) },
-            sample__payload?.let { ZBytes(it) },
-            sample__encoding?.let { Encoding(it) },
-            sample__encoding__id,
-            sample__kind,
-            sample__timestamp__ntp64,
-            sample__express,
-            sample__priority,
-            sample__congestionControl,
-            sample__attachment?.let { ZBytes(it) },
-            sample__reliability,
-            sample__sourceZid?.let { ZenohId(it) },
-            sample__sourceEid,
-            sample__sourceSn,
-            err__payload?.let { ZBytes(it) },
-            err__encoding?.let { Encoding(it) },
-            err__encoding__id
+            getSample__getKeyExpr?.let { KeyExpr(it) },
+            getSample__getPayload?.let { ZBytes(it) },
+            getSample__getEncoding?.let { Encoding(it) },
+            getSample__getEncoding__getId,
+            getSample__getKind,
+            getSample__getTimestamp__getNtp64,
+            getSample__getExpress,
+            getSample__getPriority,
+            getSample__getCongestionControl,
+            getSample__getAttachment?.let { ZBytes(it) },
+            getSample__getReliability,
+            getSample__getSourceZid?.let { ZenohId(it) },
+            getSample__getSourceEid,
+            getSample__getSourceSn,
+            getErr__getPayload?.let { ZBytes(it) },
+            getErr__getEncoding?.let { Encoding(it) },
+            getErr__getEncoding__getId
         )
     }
 

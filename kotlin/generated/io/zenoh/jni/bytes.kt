@@ -26,7 +26,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the numeric identifier of an encoding. */
-    public fun id(onError: JniErrorHandler<Int>): Int {
+    public fun getId(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {

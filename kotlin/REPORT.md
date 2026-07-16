@@ -162,13 +162,13 @@ Base package: `io.zenoh.jni`
 - `sample_new_delete` — `fun <R> sampleNewDelete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: return `Sample` decomposed → [keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding, getEncoding__getId, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 - `sample_new_put` — `fun <R> sampleNewPut(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: return `Sample` decomposed → [keyExpr, payload, encoding, encoding__id, kind, timestamp__ntp64, express, priority, congestionControl, attachment, reliability, sourceZid, sourceEid, sourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding, getEncoding__getId, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 
 ## package `io.zenoh.jni.scouting`
 
@@ -242,7 +242,7 @@ Base package: `io.zenoh.jni`
 
 ## class `io.zenoh.jni.bytes.Encoding` (ptr_class, Rust `Encoding`)
 
-- `encoding_get_id` — `fun id(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
+- `encoding_get_id` — `fun getId(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
 - `encoding_get_schema` — `fun getSchema(onError: io.zenoh.jni.JniErrorHandler<String?>): String?`
 - `encoding_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
 - `encoding_new_from_id` — `fun fromId(id: Int, schema: String?, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
@@ -253,10 +253,10 @@ Base package: `io.zenoh.jni`
 
 ## class `io.zenoh.jni.scouting.Hello` (ptr_class, Rust `Hello`)
 
-- `hello_get_locators` — `fun locators(onError: io.zenoh.jni.JniErrorHandler<List<String>>): List<String>`
+- `hello_get_locators` — `fun getLocators(onError: io.zenoh.jni.JniErrorHandler<List<String>>): List<String>`
   - shaped by: return `String` decomposed → [] (Callback delivery)
-- `hello_get_whatami` — `fun whatami(onError: io.zenoh.jni.JniErrorHandler<WhatAmI>): WhatAmI`
-- `hello_get_zid` — `fun zid(onError: io.zenoh.jni.JniErrorHandler<ZenohId>): ZenohId`
+- `hello_get_whatami` — `fun getWhatami(onError: io.zenoh.jni.JniErrorHandler<WhatAmI>): WhatAmI`
+- `hello_get_zid` — `fun getZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId>): ZenohId`
 
 ## class `io.zenoh.jni.keyexpr.KeyExpr` (ptr_class, Rust `KeyExpr`)
 
@@ -282,41 +282,41 @@ Base package: `io.zenoh.jni`
 
 ## class `io.zenoh.jni.query.Query` (ptr_class, Rust `Query`)
 
-- `query_get_accepts_replies` — `fun acceptsReplies(onError: io.zenoh.jni.JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr`
-- `query_get_attachment` — `fun attachment(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
-- `query_get_encoding` — `fun encoding(onError: io.zenoh.jni.JniErrorHandler<Encoding?>): Encoding?`
-- `query_get_keyexpr` — `fun keyExpr(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
-- `query_get_parameters` — `fun parameters(onError: io.zenoh.jni.JniErrorHandler<String>): String`
-- `query_get_payload` — `fun payload(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
+- `query_get_accepts_replies` — `fun getAcceptsReplies(onError: io.zenoh.jni.JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr`
+- `query_get_attachment` — `fun getAttachment(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
+- `query_get_encoding` — `fun getEncoding(onError: io.zenoh.jni.JniErrorHandler<Encoding?>): Encoding?`
+- `query_get_keyexpr` — `fun getKeyexpr(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
+- `query_get_parameters` — `fun getParameters(onError: io.zenoh.jni.JniErrorHandler<String>): String`
+- `query_get_payload` — `fun getPayload(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
 
 ## class `io.zenoh.jni.query.Reply` (ptr_class, Rust `Reply`)
 
-- `reply_get_err` — `fun err(onError: io.zenoh.jni.JniErrorHandler<ReplyError?>): ReplyError?`
-- `reply_get_replier_eid` — `fun replierEid(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
-- `reply_get_replier_zid` — `fun replierZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId?>): ZenohId?`
-- `reply_get_sample` — `fun sample(onError: io.zenoh.jni.JniErrorHandler<Sample?>): Sample?`
+- `reply_get_err` — `fun getErr(onError: io.zenoh.jni.JniErrorHandler<ReplyError?>): ReplyError?`
+- `reply_get_replier_eid` — `fun getReplierEid(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
+- `reply_get_replier_zid` — `fun getReplierZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId?>): ZenohId?`
+- `reply_get_sample` — `fun getSample(onError: io.zenoh.jni.JniErrorHandler<Sample?>): Sample?`
 - `reply_is_ok` — `fun isOk(onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
 
 ## class `io.zenoh.jni.query.ReplyError` (ptr_class, Rust `ReplyError`)
 
-- `reply_error_get_encoding` — `fun encoding(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
-- `reply_error_get_payload` — `fun payload(onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
+- `reply_error_get_encoding` — `fun getEncoding(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
+- `reply_error_get_payload` — `fun getPayload(onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
 
 ## class `io.zenoh.jni.sample.Sample` (ptr_class, Rust `Sample`)
 
-- `sample_get_attachment` — `fun attachment(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
-- `sample_get_congestion_control` — `fun congestionControl(onError: io.zenoh.jni.JniErrorHandler<CongestionControl>): CongestionControl`
-- `sample_get_encoding` — `fun encoding(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
-- `sample_get_express` — `fun express(onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
-- `sample_get_key_expr` — `fun keyExpr(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
-- `sample_get_kind` — `fun kind(onError: io.zenoh.jni.JniErrorHandler<SampleKind>): SampleKind`
-- `sample_get_payload` — `fun payload(onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
-- `sample_get_priority` — `fun priority(onError: io.zenoh.jni.JniErrorHandler<Priority>): Priority`
-- `sample_get_reliability` — `fun reliability(onError: io.zenoh.jni.JniErrorHandler<Reliability>): Reliability`
-- `sample_get_source_eid` — `fun sourceEid(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
-- `sample_get_source_sn` — `fun sourceSn(onError: io.zenoh.jni.JniErrorHandler<Long>): Long`
-- `sample_get_source_zid` — `fun sourceZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId?>): ZenohId?`
-- `sample_get_timestamp` — `fun timestamp(onError: io.zenoh.jni.JniErrorHandler<Timestamp?>): Timestamp?`
+- `sample_get_attachment` — `fun getAttachment(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
+- `sample_get_congestion_control` — `fun getCongestionControl(onError: io.zenoh.jni.JniErrorHandler<CongestionControl>): CongestionControl`
+- `sample_get_encoding` — `fun getEncoding(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
+- `sample_get_express` — `fun getExpress(onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
+- `sample_get_key_expr` — `fun getKeyExpr(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
+- `sample_get_kind` — `fun getKind(onError: io.zenoh.jni.JniErrorHandler<SampleKind>): SampleKind`
+- `sample_get_payload` — `fun getPayload(onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
+- `sample_get_priority` — `fun getPriority(onError: io.zenoh.jni.JniErrorHandler<Priority>): Priority`
+- `sample_get_reliability` — `fun getReliability(onError: io.zenoh.jni.JniErrorHandler<Reliability>): Reliability`
+- `sample_get_source_eid` — `fun getSourceEid(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
+- `sample_get_source_sn` — `fun getSourceSn(onError: io.zenoh.jni.JniErrorHandler<Long>): Long`
+- `sample_get_source_zid` — `fun getSourceZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId?>): ZenohId?`
+- `sample_get_timestamp` — `fun getTimestamp(onError: io.zenoh.jni.JniErrorHandler<Timestamp?>): Timestamp?`
 
 ## class `io.zenoh.jni.session.Session` (ptr_class, Rust `Session`)
 
@@ -325,7 +325,7 @@ Base package: `io.zenoh.jni`
 ## class `io.zenoh.jni.time.Timestamp` (ptr_class, Rust `Timestamp`)
 
 - `timestamp_get_id` — `fun getId(onError: io.zenoh.jni.JniErrorHandler<ByteArray>): ByteArray`
-- `timestamp_get_ntp64` — `fun ntp64(onError: io.zenoh.jni.JniErrorHandler<Long>): Long`
+- `timestamp_get_ntp64` — `fun getNtp64(onError: io.zenoh.jni.JniErrorHandler<Long>): Long`
 
 ## class `io.zenoh.jni.bytes.ZBytes` (ptr_class, Rust `ZBytes`)
 

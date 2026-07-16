@@ -88,6 +88,26 @@ public fun open(config: Config, onError: ErrorHandler<Session>): Session {
     return __ret
 }
 
+public fun sessionDeclarePublisher(
+    session: Session,
+    s: String,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Publisher>,
+): Publisher = sessionDeclarePublisher(session, 0, s, null, congestionControl, priority, express, reliability, onError)
+
+public fun sessionDeclarePublisher(
+    session: Session,
+    keyExpr: KeyExpr,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Publisher>,
+): Publisher = sessionDeclarePublisher(session, 1, null, keyExpr, congestionControl, priority, express, reliability, onError)
+
 /**
  * Declare a publisher for the given key expression.
  *
@@ -148,6 +168,36 @@ public fun sessionDeclarePublisher(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionPut(
+    session: Session,
+    s: String,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionPut(session, 0, s, null, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
+
+public fun sessionPut(
+    session: Session,
+    keyExpr: KeyExpr,
+    payload: ByteArray,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionPut(session, 1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
 
 /**
  * Publish data on a key expression.
@@ -215,6 +265,28 @@ public fun sessionPut(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun sessionDelete(
+    session: Session,
+    s: String,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionDelete(session, 0, s, null, congestionControl, priority, express, attachment, reliability, onError)
+
+public fun sessionDelete(
+    session: Session,
+    keyExpr: KeyExpr,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    attachment: ByteArray?,
+    reliability: Reliability?,
+    onError: ErrorHandler<Unit>,
+) = sessionDelete(session, 1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
+
 /**
  * Publish a deletion notification on a key expression.
  *
@@ -271,6 +343,22 @@ public fun sessionDelete(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
 
+public fun sessionDeclareSubscriber(
+    session: Session,
+    s: String,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = sessionDeclareSubscriber(session, 0, s, null, callback, onClose, onError)
+
+public fun sessionDeclareSubscriber(
+    session: Session,
+    keyExpr: KeyExpr,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = sessionDeclareSubscriber(session, 1, null, keyExpr, callback, onClose, onError)
+
 /**
  * Subscribe to samples whose key expressions match the supplied expression.
  *
@@ -322,6 +410,32 @@ public fun sessionDeclareSubscriber(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionDeclareQuerier(
+    session: Session,
+    s: String,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    timeoutMs: Long?,
+    acceptReplies: ReplyKeyExpr?,
+    onError: ErrorHandler<Querier>,
+): Querier = sessionDeclareQuerier(session, 0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+
+public fun sessionDeclareQuerier(
+    session: Session,
+    keyExpr: KeyExpr,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    timeoutMs: Long?,
+    acceptReplies: ReplyKeyExpr?,
+    onError: ErrorHandler<Querier>,
+): Querier = sessionDeclareQuerier(session, 1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
 
 /**
  * Declare a reusable querier for the given key expression.
@@ -391,6 +505,24 @@ public fun sessionDeclareQuerier(
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
     return __ret
 }
+
+public fun sessionDeclareQueryable(
+    session: Session,
+    s: String,
+    complete: Boolean?,
+    callback: QueryCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Queryable>,
+): Queryable = sessionDeclareQueryable(session, 0, s, null, complete, callback, onClose, onError)
+
+public fun sessionDeclareQueryable(
+    session: Session,
+    keyExpr: KeyExpr,
+    complete: Boolean?,
+    callback: QueryCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Queryable>,
+): Queryable = sessionDeclareQueryable(session, 1, null, keyExpr, complete, callback, onClose, onError)
 
 /**
  * Declare a queryable for queries matching the supplied key expression.
@@ -491,6 +623,48 @@ public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: 
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
+
+public fun sessionGet(
+    session: Session,
+    s: String,
+    parameters: String?,
+    timeoutMs: Long?,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    acceptReplies: ReplyKeyExpr?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    payload: ByteArray?,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    attachment: ByteArray?,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = sessionGet(session, 0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
+
+public fun sessionGet(
+    session: Session,
+    keyExpr: KeyExpr,
+    parameters: String?,
+    timeoutMs: Long?,
+    target: QueryTarget?,
+    consolidation: ConsolidationMode?,
+    acceptReplies: ReplyKeyExpr?,
+    congestionControl: CongestionControl?,
+    priority: Priority?,
+    express: Boolean?,
+    payload: ByteArray?,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
+    attachment: ByteArray?,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = sessionGet(session, 1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
 
 /**
  * Send a query to matching queryables.
@@ -604,6 +778,18 @@ public fun sessionGetRoutersZid(
     return __ret
 }
 
+public fun livelinessDeclareToken(
+    session: Session,
+    s: String,
+    onError: ErrorHandler<LivelinessToken>,
+): LivelinessToken = livelinessDeclareToken(session, 0, s, null, onError)
+
+public fun livelinessDeclareToken(
+    session: Session,
+    keyExpr: KeyExpr,
+    onError: ErrorHandler<LivelinessToken>,
+): LivelinessToken = livelinessDeclareToken(session, 1, null, keyExpr, onError)
+
 /**
  * Declare a liveliness token on the supplied key expression.
  *
@@ -652,6 +838,24 @@ public fun livelinessDeclareToken(
     return __ret
 }
 
+public fun livelinessGet(
+    session: Session,
+    s: String,
+    timeoutMs: Long,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = livelinessGet(session, 0, s, null, timeoutMs, callback, onClose, onError)
+
+public fun livelinessGet(
+    session: Session,
+    keyExpr: KeyExpr,
+    timeoutMs: Long,
+    callback: ReplyCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Unit>,
+) = livelinessGet(session, 1, null, keyExpr, timeoutMs, callback, onClose, onError)
+
 /**
  * Query liveliness tokens matching the supplied key expression.
  *
@@ -697,6 +901,24 @@ public fun livelinessGet(
     }
     if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
 }
+
+public fun livelinessDeclareSubscriber(
+    session: Session,
+    s: String,
+    history: Boolean,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = livelinessDeclareSubscriber(session, 0, s, null, history, callback, onClose, onError)
+
+public fun livelinessDeclareSubscriber(
+    session: Session,
+    keyExpr: KeyExpr,
+    history: Boolean,
+    callback: SampleCallback,
+    onClose: VoidCallback,
+    onError: ErrorHandler<Subscriber>,
+): Subscriber = livelinessDeclareSubscriber(session, 1, null, keyExpr, history, callback, onClose, onError)
 
 /**
  * Subscribe to liveliness changes matching the supplied key expression.
