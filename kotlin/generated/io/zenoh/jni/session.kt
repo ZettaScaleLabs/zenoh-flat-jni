@@ -8,7 +8,6 @@ import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
-import io.zenoh.jni.bytes.Encoding
 import io.zenoh.jni.config.Config
 import io.zenoh.jni.config.ZenohId
 import io.zenoh.jni.config.__ZenohIdFolderRawHolder
@@ -63,29 +62,27 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
 
     public fun declarePublisher(
         s: String,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(0, s, null, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(0, s, null, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, reliability, onError)
 
     public fun declarePublisher(
         keyExpr: KeyExpr,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(1, null, keyExpr, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(1, null, keyExpr, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, reliability, onError)
 
     /**
      * Declare a publisher for the given key expression.
@@ -96,7 +93,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
      * not override it. Reliability is available only when unstable features are
      * enabled.
      *
-     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
      */
@@ -104,10 +101,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: KeyExpr?,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
@@ -119,20 +115,14 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
             "Operation on a closed native handle.",
             "",
         )
-        if (encoding1 != null && encoding1.isClosed()) return onError.run(
-            "Operation on a closed native handle.",
-            "",
-        )
         val __cap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
             keyExpr1?.let { __locks.add(it) }
-            encoding1?.let { __locks.add(it) }
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-                val encoding1_ptr = encoding1?.ptr ?: 0L
                 try {
                     Publisher(
                         JNINative.sessionDeclarePublisher(
@@ -140,11 +130,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                             keyExprSel,
                             keyExpr0,
                             keyExpr1_ptr,
-                            encodingSel,
-                            encoding00 != null,
-                            encoding00 ?: 0,
-                            encoding01,
-                            encoding1_ptr,
+                            encodingPresent,
+                            encodingId,
+                            encodingSchema,
                             congestionControl != null,
                             congestionControl?.value ?: 0,
                             priority != null,
@@ -168,32 +156,30 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     public fun put(
         s: String,
         payload: ByteArray,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
         onError: ErrorHandler<Unit>,
-    ) = put(0, s, null, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(0, s, null, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
 
     public fun put(
         keyExpr: KeyExpr,
         payload: ByteArray,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
         onError: ErrorHandler<Unit>,
-    ) = put(1, null, keyExpr, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
 
     /**
      * Publish data on a key expression.
@@ -203,7 +189,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
      * only when unstable features are enabled.
      *
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
-     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
      * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -213,10 +199,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         keyExpr0: String?,
         keyExpr1: KeyExpr?,
         payload: ByteArray,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
@@ -228,30 +213,23 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         if (keyExpr1 != null && keyExpr1.isClosed()) {
             onError.run("Operation on a closed native handle.", ""); return
         }
-        if (encoding1 != null && encoding1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
-        }
         val __cap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
             keyExpr1?.let { __locks.add(it) }
-            encoding1?.let { __locks.add(it) }
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-                val encoding1_ptr = encoding1?.ptr ?: 0L
                 JNINative.sessionPut(
                     this_ptr,
                     keyExprSel,
                     keyExpr0,
                     keyExpr1_ptr,
                     payload,
-                    encodingSel,
-                    encoding00 != null,
-                    encoding00 ?: 0,
-                    encoding01,
-                    encoding1_ptr,
+                    encodingPresent,
+                    encodingId,
+                    encodingSchema,
                     congestionControl != null,
                     congestionControl?.value ?: 0,
                     priority != null,
@@ -622,15 +600,14 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         payload: ByteArray?,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
         onError: ErrorHandler<Unit>,
-    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
+    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
 
     public fun get(
         keyExpr: KeyExpr,
@@ -643,15 +620,14 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         payload: ByteArray?,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
         onError: ErrorHandler<Unit>,
-    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
+    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
 
     /**
      * Send a query to matching queryables.
@@ -662,7 +638,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
      * called after the reply stream ends.
      *
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
-     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
      * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
@@ -680,10 +656,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         payload: ByteArray?,
-        encodingSel: Int,
-        encoding00: Int?,
-        encoding01: String?,
-        encoding1: Encoding?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
@@ -693,19 +668,14 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         if (keyExpr1 != null && keyExpr1.isClosed()) {
             onError.run("Operation on a closed native handle.", ""); return
         }
-        if (encoding1 != null && encoding1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
-        }
         val __cap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
             keyExpr1?.let { __locks.add(it) }
-            encoding1?.let { __locks.add(it) }
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-                val encoding1_ptr = encoding1?.ptr ?: 0L
                 JNINative.sessionGet(
                     this_ptr,
                     keyExprSel,
@@ -727,11 +697,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                     express != null,
                     express ?: false,
                     payload,
-                    encodingSel,
-                    encoding00 != null,
-                    encoding00 ?: 0,
-                    encoding01,
-                    encoding1_ptr,
+                    encodingPresent,
+                    encodingId,
+                    encodingSchema,
                     attachment,
                     callback.asRaw(),
                     onClose,

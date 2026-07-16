@@ -4567,26 +4567,6 @@ pub(crate) unsafe fn JObject_to_Option_bool_5c82fffd<'env, 'v>(
     })
 }
 #[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
-pub(crate) unsafe fn JObject_to_Option_i32_bf7397c9<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::objects::JObject<'v>,
-) -> ::core::result::Result<Option<i32>, __JniErr> {
-    Ok({
-        if !v.is_null() {
-            let __unboxed: jni::sys::jint = env
-                .call_method(&v, "intValue", "()I", &[])
-                .and_then(|val| val.i())
-                .map(|__x| __x as jni::sys::jint)
-                .map_err(|e| <__JniErr as ::core::convert::From<
-                    String,
-                >>::from(format!("Option unbox: {}", e)))?;
-            Some(jint_to_i32_a3e3b6ef(env, &__unboxed)?)
-        } else {
-            None
-        }
-    })
-}
-#[allow(non_snake_case, unused_mut, unused_variables, unused_braces, dead_code)]
 pub(crate) unsafe fn JObject_to_Option_i64_2ba9a5ed<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::objects::JObject<'v>,
@@ -8093,11 +8073,8 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromString<'a>(
 pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     mut env: jni::JNIEnv<'a>,
     _class: jni::objects::JClass<'a>,
-    e_sel: jni::sys::jint,
-    e_0_0_present: jni::sys::jboolean,
-    e_0_0_value: jni::sys::jint,
-    e_0_1: jni::objects::JString<'a>,
-    e_1: jni::sys::jlong,
+    e_id: jni::sys::jint,
+    e_schema: jni::objects::JString<'a>,
     schema: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
@@ -8109,7 +8086,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
     const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
-    let __exp_e_sel = match jint_to_i32_a3e3b6ef(&mut env, &e_sel) {
+    let __exp_e_id = match jint_to_i32_a3e3b6ef(&mut env, &e_id) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -8125,28 +8102,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_e_0_0: Option<i32> = if e_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &e_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return 0 as jni::sys::jlong;
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_e_0_1 = match JString_to_Option_String_56d5e304(&mut env, &e_0_1) {
+    let __exp_e_schema = match JString_to_Option_String_56d5e304(&mut env, &e_schema) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __zd = __ze_defaults(&mut env);
@@ -8162,59 +8118,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_e_1 = match jlong_to_Option_Encoding_e89ec09d(&mut env, &e_1) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
-    };
-    let __folded_e = match {
-        match __exp_e_sel {
-            0i32 => {
-                match __exp_e_0_0 {
-                    ::core::option::Option::Some(__p0) => {
-                        ::core::result::Result::Ok(
-                            zenoh_flat::encoding_new_from_id(__p0, __exp_e_0_1),
-                        )
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from(
-                                "constructor variant input missing",
-                            ),
-                        )
-                    }
-                }
-            }
-            1i32 => {
-                match __exp_e_1 {
-                    ::core::option::Option::Some(__v) => {
-                        ::core::result::Result::Ok(::core::clone::Clone::clone(&*__v))
-                    }
-                    ::core::option::Option::None => {
-                        ::core::result::Result::Err(
-                            ::std::string::String::from("identity variant value missing"),
-                        )
-                    }
-                }
-            }
-            __sel => {
-                ::core::result::Result::Err(
-                    ::std::format!("invalid constructor selector: {}", __sel),
-                )
-            }
-        }
-    } {
+    let __folded_e = match ::core::result::Result::Ok(
+        zenoh_flat::encoding_new_from_id(__exp_e_id, __exp_e_schema),
+    ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
             let __je = <__JniErr as ::core::convert::From<
@@ -10785,11 +10691,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     _class: jni::objects::JClass<'a>,
     publisher: jni::sys::jlong,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     attachment: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
@@ -10857,46 +10761,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -10913,9 +10780,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -10932,51 +10815,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -11113,11 +10958,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     querier: jni::sys::jlong,
     parameters: jni::objects::JString<'a>,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     attachment: jni::objects::JByteArray<'a>,
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
@@ -11209,46 +11052,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -11265,9 +11071,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -11284,51 +11106,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12111,11 +11895,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     _class: jni::objects::JClass<'a>,
     query: jni::sys::jlong,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
     #[allow(unused_variables)]
@@ -12182,46 +11964,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12238,9 +11983,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12257,51 +12018,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12503,11 +12226,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     timestamp_ntp64_present: jni::sys::jboolean,
     timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
@@ -12687,46 +12408,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12743,9 +12427,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -12762,51 +12462,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -14695,11 +14357,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     timestamp_ntp64_present: jni::sys::jboolean,
     timestamp_ntp64_value: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
@@ -14865,46 +14525,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return jni::objects::JObject::null().into();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -14921,9 +14544,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return jni::objects::JObject::null().into();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -14940,51 +14579,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             return jni::objects::JObject::null().into();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -15842,11 +15443,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     key_expr_sel: jni::sys::jint,
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     congestion_control_present: jni::sys::jboolean,
     congestion_control_value: jni::sys::jint,
     priority_present: jni::sys::jboolean,
@@ -15990,46 +15589,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return 0 as jni::sys::jlong;
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return 0 as jni::sys::jlong;
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -16046,9 +15608,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return 0 as jni::sys::jlong;
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -16065,51 +15643,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             return 0 as jni::sys::jlong;
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -17567,11 +17107,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     express_present: jni::sys::jboolean,
     express_value: jni::sys::jboolean,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     attachment: jni::objects::JByteArray<'a>,
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
@@ -17927,46 +17465,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -17983,9 +17484,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -18002,51 +17519,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -18478,11 +17957,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
     payload: jni::objects::JByteArray<'a>,
-    encoding_sel: jni::sys::jint,
-    encoding_0_0_present: jni::sys::jboolean,
-    encoding_0_0_value: jni::sys::jint,
-    encoding_0_1: jni::objects::JString<'a>,
-    encoding_1: jni::sys::jlong,
+    encoding_present: jni::sys::jboolean,
+    encoding_id: jni::sys::jint,
+    encoding_schema: jni::objects::JString<'a>,
     congestion_control_present: jni::sys::jboolean,
     congestion_control_value: jni::sys::jint,
     priority_present: jni::sys::jboolean,
@@ -18666,46 +18143,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             return ();
         }
     };
-    let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
-        ::core::result::Result::Ok(__v) => __v,
-        ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
-                &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
-            );
-            return ();
-        }
-    };
-    let __exp_encoding_0_0: Option<i32> = if encoding_0_0_present != 0u8 {
-        let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
-            ::core::result::Result::Ok(__v) => __v,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return ();
-            }
-        };
-        ::core::option::Option::Some(__v)
-    } else {
-        ::core::option::Option::None
-    };
-    let __exp_encoding_0_1 = match JString_to_Option_String_56d5e304(
+    let __exp_encoding_present = match jboolean_to_bool_31306d98(
         &mut env,
-        &encoding_0_1,
+        &encoding_present,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -18722,9 +18162,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             return ();
         }
     };
-    let __exp_encoding_1 = match jlong_to_Option_Encoding_e89ec09d(
+    let __exp_encoding_id = match jint_to_i32_a3e3b6ef(&mut env, &encoding_id) {
+        ::core::result::Result::Ok(__v) => __v,
+        ::core::result::Result::Err(__e) => {
+            let __zd = __ze_defaults(&mut env);
+            signal_error(
+                &mut env,
+                &__error_sink,
+                &__SINK_MID,
+                __SINK_FQN,
+                __SINK_DESCR,
+                ::core::option::Option::Some(&__e.to_string()),
+                &__zd,
+            );
+            return ();
+        }
+    };
+    let __exp_encoding_schema = match JString_to_Option_String_56d5e304(
         &mut env,
-        &encoding_1,
+        &encoding_schema,
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
@@ -18741,51 +18197,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             return ();
         }
     };
-    let __folded_encoding = match if __exp_encoding_sel < 0 {
-        ::core::result::Result::Ok(::core::option::Option::None)
-    } else {
-        ({
-            match __exp_encoding_sel {
-                0i32 => {
-                    match __exp_encoding_0_0 {
-                        ::core::option::Option::Some(__p0) => {
-                            ::core::result::Result::Ok(
-                                zenoh_flat::encoding_new_from_id(__p0, __exp_encoding_0_1),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "constructor variant input missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                1i32 => {
-                    match __exp_encoding_1 {
-                        ::core::option::Option::Some(__v) => {
-                            ::core::result::Result::Ok(
-                                ::core::clone::Clone::clone(&*__v),
-                            )
-                        }
-                        ::core::option::Option::None => {
-                            ::core::result::Result::Err(
-                                ::std::string::String::from(
-                                    "identity variant value missing",
-                                ),
-                            )
-                        }
-                    }
-                }
-                __sel => {
-                    ::core::result::Result::Err(
-                        ::std::format!("invalid constructor selector: {}", __sel),
-                    )
-                }
-            }
-        })
+    let __folded_encoding = match if __exp_encoding_present {
+        (::core::result::Result::Ok(
+            zenoh_flat::encoding_new_from_id(__exp_encoding_id, __exp_encoding_schema),
+        ))
             .map(::core::option::Option::Some)
+    } else {
+        ::core::result::Result::Ok(::core::option::Option::None)
     } {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {

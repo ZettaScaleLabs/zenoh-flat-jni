@@ -382,7 +382,7 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
  * enabled.
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+ * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
  * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
@@ -393,10 +393,9 @@ public fun <R> sampleNewPut(
     keyExpr0: String?,
     keyExpr1: KeyExpr?,
     payload: ByteArray,
-    encodingSel: Int,
-    encoding00: Int?,
-    encoding01: String?,
-    encoding1: Encoding?,
+    encodingPresent: Boolean,
+    encodingId: Int,
+    encodingSchema: String?,
     timestampNtp64: Long?,
     attachment: ByteArray?,
     congestionControl: CongestionControl?,
@@ -409,19 +408,14 @@ public fun <R> sampleNewPut(
     if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
         "Operation on a closed native handle.",
     )
-    if (encoding1 != null && encoding1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-    )
     val __cap = JniErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         keyExpr1?.let { __locks.add(it) }
-        encoding1?.let { __locks.add(it) }
         withSortedHandleLocks(__locks) {
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            val encoding1_ptr = encoding1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingSel, encoding00 != null, encoding00 ?: 0, encoding01, encoding1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingPresent, encodingId, encodingSchema, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
             } finally {
                 keyExpr1?.let { it.ptr = it.ptr or 1L }
             }

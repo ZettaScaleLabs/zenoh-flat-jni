@@ -354,19 +354,13 @@ fn main() {
         // Encoding crosses **by value in both directions**: an encoding IS its
         // decomposed `(id, schema?)` pair (Zenoh core semantics — the string
         // form is derived from a fixed table), so no native handle needs to
-        // cross or be retained. Default input: built via `fromId` OR — the
-        // `variant_self` arm — an existing native handle, for a *pinned*
-        // encoding reused across a hot publish loop (the borrow arm clones,
-        // an Arc bump, so the pinned handle survives; on the `Option<&_>`
-        // params the selector also encodes absence, `-1` = `None`). Default
-        // output: the `(id, schema?)` leaves — cheap primitives; the JVM tier
-        // reconstructs its own value type from them (no per-message handle
-        // allocation, nothing to close).
-        .expand(
-            expand_param!(Encoding)
-                .variant(fun!(encoding_new_from_id))
-                .variant_self(),
-        )
+        // cross or be retained. Default input: built via `fromId` — cheap
+        // primitives; on `Option<&_>` params a leading present flag encodes
+        // absence, letting the publisher's declare-time default apply. Default
+        // output: the same `(id, schema?)` leaves; the JVM tier reconstructs
+        // its own value type from them (no per-message handle allocation,
+        // nothing to close).
+        .expand(expand_param!(Encoding).variant(fun!(encoding_new_from_id)))
         .expand(
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
