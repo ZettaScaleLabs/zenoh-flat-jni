@@ -221,6 +221,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
             return __ret
         }
 
+        public fun join(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(0, s, null, b, onError)
+
+        public fun join(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(1, null, a, b, onError)
+
         /**
          * Join a key expression and a suffix with a `/` separator.
          *
@@ -252,6 +256,10 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
+
+        public fun concat(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(0, s, null, b, onError)
+
+        public fun concat(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(1, null, a, b, onError)
 
         /**
          * Append text directly to a key expression and validate the result.

@@ -111,51 +111,11 @@ Base package: `io.zenoh.jni`
 - `val ENCODING_ZENOH_STRING: String` — binding expression
 - `val ENCODING_ZENOH_STRING_ID: i32` — binding expression
 
-## package `io.zenoh.jni.config`
-
-- `config_insert_json5` — `fun configInsertJson5(c: Config, key: String, value: String, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: error `Error` decomposed → [je, message]
-
 ## package `io.zenoh.jni.logger`
 
 - `init_android_logs` — `fun initAndroidLogs(filter: String, onError: io.zenoh.jni.JniErrorHandler<Unit>)`
 - `init_zenoh_logs_from_env_or` — `fun initZenohLogsFromEnvOr(fallbackFilter: String, onError: io.zenoh.jni.JniErrorHandler<Unit>)`
 - `try_init_zenoh_logs_from_env` — `fun tryInitZenohLogsFromEnv(onError: io.zenoh.jni.JniErrorHandler<Unit>)`
-
-## package `io.zenoh.jni.pubsub`
-
-- `publisher_delete` — `fun publisherDelete(publisher: Publisher, attachment: ByteArray?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-- `publisher_put` — `fun publisherPut(publisher: Publisher, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-
-## package `io.zenoh.jni.query`
-
-- `querier_get` — `fun querierGet(querier: Querier, parameters: String?, payload: ByteArray?, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-- `query_reply_delete` — `fun queryReplyDelete(query: Query, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, express: Boolean?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `query_reply_error` — `fun queryReplyError(query: Query, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-- `query_reply_sample` — `fun queryReplySample(query: Query, sample: Sample, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: error `Error` decomposed → [je, message]
-- `query_reply_success` — `fun queryReplySuccess(query: Query, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, timestampNtp64: Long?, attachment: ByteArray?, express: Boolean?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
 
 ## package `io.zenoh.jni.sample`
 
@@ -175,59 +135,11 @@ Base package: `io.zenoh.jni`
 - `scout` — `fun scout(whatami: Int, config: Config?, callback: io.zenoh.jni.scouting.HelloCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Scout>): Scout`
   - shaped by: error `Error` decomposed → [je, message]
 
-## package `io.zenoh.jni.session`
-
-- `liveliness_declare_subscriber` — `fun livelinessDeclareSubscriber(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, history: Boolean, callback: io.zenoh.jni.sample.SampleCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Subscriber>): Subscriber`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `liveliness_declare_token` — `fun livelinessDeclareToken(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, onError: io.zenoh.jni.ErrorHandler<LivelinessToken>): LivelinessToken`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `liveliness_get` — `fun livelinessGet(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timeoutMs: Long, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `open` — `fun open(config: Config, onError: io.zenoh.jni.ErrorHandler<Session>): Session`
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_keyexpr` — `fun sessionDeclareKeyexpr(session: Session, keyExpr: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_publisher` — `fun sessionDeclarePublisher(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Publisher>): Publisher`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_querier` — `fun sessionDeclareQuerier(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, target: QueryTarget?, consolidation: ConsolidationMode?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, timeoutMs: Long?, acceptReplies: ReplyKeyExpr?, onError: io.zenoh.jni.ErrorHandler<Querier>): Querier`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_queryable` — `fun sessionDeclareQueryable(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, complete: Boolean?, callback: io.zenoh.jni.query.QueryCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Queryable>): Queryable`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_subscriber` — `fun sessionDeclareSubscriber(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, callback: io.zenoh.jni.sample.SampleCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Subscriber>): Subscriber`
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_delete` — `fun sessionDelete(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, attachment: ByteArray?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_get` — `fun sessionGet(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, parameters: String?, timeoutMs: Long?, target: QueryTarget?, consolidation: ConsolidationMode?, acceptReplies: ReplyKeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, payload: ByteArray?, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_get_peers_zid` — `fun sessionGetPeersZid(session: Session, onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
-  - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
-- `session_get_routers_zid` — `fun sessionGetRoutersZid(session: Session, onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
-  - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
-- `session_put` — `fun sessionPut(session: Session, keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, attachment: ByteArray?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
-  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: error `Error` decomposed → [je, message]
-- `session_undeclare_keyexpr` — `fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: io.zenoh.jni.ErrorHandler<Unit>)`
-  - shaped by: error `Error` decomposed → [je, message]
-
 ## class `io.zenoh.jni.config.Config` (ptr_class, Rust `Config`)
 
 - `config_get_json` — `fun getJson(key: String, onError: io.zenoh.jni.ErrorHandler<String>): String`
+  - shaped by: error `Error` decomposed → [je, message]
+- `config_insert_json5` — `fun insertJson5(key: String, value: String, onError: io.zenoh.jni.ErrorHandler<Unit>)`
   - shaped by: error `Error` decomposed → [je, message]
 - `config_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<Config>): Config`
 - `config_new_default` — `fun newDefault(onError: io.zenoh.jni.JniErrorHandler<Config>): Config`
@@ -280,6 +192,25 @@ Base package: `io.zenoh.jni`
   - shaped by: param `b` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
 - `keyexpr_to_string` — `fun toStr(onError: io.zenoh.jni.JniErrorHandler<String>): String`
 
+## class `io.zenoh.jni.pubsub.Publisher` (ptr_class, Rust `Publisher`)
+
+- `publisher_delete` — `fun delete(attachment: ByteArray?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+- `publisher_put` — `fun put(payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+
+## class `io.zenoh.jni.query.Querier` (ptr_class, Rust `Querier`)
+
+- `querier_get` — `fun get(parameters: String?, payload: ByteArray?, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+
 ## class `io.zenoh.jni.query.Query` (ptr_class, Rust `Query`)
 
 - `query_get_accepts_replies` — `fun getAcceptsReplies(onError: io.zenoh.jni.JniErrorHandler<ReplyKeyExpr>): ReplyKeyExpr`
@@ -288,6 +219,22 @@ Base package: `io.zenoh.jni`
 - `query_get_keyexpr` — `fun getKeyexpr(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
 - `query_get_parameters` — `fun getParameters(onError: io.zenoh.jni.JniErrorHandler<String>): String`
 - `query_get_payload` — `fun getPayload(onError: io.zenoh.jni.JniErrorHandler<ZBytes?>): ZBytes?`
+- `query_reply_delete` — `fun replyDelete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, express: Boolean?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `query_reply_error` — `fun replyError(payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+- `query_reply_sample` — `fun replySample(sample: Sample, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: error `Error` decomposed → [je, message]
+- `query_reply_success` — `fun replySuccess(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, timestampNtp64: Long?, attachment: ByteArray?, express: Boolean?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
 
 ## class `io.zenoh.jni.query.Reply` (ptr_class, Rust `Reply`)
 
@@ -320,7 +267,54 @@ Base package: `io.zenoh.jni`
 
 ## class `io.zenoh.jni.session.Session` (ptr_class, Rust `Session`)
 
+- `liveliness_declare_subscriber` — `fun livelinessDeclareSubscriber(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, history: Boolean, callback: io.zenoh.jni.sample.SampleCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Subscriber>): Subscriber`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `liveliness_declare_token` — `fun livelinessDeclareToken(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, onError: io.zenoh.jni.ErrorHandler<LivelinessToken>): LivelinessToken`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `liveliness_get` — `fun livelinessGet(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timeoutMs: Long, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `open` — `fun open(config: Config, onError: io.zenoh.jni.ErrorHandler<Session>): Session`
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_declare_keyexpr` — `fun declareKeyexpr(keyExpr: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_declare_publisher` — `fun declarePublisher(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Publisher>): Publisher`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_declare_querier` — `fun declareQuerier(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, target: QueryTarget?, consolidation: ConsolidationMode?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, timeoutMs: Long?, acceptReplies: ReplyKeyExpr?, onError: io.zenoh.jni.ErrorHandler<Querier>): Querier`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_declare_queryable` — `fun declareQueryable(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, complete: Boolean?, callback: io.zenoh.jni.query.QueryCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Queryable>): Queryable`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_declare_subscriber` — `fun declareSubscriber(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, callback: io.zenoh.jni.sample.SampleCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Subscriber>): Subscriber`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_delete` — `fun delete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, attachment: ByteArray?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_get` — `fun get(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, parameters: String?, timeoutMs: Long?, target: QueryTarget?, consolidation: ConsolidationMode?, acceptReplies: ReplyKeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, payload: ByteArray?, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, attachment: ByteArray?, callback: io.zenoh.jni.query.ReplyCallback, onClose: io.zenoh.jni.VoidCallback, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_get_peers_zid` — `fun peersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
+  - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
+- `session_get_routers_zid` — `fun routersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
+  - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
 - `session_get_zid` — `fun getZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId>): ZenohId`
+- `session_put` — `fun put(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, attachment: ByteArray?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: error `Error` decomposed → [je, message]
+- `session_undeclare_keyexpr` — `fun undeclareKeyexpr(keyExpr: KeyExpr, onError: io.zenoh.jni.ErrorHandler<Unit>)`
+  - shaped by: error `Error` decomposed → [je, message]
 
 ## class `io.zenoh.jni.time.Timestamp` (ptr_class, Rust `Timestamp`)
 

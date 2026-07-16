@@ -258,8 +258,10 @@ fn main() {
                         // (see `expand_param!(KeyExpr)` below).
                         .constructor(fun!(keyexpr_new_try_from).name("tryFrom"))
                         .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
-                        .constructor(fun!(keyexpr_new_join).name("join"))
-                        .constructor(fun!(keyexpr_new_concat).name("concat"))
+                        // `a` is a `&KeyExpr` (string-or-handle); split it so
+                        // `join(a: KeyExpr, b: String)` is an idiomatic overload.
+                        .constructor(fun!(keyexpr_new_join).name("join").split_on_param("a"))
+                        .constructor(fun!(keyexpr_new_concat).name("concat").split_on_param("a"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
                         .method(fun!(keyexpr_intersects).split_on_param("b"))
@@ -284,6 +286,8 @@ fn main() {
                     ptr_class!(Config)
                         .method(fun!(config_get_json))
                         .method(fun!(config_new_clone))
+                        // `config.insertJson5(...)` — receiver-style mutator.
+                        .method(fun!(config_insert_json5))
                         // Factories → Config companion-object members.
                         .constructor(fun!(config_new_default))
                         .constructor(fun!(config_new_from_file).name("fromFile"))
@@ -291,7 +295,6 @@ fn main() {
                         .constructor(fun!(config_new_from_json5).name("fromJson5"))
                         .constructor(fun!(config_new_from_yaml).name("fromYaml")),
                 )
-                .fun(fun!(config_insert_json5))
                 .class(enum_class!(WhatAmI))
                 // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
                 // it crosses as a raw byte-blob `ByteArray` rather than a closeable jlong
@@ -428,17 +431,20 @@ fn main() {
         // by their types' canonical inputs (no per-fn calls).
         .package(
             package!("pubsub")
-                .class(ptr_class!(Publisher))
-                .fun(fun!(publisher_put))
-                .fun(fun!(publisher_delete))
+                // `publisher.put(...)` / `publisher.delete(...)` — receiver-style.
+                .class(
+                    ptr_class!(Publisher)
+                        .method(fun!(publisher_put))
+                        .method(fun!(publisher_delete)),
+                )
                 .class(ptr_class!(Subscriber)),
         )
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
                 .class(ptr_class!(Queryable))
-                .class(ptr_class!(Querier))
-                .fun(fun!(querier_get))
+                // `querier.get(...)` — receiver-style method on Querier.
+                .class(ptr_class!(Querier).method(fun!(querier_get)))
                 .class(enum_class!(ReplyKeyExpr))
                 .class(enum_class!(QueryTarget))
                 .class(enum_class!(ConsolidationMode))
@@ -449,15 +455,16 @@ fn main() {
                         .method(fun!(query_get_payload))
                         .method(fun!(query_get_encoding))
                         .method(fun!(query_get_attachment))
-                        .method(fun!(query_get_accepts_replies)),
+                        .method(fun!(query_get_accepts_replies))
+                        // Reply ops on the owned/borrowed query handle →
+                        // `query.replySuccess(...)` / `replyError` / `replyDelete`.
+                        .method(fun!(query_reply_success))
+                        .method(fun!(query_reply_error))
+                        .method(fun!(query_reply_delete))
+                        // `query_reply_sample` takes the sample by owned handle
+                        // (Sample's canonical input is identity).
+                        .method(fun!(query_reply_sample)),
                 )
-                // Reply ops on the owned/borrowed query handle.
-                .fun(fun!(query_reply_success))
-                .fun(fun!(query_reply_error))
-                .fun(fun!(query_reply_delete))
-                // `query_reply_sample` takes the sample by owned handle (Sample's
-                // canonical input is identity — see the sample package above).
-                .fun(fun!(query_reply_sample))
                 // ── Reply / ReplyError ────────────────────────────────────────
                 .class(
                     ptr_class!(ReplyError)
@@ -521,31 +528,38 @@ fn main() {
         // alongside the session API they extend.
         .package(package!("liveliness").class(ptr_class!(LivelinessToken)))
         .package(
-            package!("session")
-                .class(ptr_class!(Session).method(fun!(session_get_zid)))
-                .fun(fun!(open))
-                .fun(fun!(session_declare_publisher).split_on_param("key_expr"))
-                .fun(fun!(session_put).split_on_param("key_expr"))
-                .fun(fun!(session_delete).split_on_param("key_expr"))
-                .fun(fun!(session_declare_subscriber).split_on_param("key_expr"))
-                .fun(fun!(session_declare_querier).split_on_param("key_expr"))
-                .fun(fun!(session_declare_queryable).split_on_param("key_expr"))
-                .fun(fun!(session_declare_keyexpr))
-                // Undeclaring needs the declared handle, not a string — opt its
-                // key_expr param out of the (String-building) default param variants.
-                .fun(
-                    fun!(session_undeclare_keyexpr)
-                        .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
-                )
-                .fun(fun!(session_get).split_on_param("key_expr"))
-                // `Vec<ZenohId>`: ZenohId is a value class, so these return
-                // `List<ZenohId>` via the normal Vec converter.
-                .fun(fun!(session_get_peers_zid))
-                .fun(fun!(session_get_routers_zid))
-                // Liveliness ops (key_expr params auto-constructed by the canonical input).
-                .fun(fun!(liveliness_declare_token).split_on_param("key_expr"))
-                .fun(fun!(liveliness_get).split_on_param("key_expr"))
-                .fun(fun!(liveliness_declare_subscriber).split_on_param("key_expr")),
+            package!("session").class(
+                // Every session operation is a RECEIVER-STYLE instance method on
+                // `Session` (its `&Session` first param binds to `this`), so the
+                // Kotlin surface reads `session.put(...)` / `session.declarePublisher(...)`.
+                // `open` has no receiver (it creates a Session) → companion factory.
+                ptr_class!(Session)
+                    .constructor(fun!(open))
+                    .method(fun!(session_get_zid))
+                    .method(fun!(session_declare_publisher).split_on_param("key_expr"))
+                    .method(fun!(session_put).split_on_param("key_expr"))
+                    .method(fun!(session_delete).split_on_param("key_expr"))
+                    .method(fun!(session_declare_subscriber).split_on_param("key_expr"))
+                    .method(fun!(session_declare_querier).split_on_param("key_expr"))
+                    .method(fun!(session_declare_queryable).split_on_param("key_expr"))
+                    .method(fun!(session_declare_keyexpr))
+                    // Undeclaring needs the declared handle, not a string — opt its
+                    // key_expr param out of the (String-building) default param variants.
+                    .method(
+                        fun!(session_undeclare_keyexpr)
+                            .expand_param("key_expr", expand_param!(KeyExpr).variant_self()),
+                    )
+                    .method(fun!(session_get).split_on_param("key_expr"))
+                    // `Vec<ZenohId>`: ZenohId is a value class, so these return
+                    // `List<ZenohId>` via the normal Vec converter. Named to drop
+                    // the `get` prefix (`peersZid` / `routersZid`).
+                    .method(fun!(session_get_peers_zid).name("peersZid"))
+                    .method(fun!(session_get_routers_zid).name("routersZid"))
+                    // Liveliness ops also take `&Session` first → Session methods.
+                    .method(fun!(liveliness_declare_token).split_on_param("key_expr"))
+                    .method(fun!(liveliness_get).split_on_param("key_expr"))
+                    .method(fun!(liveliness_declare_subscriber).split_on_param("key_expr")),
+            ),
         );
 
     // zenoh-flat's `encoding_const_*` `&'static Encoding` loaning factories

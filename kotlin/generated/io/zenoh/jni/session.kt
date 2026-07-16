@@ -60,917 +60,877 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         return __ret
     }
 
+    public fun declarePublisher(
+        s: String,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Publisher>,
+    ): Publisher = declarePublisher(0, s, null, congestionControl, priority, express, reliability, onError)
+
+    public fun declarePublisher(
+        keyExpr: KeyExpr,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Publisher>,
+    ): Publisher = declarePublisher(1, null, keyExpr, congestionControl, priority, express, reliability, onError)
+
+    /**
+     * Declare a publisher for the given key expression.
+     *
+     * Optional delivery settings become defaults for publications made through
+     * the returned publisher. Reliability is available only when unstable
+     * features are enabled.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun declarePublisher(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Publisher>,
+    ): Publisher {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    Publisher(
+                        JNINative.sessionDeclarePublisher(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            congestionControl != null,
+                            congestionControl?.value ?: 0,
+                            priority != null,
+                            priority?.value ?: 0,
+                            express != null,
+                            express ?: false,
+                            reliability != null,
+                            reliability?.value ?: 0,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    public fun put(
+        s: String,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) = put(0, s, null, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
+
+    public fun put(
+        keyExpr: KeyExpr,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) = put(1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
+
+    /**
+     * Publish data on a key expression.
+     *
+     * Matching subscribers receive a PUT sample. Optional arguments specify the
+     * payload format, delivery quality, and attachment. Reliability is available
+     * only when unstable features are enabled.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun put(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        payload: ByteArray,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.sessionPut(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    payload,
+                    encodingPresent,
+                    encodingId,
+                    encodingSchema,
+                    congestionControl != null,
+                    congestionControl?.value ?: 0,
+                    priority != null,
+                    priority?.value ?: 0,
+                    express != null,
+                    express ?: false,
+                    attachment,
+                    reliability != null,
+                    reliability?.value ?: 0,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    public fun delete(
+        s: String,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) = delete(0, s, null, congestionControl, priority, express, attachment, reliability, onError)
+
+    public fun delete(
+        keyExpr: KeyExpr,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) = delete(1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
+
+    /**
+     * Publish a deletion notification on a key expression.
+     *
+     * Matching subscribers receive a DELETE sample. Optional arguments specify
+     * delivery quality and attachment. Reliability is available only when
+     * unstable features are enabled.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun delete(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        attachment: ByteArray?,
+        reliability: Reliability?,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.sessionDelete(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    congestionControl != null,
+                    congestionControl?.value ?: 0,
+                    priority != null,
+                    priority?.value ?: 0,
+                    express != null,
+                    express ?: false,
+                    attachment,
+                    reliability != null,
+                    reliability?.value ?: 0,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    public fun declareSubscriber(
+        s: String,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber = declareSubscriber(0, s, null, callback, onClose, onError)
+
+    public fun declareSubscriber(
+        keyExpr: KeyExpr,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber = declareSubscriber(1, null, keyExpr, callback, onClose, onError)
+
+    /**
+     * Subscribe to samples whose key expressions match the supplied expression.
+     *
+     * The callback is called for each sample. The close callback is called when
+     * the subscription ends.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun declareSubscriber(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    Subscriber(
+                        JNINative.sessionDeclareSubscriber(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            callback.asRaw(),
+                            onClose,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    public fun declareQuerier(
+        s: String,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        timeoutMs: Long?,
+        acceptReplies: ReplyKeyExpr?,
+        onError: ErrorHandler<Querier>,
+    ): Querier = declareQuerier(0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+
+    public fun declareQuerier(
+        keyExpr: KeyExpr,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        timeoutMs: Long?,
+        acceptReplies: ReplyKeyExpr?,
+        onError: ErrorHandler<Querier>,
+    ): Querier = declareQuerier(1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+
+    /**
+     * Declare a reusable querier for the given key expression.
+     *
+     * Optional arguments set defaults for query targets, reply consolidation,
+     * delivery quality, timeout, and accepted reply key expressions.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun declareQuerier(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        timeoutMs: Long?,
+        acceptReplies: ReplyKeyExpr?,
+        onError: ErrorHandler<Querier>,
+    ): Querier {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    Querier(
+                        JNINative.sessionDeclareQuerier(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            target != null,
+                            target?.value ?: 0,
+                            consolidation != null,
+                            consolidation?.value ?: 0,
+                            congestionControl != null,
+                            congestionControl?.value ?: 0,
+                            priority != null,
+                            priority?.value ?: 0,
+                            express != null,
+                            express ?: false,
+                            timeoutMs != null,
+                            timeoutMs ?: 0L,
+                            acceptReplies != null,
+                            acceptReplies?.value ?: 0,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    public fun declareQueryable(
+        s: String,
+        complete: Boolean?,
+        callback: QueryCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Queryable>,
+    ): Queryable = declareQueryable(0, s, null, complete, callback, onClose, onError)
+
+    public fun declareQueryable(
+        keyExpr: KeyExpr,
+        complete: Boolean?,
+        callback: QueryCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Queryable>,
+    ): Queryable = declareQueryable(1, null, keyExpr, complete, callback, onClose, onError)
+
+    /**
+     * Declare a queryable for queries matching the supplied key expression.
+     *
+     * The callback is called for each query. A complete queryable indicates that
+     * it can provide every available result for matching queries. The close
+     * callback is called when the queryable ends.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun declareQueryable(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        complete: Boolean?,
+        callback: QueryCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Queryable>,
+    ): Queryable {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    Queryable(
+                        JNINative.sessionDeclareQueryable(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            complete != null,
+                            complete ?: false,
+                            callback.asRaw(),
+                            onClose,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    /**
+     * Register a key expression with the session for efficient repeated use.
+     *
+     * Release the registration with [`session_undeclare_keyexpr`].
+     *
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun declareKeyexpr(keyExpr: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            KeyExpr(JNINative.sessionDeclareKeyexpr(this_ptr, keyExpr, __cap))
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    /**
+     * Release a key expression previously registered with
+     * [`session_declare_keyexpr`].
+     *
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun undeclareKeyexpr(keyExpr: KeyExpr, onError: ErrorHandler<Unit>) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        val __cap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this, keyExpr) {
+            val this_ptr = this.ptr
+            val keyExpr_ptr = keyExpr.ptr
+            try {
+                JNINative.sessionUndeclareKeyexpr(this_ptr, keyExpr_ptr, __cap)
+            } finally {
+                keyExpr.ptr = keyExpr.ptr or 1L
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    public fun get(
+        s: String,
+        parameters: String?,
+        timeoutMs: Long?,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        acceptReplies: ReplyKeyExpr?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        payload: ByteArray?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
+
+    public fun get(
+        keyExpr: KeyExpr,
+        parameters: String?,
+        timeoutMs: Long?,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        acceptReplies: ReplyKeyExpr?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        payload: ByteArray?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
+
+    /**
+     * Send a query to matching queryables.
+     *
+     * The callback is called for each reply. Optional arguments control selector
+     * parameters, timeout, targets, reply consolidation, accepted reply keys,
+     * delivery quality, payload metadata, and attachment. The close callback is
+     * called after the reply stream ends.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun get(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        parameters: String?,
+        timeoutMs: Long?,
+        target: QueryTarget?,
+        consolidation: ConsolidationMode?,
+        acceptReplies: ReplyKeyExpr?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        payload: ByteArray?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
+        attachment: ByteArray?,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.sessionGet(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    parameters,
+                    timeoutMs != null,
+                    timeoutMs ?: 0L,
+                    target != null,
+                    target?.value ?: 0,
+                    consolidation != null,
+                    consolidation?.value ?: 0,
+                    acceptReplies != null,
+                    acceptReplies?.value ?: 0,
+                    congestionControl != null,
+                    congestionControl?.value ?: 0,
+                    priority != null,
+                    priority?.value ?: 0,
+                    express != null,
+                    express ?: false,
+                    payload,
+                    encodingPresent,
+                    encodingId,
+                    encodingSchema,
+                    attachment,
+                    callback.asRaw(),
+                    onClose,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    /** Return the identifiers of peers currently connected to this session. */
+    public fun peersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            (JNINative.sessionGetPeersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    /** Return the identifiers of routers currently connected to this session. */
+    public fun routersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.")
+        val __cap = JniErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            (JNINative.sessionGetRoutersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+        }
+        if (__cap.failed) return onError.run(__cap.je)
+        return __ret
+    }
+
+    public fun livelinessDeclareToken(
+        s: String,
+        onError: ErrorHandler<LivelinessToken>,
+    ): LivelinessToken = livelinessDeclareToken(0, s, null, onError)
+
+    public fun livelinessDeclareToken(
+        keyExpr: KeyExpr,
+        onError: ErrorHandler<LivelinessToken>,
+    ): LivelinessToken = livelinessDeclareToken(1, null, keyExpr, onError)
+
+    /**
+     * Declare a liveliness token on the supplied key expression.
+     *
+     * The token asserts that the associated application is alive until the token
+     * is undeclared.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun livelinessDeclareToken(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        onError: ErrorHandler<LivelinessToken>,
+    ): LivelinessToken {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    LivelinessToken(
+                        JNINative.livelinessDeclareToken(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
+    public fun livelinessGet(
+        s: String,
+        timeoutMs: Long,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) = livelinessGet(0, s, null, timeoutMs, callback, onClose, onError)
+
+    public fun livelinessGet(
+        keyExpr: KeyExpr,
+        timeoutMs: Long,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) = livelinessGet(1, null, keyExpr, timeoutMs, callback, onClose, onError)
+
+    /**
+     * Query liveliness tokens matching the supplied key expression.
+     *
+     * The callback is called for each reply. The close callback is called after
+     * the reply stream ends.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun livelinessGet(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        timeoutMs: Long,
+        callback: ReplyCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (keyExpr1 != null && keyExpr1.isClosed()) {
+            onError.run("Operation on a closed native handle.", ""); return
+        }
+        val __cap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                JNINative.livelinessGet(
+                    this_ptr,
+                    keyExprSel,
+                    keyExpr0,
+                    keyExpr1_ptr,
+                    timeoutMs,
+                    callback.asRaw(),
+                    onClose,
+                    __cap,
+                )
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    }
+
+    public fun livelinessDeclareSubscriber(
+        s: String,
+        history: Boolean,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber = livelinessDeclareSubscriber(0, s, null, history, callback, onClose, onError)
+
+    public fun livelinessDeclareSubscriber(
+        keyExpr: KeyExpr,
+        history: Boolean,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber = livelinessDeclareSubscriber(1, null, keyExpr, history, callback, onClose, onError)
+
+    /**
+     * Subscribe to liveliness changes matching the supplied key expression.
+     *
+     * When history is enabled, tokens that are already alive are reported when
+     * the subscription starts. The close callback is called when the subscription
+     * ends.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     */
+    public fun livelinessDeclareSubscriber(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        history: Boolean,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber {
+        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+            "Operation on a closed native handle.",
+            "",
+        )
+        val __cap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    Subscriber(
+                        JNINative.livelinessDeclareSubscriber(
+                            this_ptr,
+                            keyExprSel,
+                            keyExpr0,
+                            keyExpr1_ptr,
+                            history,
+                            callback.asRaw(),
+                            onClose,
+                            __cap,
+                        ),
+                    )
+                } finally {
+                    keyExpr1?.let { it.ptr = it.ptr or 1L }
+                }
+            }
+        }
+        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        return __ret
+    }
+
     public companion object {
         @JvmStatic
         external fun freePtr(ptr: Long)
-    }
-}
 
-/**
- * Open a session with the given configuration.
- *
- * The configuration is consumed by this operation.
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun open(config: Config, onError: ErrorHandler<Session>): Session {
-    if (config.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(config) {
-        val config_ptr = config.ptr
-        try {
-            Session(JNINative.open(config_ptr, __cap))
-        } finally {
-            config.ptr = config.ptr or 1L
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun sessionDeclarePublisher(
-    session: Session,
-    s: String,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Publisher>,
-): Publisher = sessionDeclarePublisher(session, 0, s, null, congestionControl, priority, express, reliability, onError)
-
-public fun sessionDeclarePublisher(
-    session: Session,
-    keyExpr: KeyExpr,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Publisher>,
-): Publisher = sessionDeclarePublisher(session, 1, null, keyExpr, congestionControl, priority, express, reliability, onError)
-
-/**
- * Declare a publisher for the given key expression.
- *
- * Optional delivery settings become defaults for publications made through
- * the returned publisher. Reliability is available only when unstable
- * features are enabled.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDeclarePublisher(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Publisher>,
-): Publisher {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Publisher(
-                    JNINative.sessionDeclarePublisher(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        congestionControl != null,
-                        congestionControl?.value ?: 0,
-                        priority != null,
-                        priority?.value ?: 0,
-                        express != null,
-                        express ?: false,
-                        reliability != null,
-                        reliability?.value ?: 0,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
+        /**
+         * Open a session with the given configuration.
+         *
+         * The configuration is consumed by this operation.
+         *
+         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         */
+        public fun open(config: Config, onError: ErrorHandler<Session>): Session {
+            if (config.isClosed()) return onError.run("Operation on a closed native handle.", "")
+            val __cap = ErrorHandlerCapture.acquire()
+            val __ret = withSortedHandleLocks(config) {
+                val config_ptr = config.ptr
+                try {
+                    Session(JNINative.open(config_ptr, __cap))
+                } finally {
+                    config.ptr = config.ptr or 1L
+                }
             }
+            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            return __ret
         }
     }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun sessionPut(
-    session: Session,
-    s: String,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) = sessionPut(session, 0, s, null, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
-
-public fun sessionPut(
-    session: Session,
-    keyExpr: KeyExpr,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) = sessionPut(session, 1, null, keyExpr, payload, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, attachment, reliability, onError)
-
-/**
- * Publish data on a key expression.
- *
- * Matching subscribers receive a PUT sample. Optional arguments specify the
- * payload format, delivery quality, and attachment. Reliability is available
- * only when unstable features are enabled.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionPut(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    payload: ByteArray,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.sessionPut(
-                session_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                payload,
-                encodingPresent,
-                encodingId,
-                encodingSchema,
-                congestionControl != null,
-                congestionControl?.value ?: 0,
-                priority != null,
-                priority?.value ?: 0,
-                express != null,
-                express ?: false,
-                attachment,
-                reliability != null,
-                reliability?.value ?: 0,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun sessionDelete(
-    session: Session,
-    s: String,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) = sessionDelete(session, 0, s, null, congestionControl, priority, express, attachment, reliability, onError)
-
-public fun sessionDelete(
-    session: Session,
-    keyExpr: KeyExpr,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) = sessionDelete(session, 1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
-
-/**
- * Publish a deletion notification on a key expression.
- *
- * Matching subscribers receive a DELETE sample. Optional arguments specify
- * delivery quality and attachment. Reliability is available only when
- * unstable features are enabled.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDelete(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    attachment: ByteArray?,
-    reliability: Reliability?,
-    onError: ErrorHandler<Unit>,
-) {
-    if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.sessionDelete(
-                session_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                congestionControl != null,
-                congestionControl?.value ?: 0,
-                priority != null,
-                priority?.value ?: 0,
-                express != null,
-                express ?: false,
-                attachment,
-                reliability != null,
-                reliability?.value ?: 0,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun sessionDeclareSubscriber(
-    session: Session,
-    s: String,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber = sessionDeclareSubscriber(session, 0, s, null, callback, onClose, onError)
-
-public fun sessionDeclareSubscriber(
-    session: Session,
-    keyExpr: KeyExpr,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber = sessionDeclareSubscriber(session, 1, null, keyExpr, callback, onClose, onError)
-
-/**
- * Subscribe to samples whose key expressions match the supplied expression.
- *
- * The callback is called for each sample. The close callback is called when
- * the subscription ends.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDeclareSubscriber(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Subscriber(
-                    JNINative.sessionDeclareSubscriber(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun sessionDeclareQuerier(
-    session: Session,
-    s: String,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    timeoutMs: Long?,
-    acceptReplies: ReplyKeyExpr?,
-    onError: ErrorHandler<Querier>,
-): Querier = sessionDeclareQuerier(session, 0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
-
-public fun sessionDeclareQuerier(
-    session: Session,
-    keyExpr: KeyExpr,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    timeoutMs: Long?,
-    acceptReplies: ReplyKeyExpr?,
-    onError: ErrorHandler<Querier>,
-): Querier = sessionDeclareQuerier(session, 1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
-
-/**
- * Declare a reusable querier for the given key expression.
- *
- * Optional arguments set defaults for query targets, reply consolidation,
- * delivery quality, timeout, and accepted reply key expressions.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDeclareQuerier(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    timeoutMs: Long?,
-    acceptReplies: ReplyKeyExpr?,
-    onError: ErrorHandler<Querier>,
-): Querier {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Querier(
-                    JNINative.sessionDeclareQuerier(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        target != null,
-                        target?.value ?: 0,
-                        consolidation != null,
-                        consolidation?.value ?: 0,
-                        congestionControl != null,
-                        congestionControl?.value ?: 0,
-                        priority != null,
-                        priority?.value ?: 0,
-                        express != null,
-                        express ?: false,
-                        timeoutMs != null,
-                        timeoutMs ?: 0L,
-                        acceptReplies != null,
-                        acceptReplies?.value ?: 0,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun sessionDeclareQueryable(
-    session: Session,
-    s: String,
-    complete: Boolean?,
-    callback: QueryCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Queryable>,
-): Queryable = sessionDeclareQueryable(session, 0, s, null, complete, callback, onClose, onError)
-
-public fun sessionDeclareQueryable(
-    session: Session,
-    keyExpr: KeyExpr,
-    complete: Boolean?,
-    callback: QueryCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Queryable>,
-): Queryable = sessionDeclareQueryable(session, 1, null, keyExpr, complete, callback, onClose, onError)
-
-/**
- * Declare a queryable for queries matching the supplied key expression.
- *
- * The callback is called for each query. A complete queryable indicates that
- * it can provide every available result for matching queries. The close
- * callback is called when the queryable ends.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDeclareQueryable(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    complete: Boolean?,
-    callback: QueryCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Queryable>,
-): Queryable {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Queryable(
-                    JNINative.sessionDeclareQueryable(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        complete != null,
-                        complete ?: false,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-/**
- * Register a key expression with the session for efficient repeated use.
- *
- * Release the registration with [`session_undeclare_keyexpr`].
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionDeclareKeyexpr(
-    session: Session,
-    keyExpr: String,
-    onError: ErrorHandler<KeyExpr>,
-): KeyExpr {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(session) {
-        val session_ptr = session.ptr
-        KeyExpr(JNINative.sessionDeclareKeyexpr(session_ptr, keyExpr, __cap))
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-/**
- * Release a key expression previously registered with
- * [`session_declare_keyexpr`].
- *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionUndeclareKeyexpr(session: Session, keyExpr: KeyExpr, onError: ErrorHandler<Unit>) {
-    if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    val __cap = ErrorHandlerCapture.acquire()
-    withSortedHandleLocks(session, keyExpr) {
-        val session_ptr = session.ptr
-        val keyExpr_ptr = keyExpr.ptr
-        try {
-            JNINative.sessionUndeclareKeyexpr(session_ptr, keyExpr_ptr, __cap)
-        } finally {
-            keyExpr.ptr = keyExpr.ptr or 1L
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun sessionGet(
-    session: Session,
-    s: String,
-    parameters: String?,
-    timeoutMs: Long?,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    acceptReplies: ReplyKeyExpr?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    payload: ByteArray?,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) = sessionGet(session, 0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
-
-public fun sessionGet(
-    session: Session,
-    keyExpr: KeyExpr,
-    parameters: String?,
-    timeoutMs: Long?,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    acceptReplies: ReplyKeyExpr?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    payload: ByteArray?,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) = sessionGet(session, 1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingPresent, encodingId, encodingSchema, attachment, callback, onClose, onError)
-
-/**
- * Send a query to matching queryables.
- *
- * The callback is called for each reply. Optional arguments control selector
- * parameters, timeout, targets, reply consolidation, accepted reply keys,
- * delivery quality, payload metadata, and attachment. The close callback is
- * called after the reply stream ends.
- *
- * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
- * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun sessionGet(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    parameters: String?,
-    timeoutMs: Long?,
-    target: QueryTarget?,
-    consolidation: ConsolidationMode?,
-    acceptReplies: ReplyKeyExpr?,
-    congestionControl: CongestionControl?,
-    priority: Priority?,
-    express: Boolean?,
-    payload: ByteArray?,
-    encodingPresent: Boolean,
-    encodingId: Int,
-    encodingSchema: String?,
-    attachment: ByteArray?,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) {
-    if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.sessionGet(
-                session_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                parameters,
-                timeoutMs != null,
-                timeoutMs ?: 0L,
-                target != null,
-                target?.value ?: 0,
-                consolidation != null,
-                consolidation?.value ?: 0,
-                acceptReplies != null,
-                acceptReplies?.value ?: 0,
-                congestionControl != null,
-                congestionControl?.value ?: 0,
-                priority != null,
-                priority?.value ?: 0,
-                express != null,
-                express ?: false,
-                payload,
-                encodingPresent,
-                encodingId,
-                encodingSchema,
-                attachment,
-                callback.asRaw(),
-                onClose,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-/** Return the identifiers of peers currently connected to this session. */
-public fun sessionGetPeersZid(
-    session: Session,
-    onError: JniErrorHandler<List<ZenohId>>,
-): List<ZenohId> {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(session) {
-        val session_ptr = session.ptr
-        (JNINative.sessionGetPeersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-/** Return the identifiers of routers currently connected to this session. */
-public fun sessionGetRoutersZid(
-    session: Session,
-    onError: JniErrorHandler<List<ZenohId>>,
-): List<ZenohId> {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.")
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = withSortedHandleLocks(session) {
-        val session_ptr = session.ptr
-        (JNINative.sessionGetRoutersZid(session_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
-    }
-    if (__cap.failed) return onError.run(__cap.je)
-    return __ret
-}
-
-public fun livelinessDeclareToken(
-    session: Session,
-    s: String,
-    onError: ErrorHandler<LivelinessToken>,
-): LivelinessToken = livelinessDeclareToken(session, 0, s, null, onError)
-
-public fun livelinessDeclareToken(
-    session: Session,
-    keyExpr: KeyExpr,
-    onError: ErrorHandler<LivelinessToken>,
-): LivelinessToken = livelinessDeclareToken(session, 1, null, keyExpr, onError)
-
-/**
- * Declare a liveliness token on the supplied key expression.
- *
- * The token asserts that the associated application is alive until the token
- * is undeclared.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun livelinessDeclareToken(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    onError: ErrorHandler<LivelinessToken>,
-): LivelinessToken {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                LivelinessToken(
-                    JNINative.livelinessDeclareToken(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
-}
-
-public fun livelinessGet(
-    session: Session,
-    s: String,
-    timeoutMs: Long,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) = livelinessGet(session, 0, s, null, timeoutMs, callback, onClose, onError)
-
-public fun livelinessGet(
-    session: Session,
-    keyExpr: KeyExpr,
-    timeoutMs: Long,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) = livelinessGet(session, 1, null, keyExpr, timeoutMs, callback, onClose, onError)
-
-/**
- * Query liveliness tokens matching the supplied key expression.
- *
- * The callback is called for each reply. The close callback is called after
- * the reply stream ends.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun livelinessGet(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    timeoutMs: Long,
-    callback: ReplyCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Unit>,
-) {
-    if (session.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-    if (keyExpr1 != null && keyExpr1.isClosed()) {
-        onError.run("Operation on a closed native handle.", ""); return
-    }
-    val __cap = ErrorHandlerCapture.acquire()
-    run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            JNINative.livelinessGet(
-                session_ptr,
-                keyExprSel,
-                keyExpr0,
-                keyExpr1_ptr,
-                timeoutMs,
-                callback.asRaw(),
-                onClose,
-                __cap,
-            )
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-}
-
-public fun livelinessDeclareSubscriber(
-    session: Session,
-    s: String,
-    history: Boolean,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber = livelinessDeclareSubscriber(session, 0, s, null, history, callback, onClose, onError)
-
-public fun livelinessDeclareSubscriber(
-    session: Session,
-    keyExpr: KeyExpr,
-    history: Boolean,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber = livelinessDeclareSubscriber(session, 1, null, keyExpr, history, callback, onClose, onError)
-
-/**
- * Subscribe to liveliness changes matching the supplied key expression.
- *
- * When history is enabled, tokens that are already alive are reported when
- * the subscription starts. The close callback is called when the subscription
- * ends.
- *
- * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
- */
-public fun livelinessDeclareSubscriber(
-    session: Session,
-    keyExprSel: Int,
-    keyExpr0: String?,
-    keyExpr1: KeyExpr?,
-    history: Boolean,
-    callback: SampleCallback,
-    onClose: VoidCallback,
-    onError: ErrorHandler<Subscriber>,
-): Subscriber {
-    if (session.isClosed()) return onError.run("Operation on a closed native handle.", "")
-    if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
-        "Operation on a closed native handle.",
-        "",
-    )
-    val __cap = ErrorHandlerCapture.acquire()
-    val __ret = run {
-        val __locks = ArrayList<NativeHandle>()
-        __locks.add(session)
-        keyExpr1?.let { __locks.add(it) }
-        withSortedHandleLocks(__locks) {
-            val session_ptr = session.ptr
-            val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
-            try {
-                Subscriber(
-                    JNINative.livelinessDeclareSubscriber(
-                        session_ptr,
-                        keyExprSel,
-                        keyExpr0,
-                        keyExpr1_ptr,
-                        history,
-                        callback.asRaw(),
-                        onClose,
-                        __cap,
-                    ),
-                )
-            } finally {
-                keyExpr1?.let { it.ptr = it.ptr or 1L }
-            }
-        }
-    }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
-    return __ret
 }
