@@ -351,15 +351,20 @@ fn main() {
         // on demand via `zbytesAsBytes` (one borrow-copy).
         .expand(expand_param!(ZBytes).variant(fun!(zbytes_new_from_vec)))
         .expand(expand_return!(ZBytes).field_self())
-        // Encoding default input: the decomposed value `(id, schema?)` (built
-        // via `fromId`) — cheap primitives, no per-call String parse. Default
-        // output: the handle + its id (both free jvalue slots); schema and
-        // the canonical string stay on-demand accessors.
+        // Encoding crosses **by value in both directions**: an encoding IS its
+        // decomposed `(id, schema?)` pair (Zenoh core semantics — the string
+        // form is derived from a fixed table), so no native handle needs to
+        // cross or be retained. Default input: built via `fromId` — cheap
+        // primitives; on `Option<&_>` params a leading present flag encodes
+        // absence, letting the publisher's declare-time default apply. Default
+        // output: the same `(id, schema?)` leaves; the JVM tier reconstructs
+        // its own value type from them (no per-message handle allocation,
+        // nothing to close).
         .expand(expand_param!(Encoding).variant(fun!(encoding_new_from_id)))
         .expand(
             expand_return!(Encoding)
-                .field_self()
-                .field(fun!(encoding_get_id)),
+                .field(fun!(encoding_get_id))
+                .field(fun!(encoding_get_schema)),
         )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`

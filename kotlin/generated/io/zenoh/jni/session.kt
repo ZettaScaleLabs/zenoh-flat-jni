@@ -62,29 +62,38 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
 
     public fun declarePublisher(
         s: String,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(0, s, null, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(0, s, null, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, reliability, onError)
 
     public fun declarePublisher(
         keyExpr: KeyExpr,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(1, null, keyExpr, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(1, null, keyExpr, encodingPresent, encodingId, encodingSchema, congestionControl, priority, express, reliability, onError)
 
     /**
      * Declare a publisher for the given key expression.
      *
      * Optional delivery settings become defaults for publications made through
-     * the returned publisher. Reliability is available only when unstable
-     * features are enabled.
+     * the returned publisher; the optional `encoding` becomes the publisher's
+     * default payload encoding, applied natively to every publication that does
+     * not override it. Reliability is available only when unstable features are
+     * enabled.
      *
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
      */
@@ -92,6 +101,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: KeyExpr?,
+        encodingPresent: Boolean,
+        encodingId: Int,
+        encodingSchema: String?,
         congestionControl: CongestionControl?,
         priority: Priority?,
         express: Boolean?,
@@ -118,6 +130,9 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
                             keyExprSel,
                             keyExpr0,
                             keyExpr1_ptr,
+                            encodingPresent,
+                            encodingId,
+                            encodingSchema,
                             congestionControl != null,
                             congestionControl?.value ?: 0,
                             priority != null,

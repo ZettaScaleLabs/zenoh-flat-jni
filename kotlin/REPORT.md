@@ -122,13 +122,13 @@ Base package: `io.zenoh.jni`
 - `sample_new_delete` — `fun <R> sampleNewDelete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding, getEncoding__getId, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding__getId, getEncoding__getSchema, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 - `sample_new_put` — `fun <R> sampleNewPut(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding, getEncoding__getId, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding__getId, getEncoding__getSchema, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 
 ## package `io.zenoh.jni.scouting`
 
@@ -280,7 +280,8 @@ Base package: `io.zenoh.jni`
   - shaped by: error `Error` decomposed → [je, message]
 - `session_declare_keyexpr` — `fun declareKeyexpr(keyExpr: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: error `Error` decomposed → [je, message]
-- `session_declare_publisher` — `fun declarePublisher(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Publisher>): Publisher`
+- `session_declare_publisher` — `fun declarePublisher(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Publisher>): Publisher`
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: error `Error` decomposed → [je, message]
 - `session_declare_querier` — `fun declareQuerier(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, target: QueryTarget?, consolidation: ConsolidationMode?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, timeoutMs: Long?, acceptReplies: ReplyKeyExpr?, onError: io.zenoh.jni.ErrorHandler<Querier>): Querier`

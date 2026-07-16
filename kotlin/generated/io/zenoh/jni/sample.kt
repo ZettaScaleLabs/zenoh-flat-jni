@@ -234,8 +234,8 @@ public fun interface SampleCallback {
     public fun run(
         getKeyExpr: KeyExpr,
         getPayload: ZBytes,
-        getEncoding: Encoding,
         getEncoding__getId: Int,
+        getEncoding__getSchema: String?,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -253,8 +253,8 @@ public fun interface SampleCallbackRaw {
     public fun run(
         getKeyExpr: Long,
         getPayload: Long,
-        getEncoding: Long,
         getEncoding__getId: Int,
+        getEncoding__getSchema: String?,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -272,8 +272,8 @@ public fun SampleCallback.asRaw(): SampleCallbackRaw =
     SampleCallbackRaw {
         getKeyExpr,
         getPayload,
-        getEncoding,
         getEncoding__getId,
+        getEncoding__getSchema,
         getKind,
         getTimestamp__getNtp64,
         getExpress,
@@ -287,8 +287,8 @@ public fun SampleCallback.asRaw(): SampleCallbackRaw =
         run(
             KeyExpr(getKeyExpr),
             ZBytes(getPayload),
-            Encoding(getEncoding),
             getEncoding__getId,
+            getEncoding__getSchema,
             getKind,
             getTimestamp__getNtp64,
             getExpress,
@@ -306,8 +306,8 @@ public fun interface SampleBuilder<out R> {
     public fun run(
         getKeyExpr: KeyExpr,
         getPayload: ZBytes,
-        getEncoding: Encoding,
         getEncoding__getId: Int,
+        getEncoding__getSchema: String?,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -325,8 +325,8 @@ public fun interface SampleBuilderRaw<out R> {
     public fun run(
         getKeyExpr: Long,
         getPayload: Long,
-        getEncoding: Long,
         getEncoding__getId: Int,
+        getEncoding__getSchema: String?,
         getKind: Int,
         getTimestamp__getNtp64: Long?,
         getExpress: Boolean,
@@ -344,8 +344,8 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
     SampleBuilderRaw<R> {
         getKeyExpr,
         getPayload,
-        getEncoding,
         getEncoding__getId,
+        getEncoding__getSchema,
         getKind,
         getTimestamp__getNtp64,
         getExpress,
@@ -359,8 +359,8 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
         run(
             KeyExpr(getKeyExpr),
             ZBytes(getPayload),
-            Encoding(getEncoding),
             getEncoding__getId,
+            getEncoding__getSchema,
             getKind,
             getTimestamp__getNtp64,
             getExpress,
@@ -385,7 +385,7 @@ public fun <R> SampleBuilder<R>.asRaw(): SampleBuilderRaw<R> =
  * Parameter `encoding` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `encodingPresent`, `encodingId`, `encodingSchema`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
  * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding`, `getEncoding__getId`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
+ * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
  */
 @Suppress("UNCHECKED_CAST")
 public fun <R> sampleNewPut(
@@ -433,7 +433,7 @@ public fun <R> sampleNewPut(
  *
  * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
  * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
- * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding`, `getEncoding__getId`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
+ * The Rust `Sample` result is delivered decomposed: the builder callback receives (`getKeyExpr`, `getPayload`, `getEncoding__getId`, `getEncoding__getSchema`, `getKind`, `getTimestamp__getNtp64`, `getExpress`, `getPriority`, `getCongestionControl`, `getAttachment`, `getReliability`, `getSourceZid`, `getSourceEid`, `getSourceSn`).
  */
 @Suppress("UNCHECKED_CAST")
 public fun <R> sampleNewDelete(
