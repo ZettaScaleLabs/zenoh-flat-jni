@@ -143,13 +143,13 @@ Base package: `io.zenoh.jni`
   - shaped by: error `Error` decomposed → [je, message]
 - `config_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<Config>): Config`
 - `config_new_default` — `fun newDefault(onError: io.zenoh.jni.JniErrorHandler<Config>): Config`
-- `config_new_from_file` — `fun fromFile(path: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
+- `config_new_from_file` — `fun newFromFile(path: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
   - shaped by: error `Error` decomposed → [je, message]
-- `config_new_from_json` — `fun fromJson(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
+- `config_new_from_json` — `fun newFromJson(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
   - shaped by: error `Error` decomposed → [je, message]
-- `config_new_from_json5` — `fun fromJson5(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
+- `config_new_from_json5` — `fun newFromJson5(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
   - shaped by: error `Error` decomposed → [je, message]
-- `config_new_from_yaml` — `fun fromYaml(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
+- `config_new_from_yaml` — `fun newFromYaml(s: String, onError: io.zenoh.jni.ErrorHandler<Config>): Config`
   - shaped by: error `Error` decomposed → [je, message]
 
 ## class `io.zenoh.jni.bytes.Encoding` (ptr_class, Rust `Encoding`)
@@ -157,9 +157,9 @@ Base package: `io.zenoh.jni`
 - `encoding_get_id` — `fun getId(onError: io.zenoh.jni.JniErrorHandler<Int>): Int`
 - `encoding_get_schema` — `fun getSchema(onError: io.zenoh.jni.JniErrorHandler<String?>): String?`
 - `encoding_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
-- `encoding_new_from_id` — `fun fromId(id: Int, schema: String?, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
-- `encoding_new_from_string` — `fun fromString(s: String, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
-- `encoding_new_with_schema` — `fun withSchema(eId: Int, eSchema: String?, schema: String, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
+- `encoding_new_from_id` — `fun newFromId(id: Int, schema: String?, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
+- `encoding_new_from_string` — `fun newFromString(s: String, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
+- `encoding_new_with_schema` — `fun newWithSchema(eId: Int, eSchema: String?, schema: String, onError: io.zenoh.jni.JniErrorHandler<Encoding>): Encoding`
   - shaped by: param `e` expanded from `Encoding` — variants [encoding_new_from_id]
 - `encoding_to_string` — `fun toStr(onError: io.zenoh.jni.JniErrorHandler<String>): String`
 
@@ -177,16 +177,16 @@ Base package: `io.zenoh.jni`
   - shaped by: param `b` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
 - `keyexpr_intersects` — `fun intersects(bSel: Int, b0: String?, b1: KeyExpr?, onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
   - shaped by: param `b` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-- `keyexpr_new_autocanonize` — `fun autocanonize(s: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
+- `keyexpr_new_autocanonize` — `fun newAutocanonize(s: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: error `Error` decomposed → [je, message]
 - `keyexpr_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<KeyExpr>): KeyExpr`
-- `keyexpr_new_concat` — `fun concat(aSel: Int, a0: String?, a1: KeyExpr?, b: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
+- `keyexpr_new_concat` — `fun newConcat(aSel: Int, a0: String?, a1: KeyExpr?, b: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: param `a` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: error `Error` decomposed → [je, message]
-- `keyexpr_new_join` — `fun join(aSel: Int, a0: String?, a1: KeyExpr?, b: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
+- `keyexpr_new_join` — `fun newJoin(aSel: Int, a0: String?, a1: KeyExpr?, b: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: param `a` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: error `Error` decomposed → [je, message]
-- `keyexpr_new_try_from` — `fun tryFrom(s: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
+- `keyexpr_new_try_from` — `fun newTryFrom(s: String, onError: io.zenoh.jni.ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: error `Error` decomposed → [je, message]
 - `keyexpr_relation_to` — `fun relationTo(bSel: Int, b0: String?, b1: KeyExpr?, onError: io.zenoh.jni.JniErrorHandler<SetIntersectionLevel>): SetIntersectionLevel`
   - shaped by: param `b` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
@@ -302,9 +302,9 @@ Base package: `io.zenoh.jni`
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: error `Error` decomposed → [je, message]
-- `session_get_peers_zid` — `fun peersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
+- `session_get_peers_zid` — `fun getPeersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
   - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
-- `session_get_routers_zid` — `fun routersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
+- `session_get_routers_zid` — `fun getRoutersZid(onError: io.zenoh.jni.JniErrorHandler<List<ZenohId>>): List<ZenohId>`
   - shaped by: return `ZenohId` decomposed → [] (Callback delivery)
 - `session_get_zid` — `fun getZid(onError: io.zenoh.jni.JniErrorHandler<ZenohId>): ZenohId`
 - `session_put` — `fun put(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingPresent: Boolean, encodingId: Int, encodingSchema: String?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, attachment: ByteArray?, reliability: Reliability?, onError: io.zenoh.jni.ErrorHandler<Unit>)`
@@ -325,7 +325,7 @@ Base package: `io.zenoh.jni`
 
 - `zbytes_as_bytes` — `fun asBytes(onError: io.zenoh.jni.JniErrorHandler<ByteArray>): ByteArray`
 - `zbytes_new_clone` — `fun newClone(onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
-- `zbytes_new_from_vec` — `fun fromVec(bytes: ByteArray, onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
+- `zbytes_new_from_vec` — `fun newFromVec(bytes: ByteArray, onError: io.zenoh.jni.JniErrorHandler<ZBytes>): ZBytes`
 
 ## class `io.zenoh.jni.config.ZenohId` (value_class, Rust `ZenohId`)
 

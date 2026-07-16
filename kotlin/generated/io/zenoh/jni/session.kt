@@ -696,7 +696,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the identifiers of peers currently connected to this session. */
-    public fun peersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
+    public fun getPeersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
@@ -708,7 +708,7 @@ public class Session(initialPtr: Long) : NativeHandle(initialPtr) {
     }
 
     /** Return the identifiers of routers currently connected to this session. */
-    public fun routersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
+    public fun getRoutersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {

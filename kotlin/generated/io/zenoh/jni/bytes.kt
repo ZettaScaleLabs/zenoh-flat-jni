@@ -85,7 +85,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * Parameter `e` is the Rust `Encoding` argument, expanded: its `encoding_new_from_id` inputs (crosses as `eId`, `eSchema`).
          */
-        public fun withSchema(
+        public fun newWithSchema(
             eId: Int,
             eSchema: String?,
             schema: String,
@@ -98,7 +98,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
         }
 
         /** Create an encoding from its numeric identifier and optional schema. */
-        public fun fromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
+        public fun newFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
             if (__cap.failed) return onError.run(__cap.je)
@@ -111,7 +111,7 @@ public class Encoding(initialPtr: Long) : NativeHandle(initialPtr) {
          * Known names resolve to their standard identifiers. Other names are
          * preserved as custom encodings.
          */
-        public fun fromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
+        public fun newFromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = Encoding(JNINative.encodingNewFromString(s, __cap))
             if (__cap.failed) return onError.run(__cap.je)
@@ -167,7 +167,7 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         external fun freePtr(ptr: Long)
 
         /** Create a payload from a byte sequence. */
-        public fun fromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
+        public fun newFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
             val __cap = JniErrorHandlerCapture.acquire()
             val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
             if (__cap.failed) return onError.run(__cap.je)

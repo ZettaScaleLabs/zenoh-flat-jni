@@ -199,7 +199,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun tryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+        public fun newTryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -214,16 +214,16 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun autocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
+        public fun newAutocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
             return __ret
         }
 
-        public fun join(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(0, s, null, b, onError)
+        public fun newJoin(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newJoin(0, s, null, b, onError)
 
-        public fun join(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = join(1, null, a, b, onError)
+        public fun newJoin(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newJoin(1, null, a, b, onError)
 
         /**
          * Join a key expression and a suffix with a `/` separator.
@@ -233,7 +233,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun join(
+        public fun newJoin(
             aSel: Int,
             a0: String?,
             a1: KeyExpr?,
@@ -257,9 +257,9 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
             return __ret
         }
 
-        public fun concat(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(0, s, null, b, onError)
+        public fun newConcat(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newConcat(0, s, null, b, onError)
 
-        public fun concat(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = concat(1, null, a, b, onError)
+        public fun newConcat(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newConcat(1, null, a, b, onError)
 
         /**
          * Append text directly to a key expression and validate the result.
@@ -270,7 +270,7 @@ public class KeyExpr(initialPtr: Long) : NativeHandle(initialPtr) {
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun concat(
+        public fun newConcat(
             aSel: Int,
             a0: String?,
             a1: KeyExpr?,

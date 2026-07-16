@@ -30,8 +30,10 @@
 //! Kotlin **method names are derived automatically** by the
 //! `set_method_name_mangle` hook ([`strip_flat_class_prefix`], which strips the
 //! class-name prefix): `sample_get_payload` → `getPayload`, `keyexpr_get_str`
-//! → `getStr`. Only irregular names (factory names like `tryFrom`/`join`, the
-//! abbreviated `toStr`) carry an explicit `.name(...)`.
+//! → `getStr`, `keyexpr_new_join` → `newJoin`. An explicit `.name(...)` is
+//! used only where absolutely necessary: `toStr` (a derived `toString` would
+//! clash with Kotlin's `Any.toString()`) and the `message` field label of the
+//! class-less rust-side-only `Error` decomposition.
 //!
 //! Where a multi-variant param crosses as the string-or-handle `KeyExpr`
 //! idiom, `.split_on_param("key_expr")` emits idiomatic typed overloads
@@ -119,11 +121,11 @@ fn main() {
         // Encoding — a companion factory returning a raw handle (a constructor
         // never return-field-decomposes, so the result stays a usable handle rather than
         // a decomposed builder).
-        .constructor(fun!(encoding_new_with_schema).name("withSchema"))
+        .constructor(fun!(encoding_new_with_schema))
         // Factories → companion members; `fromId` is also the input variant
         // (see the `expand_param!(Encoding)` declaration below).
-        .constructor(fun!(encoding_new_from_id).name("fromId"))
-        .constructor(fun!(encoding_new_from_string).name("fromString"));
+        .constructor(fun!(encoding_new_from_id))
+        .constructor(fun!(encoding_new_from_string));
 
     // ── Bytes package: ZBytes + Encoding + predefined-encoding consts ────
     // ZBytes canonical input: `payload`/`attachment` params accept a `ByteArray`
@@ -152,7 +154,7 @@ fn main() {
                 // AND a companion factory (a constructor never
                 // return-field-decomposes, so the factory keeps its
                 // raw-handle return).
-                .constructor(fun!(zbytes_new_from_vec).name("fromVec")),
+                .constructor(fun!(zbytes_new_from_vec)),
         )
         .class(encoding);
     for lower in [
@@ -256,12 +258,12 @@ fn main() {
                         // Constructors → companion factories returning `Result<KeyExpr, Error>`;
                         // `tryFrom` is also the build-from-String input variant
                         // (see `expand_param!(KeyExpr)` below).
-                        .constructor(fun!(keyexpr_new_try_from).name("tryFrom"))
-                        .constructor(fun!(keyexpr_new_autocanonize).name("autocanonize"))
+                        .constructor(fun!(keyexpr_new_try_from))
+                        .constructor(fun!(keyexpr_new_autocanonize))
                         // `a` is a `&KeyExpr` (string-or-handle); split it so
                         // `join(a: KeyExpr, b: String)` is an idiomatic overload.
-                        .constructor(fun!(keyexpr_new_join).name("join").split_on_param("a"))
-                        .constructor(fun!(keyexpr_new_concat).name("concat").split_on_param("a"))
+                        .constructor(fun!(keyexpr_new_join).split_on_param("a"))
+                        .constructor(fun!(keyexpr_new_concat).split_on_param("a"))
                         // Consumer methods: the receiver key-expr is `this`; the other
                         // param accepts a String (built via the default param variants below).
                         .method(fun!(keyexpr_intersects).split_on_param("b"))
@@ -290,10 +292,10 @@ fn main() {
                         .method(fun!(config_insert_json5))
                         // Factories → Config companion-object members.
                         .constructor(fun!(config_new_default))
-                        .constructor(fun!(config_new_from_file).name("fromFile"))
-                        .constructor(fun!(config_new_from_json).name("fromJson"))
-                        .constructor(fun!(config_new_from_json5).name("fromJson5"))
-                        .constructor(fun!(config_new_from_yaml).name("fromYaml")),
+                        .constructor(fun!(config_new_from_file))
+                        .constructor(fun!(config_new_from_json))
+                        .constructor(fun!(config_new_from_json5))
+                        .constructor(fun!(config_new_from_yaml)),
                 )
                 .class(enum_class!(WhatAmI))
                 // `ZenohId` is a `Copy` value (zenoh's `ZenohId`, repr(transparent)), so
@@ -553,8 +555,8 @@ fn main() {
                     // `Vec<ZenohId>`: ZenohId is a value class, so these return
                     // `List<ZenohId>` via the normal Vec converter. Named to drop
                     // the `get` prefix (`peersZid` / `routersZid`).
-                    .method(fun!(session_get_peers_zid).name("peersZid"))
-                    .method(fun!(session_get_routers_zid).name("routersZid"))
+                    .method(fun!(session_get_peers_zid))
+                    .method(fun!(session_get_routers_zid))
                     // Liveliness ops also take `&Session` first → Session methods.
                     .method(fun!(liveliness_declare_token).split_on_param("key_expr"))
                     .method(fun!(liveliness_get).split_on_param("key_expr"))

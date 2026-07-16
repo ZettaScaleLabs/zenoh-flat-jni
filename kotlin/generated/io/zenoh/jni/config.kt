@@ -127,7 +127,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromFile(path: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromFile(path: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromFile(path, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -139,7 +139,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromJson(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromJson(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromJson(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -151,7 +151,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromJson5(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromJson5(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromJson5(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
@@ -163,7 +163,7 @@ public class Config(initialPtr: Long) : NativeHandle(initialPtr) {
          *
          * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
          */
-        public fun fromYaml(s: String, onError: ErrorHandler<Config>): Config {
+        public fun newFromYaml(s: String, onError: ErrorHandler<Config>): Config {
             val __cap = ErrorHandlerCapture.acquire()
             val __ret = Config(JNINative.configNewFromYaml(s, __cap))
             if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
