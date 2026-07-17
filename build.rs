@@ -249,6 +249,14 @@ fn main() {
             package!("keyexpr")
                 .class(
                     ptr_class!(KeyExpr)
+                        // `.gc_managed()`: with the string-only receive path,
+                        // KeyExpr handles exist only on cold paths — declared
+                        // keyexprs (long-lived, user may forget to undeclare),
+                        // construction/algebra probes (closed immediately),
+                        // declare-time clones (consumed) — so the Cleaner
+                        // backstop costs nothing per message and declared
+                        // handles stop leaking on forgotten close.
+                        .gc_managed()
                         // Read accessors → instance methods on the KeyExpr class.
                         // `newClone` returns the borrowed clone as a WHOLE handle —
                         // override the class's default return fields (identity via
