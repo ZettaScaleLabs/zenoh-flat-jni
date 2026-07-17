@@ -4851,34 +4851,6 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Query_Send_Sync_static_6c353bcb<'env, 'v
                         }
                         ::core::option::Option::None => jni::objects::JObject::null(),
                     };
-                    let __cb0_obj5: jni::objects::JObject = match zenoh_flat::query_get_encoding(
-                        &__cb_arg0,
-                    ) {
-                        ::core::option::Option::Some(__n0) => {
-                            let __enc5 = match Option_Encoding_to_jlong_e89ec09d(
-                                &mut env,
-                                crate::encoding_if_schema(__n0),
-                            ) {
-                                ::core::result::Result::Ok(__w) => __w,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<
-                                            String,
-                                        >>::from(__e.to_string()),
-                                    );
-                                }
-                            };
-                            match ::prebindgen::lang::box_jlong(&mut env, __enc5) {
-                                ::core::result::Result::Ok(__o) => __o,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<String>>::from(__e),
-                                    );
-                                }
-                            }
-                        }
-                        ::core::option::Option::None => jni::objects::JObject::null(),
-                    };
                     let __cb0_obj7: jni::sys::jvalue = {
                         let __enc7 = match ReplyKeyExpr_to_jint_0d9719f5(
                             &mut env,
@@ -4936,6 +4908,43 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Query_Send_Sync_static_6c353bcb<'env, 'v
                                             String,
                                         >>::from(__e.to_string()),
                                     );
+                                }
+                            }
+                        }
+                        ::core::option::Option::None => jni::objects::JObject::null(),
+                    };
+                    let __cb0_obj5: jni::objects::JObject = match zenoh_flat::query_get_encoding(
+                        &__cb_arg0,
+                    ) {
+                        ::core::option::Option::Some(__n0) => {
+                            match crate::encoding_if_schema(__n0) {
+                                ::core::option::Option::Some(__n1) => {
+                                    let __h5: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                                        &mut env,
+                                        __n1,
+                                    ) {
+                                        ::core::result::Result::Ok(__w) => __w,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    };
+                                    match ::prebindgen::lang::box_jlong(&mut env, __h5) {
+                                        ::core::result::Result::Ok(__o) => __o,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    }
+                                }
+                                ::core::option::Option::None => {
+                                    jni::objects::JObject::null()
                                 }
                             }
                         }
@@ -5173,36 +5182,6 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Reply_Send_Sync_static_a5b82e2d<'env, 'v
                                 }
                             };
                             __enc6.into()
-                        }
-                        ::core::option::Option::None => jni::objects::JObject::null(),
-                    };
-                    let __cb0_obj7: jni::objects::JObject = match zenoh_flat::reply_get_sample(
-                        &__cb_arg0,
-                    ) {
-                        ::core::option::Option::Some(__n0) => {
-                            let __enc7 = match Option_Encoding_to_jlong_e89ec09d(
-                                &mut env,
-                                crate::encoding_if_schema(
-                                    zenoh_flat::sample_get_encoding(__n0),
-                                ),
-                            ) {
-                                ::core::result::Result::Ok(__w) => __w,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<
-                                            String,
-                                        >>::from(__e.to_string()),
-                                    );
-                                }
-                            };
-                            match ::prebindgen::lang::box_jlong(&mut env, __enc7) {
-                                ::core::result::Result::Ok(__o) => __o,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<String>>::from(__e),
-                                    );
-                                }
-                            }
                         }
                         ::core::option::Option::None => jni::objects::JObject::null(),
                     };
@@ -5511,36 +5490,6 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Reply_Send_Sync_static_a5b82e2d<'env, 'v
                         }
                         ::core::option::Option::None => jni::objects::JObject::null(),
                     };
-                    let __cb0_obj21: jni::objects::JObject = match zenoh_flat::reply_get_err(
-                        &__cb_arg0,
-                    ) {
-                        ::core::option::Option::Some(__n0) => {
-                            let __enc21 = match Option_Encoding_to_jlong_e89ec09d(
-                                &mut env,
-                                crate::encoding_if_schema(
-                                    zenoh_flat::reply_error_get_encoding(__n0),
-                                ),
-                            ) {
-                                ::core::result::Result::Ok(__w) => __w,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<
-                                            String,
-                                        >>::from(__e.to_string()),
-                                    );
-                                }
-                            };
-                            match ::prebindgen::lang::box_jlong(&mut env, __enc21) {
-                                ::core::result::Result::Ok(__o) => __o,
-                                ::core::result::Result::Err(__e) => {
-                                    return ::core::result::Result::Err(
-                                        <__JniErr as ::core::convert::From<String>>::from(__e),
-                                    );
-                                }
-                            }
-                        }
-                        ::core::option::Option::None => jni::objects::JObject::null(),
-                    };
                     let __cb0_obj3: jni::objects::JObject = match zenoh_flat::reply_get_sample(
                         &__cb_arg0,
                     ) {
@@ -5596,6 +5545,45 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Reply_Send_Sync_static_a5b82e2d<'env, 'v
                                             String,
                                         >>::from(__e.to_string()),
                                     );
+                                }
+                            }
+                        }
+                        ::core::option::Option::None => jni::objects::JObject::null(),
+                    };
+                    let __cb0_obj7: jni::objects::JObject = match zenoh_flat::reply_get_sample(
+                        &__cb_arg0,
+                    ) {
+                        ::core::option::Option::Some(__n0) => {
+                            match crate::encoding_if_schema(
+                                zenoh_flat::sample_get_encoding(__n0),
+                            ) {
+                                ::core::option::Option::Some(__n1) => {
+                                    let __h7: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                                        &mut env,
+                                        __n1,
+                                    ) {
+                                        ::core::result::Result::Ok(__w) => __w,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    };
+                                    match ::prebindgen::lang::box_jlong(&mut env, __h7) {
+                                        ::core::result::Result::Ok(__o) => __o,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    }
+                                }
+                                ::core::option::Option::None => {
+                                    jni::objects::JObject::null()
                                 }
                             }
                         }
@@ -5663,6 +5651,45 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Reply_Send_Sync_static_a5b82e2d<'env, 'v
                                             String,
                                         >>::from(__e.to_string()),
                                     );
+                                }
+                            }
+                        }
+                        ::core::option::Option::None => jni::objects::JObject::null(),
+                    };
+                    let __cb0_obj21: jni::objects::JObject = match zenoh_flat::reply_get_err(
+                        &__cb_arg0,
+                    ) {
+                        ::core::option::Option::Some(__n0) => {
+                            match crate::encoding_if_schema(
+                                zenoh_flat::reply_error_get_encoding(__n0),
+                            ) {
+                                ::core::option::Option::Some(__n1) => {
+                                    let __h21: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                                        &mut env,
+                                        __n1,
+                                    ) {
+                                        ::core::result::Result::Ok(__w) => __w,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    };
+                                    match ::prebindgen::lang::box_jlong(&mut env, __h21) {
+                                        ::core::result::Result::Ok(__o) => __o,
+                                        ::core::result::Result::Err(__e) => {
+                                            return ::core::result::Result::Err(
+                                                <__JniErr as ::core::convert::From<
+                                                    String,
+                                                >>::from(__e.to_string()),
+                                            );
+                                        }
+                                    }
+                                }
+                                ::core::option::Option::None => {
+                                    jni::objects::JObject::null()
                                 }
                             }
                         }
@@ -5844,24 +5871,6 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Sample_Send_Sync_static_a050ca1d<'env, '
                             }
                         };
                         __enc3.into()
-                    };
-                    let __cb0_obj4: jni::sys::jvalue = {
-                        let __enc4 = match Option_Encoding_to_jlong_e89ec09d(
-                            &mut env,
-                            crate::encoding_if_schema(
-                                zenoh_flat::sample_get_encoding(&__cb_arg0),
-                            ),
-                        ) {
-                            ::core::result::Result::Ok(__w) => __w,
-                            ::core::result::Result::Err(__e) => {
-                                return ::core::result::Result::Err(
-                                    <__JniErr as ::core::convert::From<
-                                        String,
-                                    >>::from(__e.to_string()),
-                                );
-                            }
-                        };
-                        jni::sys::jvalue { j: __enc4 }
                     };
                     let __cb0_obj5: jni::sys::jvalue = {
                         let __enc5 = match SampleKind_to_jint_d7ea75a8(
@@ -6051,6 +6060,36 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Sample_Send_Sync_static_a050ca1d<'env, '
                         };
                         jni::sys::jvalue { j: __h1 }
                     };
+                    let __cb0_obj4: jni::objects::JObject = match crate::encoding_if_schema(
+                        zenoh_flat::sample_get_encoding(&__cb_arg0),
+                    ) {
+                        ::core::option::Option::Some(__n0) => {
+                            let __h4: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                                &mut env,
+                                __n0,
+                            ) {
+                                ::core::result::Result::Ok(__w) => __w,
+                                ::core::result::Result::Err(__e) => {
+                                    return ::core::result::Result::Err(
+                                        <__JniErr as ::core::convert::From<
+                                            String,
+                                        >>::from(__e.to_string()),
+                                    );
+                                }
+                            };
+                            match ::prebindgen::lang::box_jlong(&mut env, __h4) {
+                                ::core::result::Result::Ok(__o) => __o,
+                                ::core::result::Result::Err(__e) => {
+                                    return ::core::result::Result::Err(
+                                        <__JniErr as ::core::convert::From<
+                                            String,
+                                        >>::from(__e.to_string()),
+                                    );
+                                }
+                            }
+                        }
+                        ::core::option::Option::None => jni::objects::JObject::null(),
+                    };
                     let __cb0_obj10: jni::objects::JObject = match zenoh_flat::sample_get_attachment(
                         &__cb_arg0,
                     ) {
@@ -6095,7 +6134,9 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Sample_Send_Sync_static_a050ca1d<'env, '
                                 jni::sys::jvalue {
                                     l: __cb0_obj3.as_raw(),
                                 },
-                                __cb0_obj4,
+                                jni::sys::jvalue {
+                                    l: __cb0_obj4.as_raw(),
+                                },
                                 __cb0_obj5,
                                 jni::sys::jvalue {
                                     l: __cb0_obj6.as_raw(),
@@ -14452,28 +14493,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         };
         __enc3.into()
     };
-    let __obj4: jni::sys::jvalue = {
-        let __enc4 = match Option_Encoding_to_jlong_e89ec09d(
-            &mut env,
-            crate::encoding_if_schema(zenoh_flat::sample_get_encoding(&__out)),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __enc4 }
-    };
     let __obj5: jni::sys::jvalue = {
         let __enc5 = match SampleKind_to_jint_d7ea75a8(
             &mut env,
@@ -14734,6 +14753,48 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         };
         jni::sys::jvalue { j: __h1 }
     };
+    let __obj4: jni::objects::JObject = match crate::encoding_if_schema(
+        zenoh_flat::sample_get_encoding(&__out),
+    ) {
+        ::core::option::Option::Some(__n0) => {
+            let __h4: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                &mut env,
+                __n0,
+            ) {
+                ::core::result::Result::Ok(__w) => __w,
+                ::core::result::Result::Err(__e) => {
+                    let __zd = __ze_defaults(&mut env);
+                    signal_error(
+                        &mut env,
+                        &__error_sink,
+                        &__SINK_MID,
+                        __SINK_FQN,
+                        __SINK_DESCR,
+                        ::core::option::Option::Some(&__e.to_string()),
+                        &__zd,
+                    );
+                    return jni::objects::JObject::null().into();
+                }
+            };
+            match ::prebindgen::lang::box_jlong(&mut env, __h4) {
+                ::core::result::Result::Ok(__o) => __o,
+                ::core::result::Result::Err(__e) => {
+                    let __zd = __ze_defaults(&mut env);
+                    signal_error(
+                        &mut env,
+                        &__error_sink,
+                        &__SINK_MID,
+                        __SINK_FQN,
+                        __SINK_DESCR,
+                        ::core::option::Option::Some(&__e.to_string()),
+                        &__zd,
+                    );
+                    return jni::objects::JObject::null().into();
+                }
+            }
+        }
+        ::core::option::Option::None => jni::objects::JObject::null(),
+    };
     let __obj10: jni::objects::JObject = match zenoh_flat::sample_get_attachment(
         &__out,
     ) {
@@ -14787,7 +14848,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
                 jni::sys::jvalue {
                     l: __obj3.as_raw(),
                 },
-                __obj4,
+                jni::sys::jvalue {
+                    l: __obj4.as_raw(),
+                },
                 __obj5,
                 jni::sys::jvalue {
                     l: __obj6.as_raw(),
@@ -15364,28 +15427,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         };
         __enc3.into()
     };
-    let __obj4: jni::sys::jvalue = {
-        let __enc4 = match Option_Encoding_to_jlong_e89ec09d(
-            &mut env,
-            crate::encoding_if_schema(zenoh_flat::sample_get_encoding(&__out)),
-        ) {
-            ::core::result::Result::Ok(__w) => __w,
-            ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
-                    &mut env,
-                    &__error_sink,
-                    &__SINK_MID,
-                    __SINK_FQN,
-                    __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
-                );
-                return jni::objects::JObject::null().into();
-            }
-        };
-        jni::sys::jvalue { j: __enc4 }
-    };
     let __obj5: jni::sys::jvalue = {
         let __enc5 = match SampleKind_to_jint_d7ea75a8(
             &mut env,
@@ -15646,6 +15687,48 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         };
         jni::sys::jvalue { j: __h1 }
     };
+    let __obj4: jni::objects::JObject = match crate::encoding_if_schema(
+        zenoh_flat::sample_get_encoding(&__out),
+    ) {
+        ::core::option::Option::Some(__n0) => {
+            let __h4: jni::sys::jlong = match Encoding_to_jlong_072adb3b(
+                &mut env,
+                __n0,
+            ) {
+                ::core::result::Result::Ok(__w) => __w,
+                ::core::result::Result::Err(__e) => {
+                    let __zd = __ze_defaults(&mut env);
+                    signal_error(
+                        &mut env,
+                        &__error_sink,
+                        &__SINK_MID,
+                        __SINK_FQN,
+                        __SINK_DESCR,
+                        ::core::option::Option::Some(&__e.to_string()),
+                        &__zd,
+                    );
+                    return jni::objects::JObject::null().into();
+                }
+            };
+            match ::prebindgen::lang::box_jlong(&mut env, __h4) {
+                ::core::result::Result::Ok(__o) => __o,
+                ::core::result::Result::Err(__e) => {
+                    let __zd = __ze_defaults(&mut env);
+                    signal_error(
+                        &mut env,
+                        &__error_sink,
+                        &__SINK_MID,
+                        __SINK_FQN,
+                        __SINK_DESCR,
+                        ::core::option::Option::Some(&__e.to_string()),
+                        &__zd,
+                    );
+                    return jni::objects::JObject::null().into();
+                }
+            }
+        }
+        ::core::option::Option::None => jni::objects::JObject::null(),
+    };
     let __obj10: jni::objects::JObject = match zenoh_flat::sample_get_attachment(
         &__out,
     ) {
@@ -15699,7 +15782,9 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
                 jni::sys::jvalue {
                     l: __obj3.as_raw(),
                 },
-                __obj4,
+                jni::sys::jvalue {
+                    l: __obj4.as_raw(),
+                },
                 __obj5,
                 jni::sys::jvalue {
                     l: __obj6.as_raw(),
