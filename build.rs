@@ -51,9 +51,9 @@
 
 use prebindgen::{
     core::Registry,
-    enum_class, expand_param, expand_return, fun,
+    enum_class, expand_param, expand_return, field, fun,
     lang::{ConstDecl, FunctionDecl, JniGen},
-    package, ptr_class, value_class,
+    package, path, ptr_class, ty, value_class,
 };
 use syn::parse_quote as pq;
 
@@ -375,10 +375,13 @@ fn main() {
         // forever. No `.split_on_param`: neither arm alone covers the
         // value-or-handle send dichotomy, so consumers drive the selector
         // block directly.
-        // OUTPUT: the `(id, schema?)` leaves for JVM-side identity PLUS the
-        // owned handle (`field_self`, a cheap clone) — a received encoding
-        // arrives send-ready in the same single crossing, so re-sending it
-        // never rebuilds the native value.
+        // OUTPUT: the `(id, schema?)` leaves for JVM-side identity PLUS a
+        // CONDITIONAL owned handle — delivered (a cheap clone) only when the
+        // encoding has a schema, i.e. only when re-sending it by handle
+        // saves anything; a schema-less (predefined) encoding arrives
+        // value-only and re-sends through the id arm for free. The condition
+        // is binding policy, so it lives HERE: `crate::encoding_if_schema`
+        // (src/lib.rs) behind a binding-local `field!` leaf.
         .expand(
             expand_param!(Encoding)
                 .variant(fun!(encoding_new_from_id))
@@ -388,7 +391,10 @@ fn main() {
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
                 .field(fun!(encoding_get_schema))
-                .field_self(),
+                .field(field!("handle").with(
+                    ty!(Option<&Encoding>),
+                    path!(crate::encoding_if_schema),
+                )),
         )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`
