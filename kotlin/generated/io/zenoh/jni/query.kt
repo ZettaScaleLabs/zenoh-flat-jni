@@ -640,7 +640,7 @@ public fun interface QueryCallback {
         getPayload: ZBytes?,
         getEncoding__getId: Int?,
         getEncoding__getSchema: String?,
-        getEncoding: Encoding?,
+        getEncoding__handle: Encoding?,
         getAttachment: ZBytes?,
         getAcceptsReplies: Int,
         handle: Query,
@@ -654,7 +654,7 @@ public fun interface QueryCallbackRaw {
         getPayload: Long?,
         getEncoding__getId: Int?,
         getEncoding__getSchema: String?,
-        getEncoding: Long?,
+        getEncoding__handle: Long?,
         getAttachment: Long?,
         getAcceptsReplies: Int,
         handle: Long,
@@ -668,7 +668,7 @@ public fun QueryCallback.asRaw(): QueryCallbackRaw =
         getPayload,
         getEncoding__getId,
         getEncoding__getSchema,
-        getEncoding,
+        getEncoding__handle,
         getAttachment,
         getAcceptsReplies,
         handle ->
@@ -678,7 +678,7 @@ public fun QueryCallback.asRaw(): QueryCallbackRaw =
             getPayload?.let { ZBytes(it) },
             getEncoding__getId,
             getEncoding__getSchema,
-            getEncoding?.let { Encoding(it) },
+            getEncoding__handle?.let { Encoding(it) },
             getAttachment?.let { ZBytes(it) },
             getAcceptsReplies,
             Query(handle)
@@ -694,7 +694,7 @@ public fun interface ReplyCallback {
         getSample__getPayload: ZBytes?,
         getSample__getEncoding__getId: Int?,
         getSample__getEncoding__getSchema: String?,
-        getSample__getEncoding: Encoding?,
+        getSample__getEncoding__handle: Encoding?,
         getSample__getKind: Int?,
         getSample__getTimestamp__getNtp64: Long?,
         getSample__getExpress: Boolean?,
@@ -708,7 +708,7 @@ public fun interface ReplyCallback {
         getErr__getPayload: ZBytes?,
         getErr__getEncoding__getId: Int?,
         getErr__getEncoding__getSchema: String?,
-        getErr__getEncoding: Encoding?,
+        getErr__getEncoding__handle: Encoding?,
     )
 }
 
@@ -721,7 +721,7 @@ public fun interface ReplyCallbackRaw {
         getSample__getPayload: Long?,
         getSample__getEncoding__getId: Int?,
         getSample__getEncoding__getSchema: String?,
-        getSample__getEncoding: Long?,
+        getSample__getEncoding__handle: Long?,
         getSample__getKind: Int?,
         getSample__getTimestamp__getNtp64: Long?,
         getSample__getExpress: Boolean?,
@@ -735,7 +735,7 @@ public fun interface ReplyCallbackRaw {
         getErr__getPayload: Long?,
         getErr__getEncoding__getId: Int?,
         getErr__getEncoding__getSchema: String?,
-        getErr__getEncoding: Long?,
+        getErr__getEncoding__handle: Long?,
     )
 }
 
@@ -748,7 +748,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
         getSample__getPayload,
         getSample__getEncoding__getId,
         getSample__getEncoding__getSchema,
-        getSample__getEncoding,
+        getSample__getEncoding__handle,
         getSample__getKind,
         getSample__getTimestamp__getNtp64,
         getSample__getExpress,
@@ -762,7 +762,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
         getErr__getPayload,
         getErr__getEncoding__getId,
         getErr__getEncoding__getSchema,
-        getErr__getEncoding ->
+        getErr__getEncoding__handle ->
         run(
             getReplierZid?.let { ZenohId(it) },
             getReplierEid,
@@ -771,7 +771,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getSample__getPayload?.let { ZBytes(it) },
             getSample__getEncoding__getId,
             getSample__getEncoding__getSchema,
-            getSample__getEncoding?.let { Encoding(it) },
+            getSample__getEncoding__handle?.let { Encoding(it) },
             getSample__getKind,
             getSample__getTimestamp__getNtp64,
             getSample__getExpress,
@@ -785,6 +785,6 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getErr__getPayload?.let { ZBytes(it) },
             getErr__getEncoding__getId,
             getErr__getEncoding__getSchema,
-            getErr__getEncoding?.let { Encoding(it) }
+            getErr__getEncoding__handle?.let { Encoding(it) }
         )
     }
