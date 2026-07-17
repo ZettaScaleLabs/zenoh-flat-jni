@@ -376,12 +376,14 @@ fn main() {
         // value-or-handle send dichotomy, so consumers drive the selector
         // block directly.
         // OUTPUT: the `(id, schema?)` leaves for JVM-side identity PLUS a
-        // CONDITIONAL owned handle — delivered (a cheap clone) only when the
-        // encoding has a schema, i.e. only when re-sending it by handle
-        // saves anything; a schema-less (predefined) encoding arrives
-        // value-only and re-sends through the id arm for free. The condition
-        // is binding policy, so it lives HERE: `crate::encoding_if_schema`
-        // (src/lib.rs) behind a binding-local `field!` leaf.
+        // handle leaf backed by a BINDING-LOCAL (custom, locally-defined)
+        // accessor — `crate::encoding_if_schema` (src/lib.rs) behind a
+        // `field!` leaf. This binding uses it for CONDITIONAL delivery: the
+        // owned handle (a cheap clone) crosses only when the encoding has a
+        // schema, i.e. only when re-sending it by handle saves anything; a
+        // schema-less (predefined) encoding arrives value-only and re-sends
+        // through the id arm for free. The condition is binding policy, so
+        // it lives here, not in zenoh-flat.
         .expand(
             expand_param!(Encoding)
                 .variant(fun!(encoding_new_from_id))
