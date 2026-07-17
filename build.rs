@@ -53,7 +53,7 @@ use prebindgen::{
     core::Registry,
     enum_class, expand_param, expand_return, fun,
     lang::{ConstDecl, FunctionDecl, JniGen},
-    package, ptr_class, sig, value_class,
+    package, ptr_class, value_class,
 };
 use syn::parse_quote as pq;
 
