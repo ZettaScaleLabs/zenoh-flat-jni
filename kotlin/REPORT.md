@@ -122,13 +122,13 @@ Base package: `io.zenoh.jni`
 - `sample_new_delete` — `fun <R> sampleNewDelete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
-  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding__getId, getEncoding__getSchema, getEncoding__handle, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr__getStr, getPayload, getEncoding__getId, getEncoding__getSchema, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 - `sample_new_put` — `fun <R> sampleNewPut(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, payload: ByteArray, encodingSel: Int, encoding00: Int?, encoding01: String?, encoding1: Encoding?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`
   - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
   - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id, self]
   - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
   - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
-  - shaped by: return `Sample` decomposed → [getKeyExpr, getPayload, getEncoding__getId, getEncoding__getSchema, getEncoding__handle, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
+  - shaped by: return `Sample` decomposed → [getKeyExpr__getStr, getPayload, getEncoding__getId, getEncoding__getSchema, getKind, getTimestamp__getNtp64, getExpress, getPriority, getCongestionControl, getAttachment, getReliability, getSourceZid, getSourceEid, getSourceSn] (Callback delivery)
 
 ## package `io.zenoh.jni.scouting`
 

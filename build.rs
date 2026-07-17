@@ -53,7 +53,7 @@ use prebindgen::{
     core::Registry,
     enum_class, expand_param, expand_return, fun,
     lang::{ConstDecl, FunctionDecl, JniGen},
-    package, ptr_class, sig, value_class,
+    package, ptr_class, value_class,
 };
 use syn::parse_quote as pq;
 
@@ -249,6 +249,14 @@ fn main() {
             package!("keyexpr")
                 .class(
                     ptr_class!(KeyExpr)
+                        // `.gc_managed()`: with the string-only receive path,
+                        // KeyExpr handles exist only on cold paths — declared
+                        // keyexprs (long-lived, user may forget to undeclare),
+                        // construction/algebra probes (closed immediately),
+                        // declare-time clones (consumed) — so the Cleaner
+                        // backstop costs nothing per message and declared
+                        // handles stop leaking on forgotten close.
+                        .gc_managed()
                         // Read accessors → instance methods on the KeyExpr class.
                         // `newClone` returns the borrowed clone as a WHOLE handle —
                         // override the class's default return fields (identity via
@@ -279,13 +287,21 @@ fn main() {
         )
         // Default param variants: a key-expr param accepts EITHER a String (built
         // via `tryFrom`) OR an existing handle (self). Default return field: the
-        // handle only (the string form stays the `getStr` accessor method).
+        // STRING — deliberately inverting forward-extraction for this type.
+        // A received keyexpr never carries a wire declaration (zenoh's RX path
+        // builds it declaration-less), so its native handle buys nothing over
+        // the string on re-send, consumers almost always read the string
+        // anyway, and delivering the handle cost a per-message native
+        // allocation with no owner to free it. One eager jstring instead:
+        // nothing to free, no second `getStr` crossing. Handles exist only
+        // where the wire declaration does — `session_declare_keyexpr` (and
+        // explicit `newClone`), which return raw handles as constructors.
         .expand(
             expand_param!(KeyExpr)
                 .variant(fun!(keyexpr_new_try_from))
                 .variant_self(),
         )
-        .expand(expand_return!(KeyExpr).field_self())
+        .expand(expand_return!(KeyExpr).field(fun!(keyexpr_get_str)))
         // ── Config + ZenohId ──────────────────────────────────────────────
         .package(
             package!("config")
@@ -369,21 +385,19 @@ fn main() {
         // INSIDE the send call itself: a predefined encoding costs one Int,
         // no handle, no extra crossing. The `variant_self()` arm additionally
         // accepts an existing handle for encodings that already own one
-        // (custom-created and received ones) — a bare jlong instead of
+        // (custom-created, born at construction) — a bare jlong instead of
         // re-decoding the schema string each call; every encoding param is
         // `Option<&Encoding>`, so the handle is borrowed and reusable
         // forever. No `.split_on_param`: neither arm alone covers the
         // value-or-handle send dichotomy, so consumers drive the selector
         // block directly.
-        // OUTPUT: the `(id, schema?)` leaves for JVM-side identity PLUS a
-        // handle leaf backed by a BINDING-LOCAL (custom, locally-defined)
-        // accessor — `crate::encoding_if_schema` (src/lib.rs) behind a
-        // `field!` leaf. This binding uses it for CONDITIONAL delivery: the
-        // owned handle (a cheap clone) crosses only when the encoding has a
-        // schema, i.e. only when re-sending it by handle saves anything; a
-        // schema-less (predefined) encoding arrives value-only and re-sends
-        // through the id arm for free. The condition is binding policy, so
-        // it lives here, not in zenoh-flat.
+        // OUTPUT: the `(id, schema?)` value leaves only — received encodings
+        // never carry a native handle. A ping-pong A/B (the very
+        // receive-then-resend scenario that motivated handle delivery) showed
+        // the per-receive handle lifecycle (clone + Box + wrapper + Cleaner)
+        // costs more than the schema-string re-decode it saves on the resent
+        // fraction, so the handle arm of the send selector is served only by
+        // construction-born handles (`variant_self()` above).
         .expand(
             expand_param!(Encoding)
                 .variant(fun!(encoding_new_from_id))
@@ -392,12 +406,7 @@ fn main() {
         .expand(
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
-                .field(fun!(encoding_get_schema))
-                .field(
-                    fun!(crate::encoding_if_schema)
-                        .sig(sig!((e: &Encoding) -> Option<&Encoding>))
-                        .name("handle"),
-                ),
+                .field(fun!(encoding_get_schema)),
         )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`
