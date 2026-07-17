@@ -776,3 +776,54 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getErr__getEncoding__getSchema
         )
     }
+
+/**
+ * Get the value for a key according to the parameters format
+ * (`a=b;c=d|e;f=g`): entries split on `;`, key/value on the first `=`,
+ * the first matching key wins.
+ */
+public fun parametersGet(s: String, k: String, onError: JniErrorHandler<String?>): String? {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersGet(s, k, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Insert a key-value pair into a parameters string: every existing entry
+ * for the key is removed and the new pair appended at the end. Returns the
+ * resulting string.
+ */
+public fun parametersInsert(
+    s: String,
+    k: String,
+    v: String,
+    onError: JniErrorHandler<String>,
+): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersInsert(s, k, v, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Remove every entry for a key from a parameters string. Returns the
+ * resulting string.
+ */
+public fun parametersRemove(s: String, k: String, onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersRemove(s, k, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Return `true` if the parameters string contains at least one entry and
+ * none of its keys are empty.
+ */
+public fun parametersIsWellFormed(s: String, onError: JniErrorHandler<Boolean>): Boolean {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersIsWellFormed(s, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}

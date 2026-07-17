@@ -117,6 +117,13 @@ Base package: `io.zenoh.jni`
 - `init_zenoh_logs_from_env_or` — `fun initZenohLogsFromEnvOr(fallbackFilter: String, onError: io.zenoh.jni.JniErrorHandler<Unit>)`
 - `try_init_zenoh_logs_from_env` — `fun tryInitZenohLogsFromEnv(onError: io.zenoh.jni.JniErrorHandler<Unit>)`
 
+## package `io.zenoh.jni.query`
+
+- `parameters_get` — `fun parametersGet(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<String?>): String?`
+- `parameters_insert` — `fun parametersInsert(s: String, k: String, v: String, onError: io.zenoh.jni.JniErrorHandler<String>): String`
+- `parameters_is_well_formed` — `fun parametersIsWellFormed(s: String, onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
+- `parameters_remove` — `fun parametersRemove(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<String>): String`
+
 ## package `io.zenoh.jni.sample`
 
 - `sample_new_delete` — `fun <R> sampleNewDelete(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, timestampNtp64: Long?, attachment: ByteArray?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onError: io.zenoh.jni.JniErrorHandler<R>, build: io.zenoh.jni.sample.SampleBuilder<R>): R`

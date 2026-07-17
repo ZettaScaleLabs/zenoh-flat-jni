@@ -499,6 +499,15 @@ fn main() {
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
+                // Native parameters oracle: used ONLY by the SDKs'
+                // correspondence tests to validate the shared pure-Kotlin
+                // `Parameters` (see kotlin/io/zenoh/jni/query/Parameters.kt)
+                // against the Rust semantics — the production parse never
+                // crosses JNI.
+                .fun(fun!(parameters_get))
+                .fun(fun!(parameters_insert))
+                .fun(fun!(parameters_remove))
+                .fun(fun!(parameters_is_well_formed))
                 .class(ptr_class!(Queryable).gc_managed())
                 // `querier.get(...)` — receiver-style method on Querier.
                 .class(ptr_class!(Querier).gc_managed().method(fun!(querier_get)))
