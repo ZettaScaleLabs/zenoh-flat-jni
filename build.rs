@@ -307,6 +307,13 @@ fn main() {
             package!("config")
                 .class(
                     ptr_class!(Config)
+                        // `.gc_managed()`: cold-path leak backstop. A config
+                        // is normally consumed by `open`/`scout`, so a live
+                        // handle exists only between construction and use —
+                        // GC only ever fires for configs that were built and
+                        // then abandoned. With this, ZBytes is the SOLE
+                        // deliberate gc_managed exclusion (hot-path cost).
+                        .gc_managed()
                         .method(fun!(config_get_json))
                         .method(fun!(config_new_clone))
                         // `config.insertJson5(...)` — receiver-style mutator.
