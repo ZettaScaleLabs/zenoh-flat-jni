@@ -125,8 +125,16 @@ public class Parameters private constructor(private var inner: String) {
         return old
     }
 
-    /** Remove every entry for [key]; returns the previous FIRST value
-     * (Rust `remove`). The string is normalized as a side effect. */
+    /** Remove every entry for [key]; returns the previous FIRST value.
+     * The string is normalized as a side effect.
+     *
+     * NOTE: this follows Rust's DOCUMENTED `remove` contract ("preserving
+     * the insertion order"), not its current implementation, which has an
+     * iterator-consumption bug that also drops every entry PRECEDING the
+     * first match (and erases everything when the key is absent). The
+     * divergence is pinned by `ParametersCorrespondenceTest`'s canary in
+     * zenoh-java; when upstream zenoh fixes `parameters::remove`, the canary
+     * fails and full remove-correspondence can be enabled. */
     public fun remove(key: String): String? {
         val old = get(key)
         inner = concat(iter().asSequence().filter { it.first != key })
