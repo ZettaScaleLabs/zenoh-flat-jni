@@ -279,13 +279,21 @@ fn main() {
         )
         // Default param variants: a key-expr param accepts EITHER a String (built
         // via `tryFrom`) OR an existing handle (self). Default return field: the
-        // handle only (the string form stays the `getStr` accessor method).
+        // STRING — deliberately inverting forward-extraction for this type.
+        // A received keyexpr never carries a wire declaration (zenoh's RX path
+        // builds it declaration-less), so its native handle buys nothing over
+        // the string on re-send, consumers almost always read the string
+        // anyway, and delivering the handle cost a per-message native
+        // allocation with no owner to free it. One eager jstring instead:
+        // nothing to free, no second `getStr` crossing. Handles exist only
+        // where the wire declaration does — `session_declare_keyexpr` (and
+        // explicit `newClone`), which return raw handles as constructors.
         .expand(
             expand_param!(KeyExpr)
                 .variant(fun!(keyexpr_new_try_from))
                 .variant_self(),
         )
-        .expand(expand_return!(KeyExpr).field_self())
+        .expand(expand_return!(KeyExpr).field(fun!(keyexpr_get_str)))
         // ── Config + ZenohId ──────────────────────────────────────────────
         .package(
             package!("config")

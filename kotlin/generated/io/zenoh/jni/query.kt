@@ -635,7 +635,7 @@ public class ReplyError(initialPtr: Long) : NativeHandle(initialPtr) {
 
 public fun interface QueryCallback {
     public fun run(
-        getKeyexpr: KeyExpr,
+        getKeyexpr__getStr: String,
         getParameters: String,
         getPayload: ZBytes?,
         getEncoding__getId: Int?,
@@ -649,7 +649,7 @@ public fun interface QueryCallback {
 
 public fun interface QueryCallbackRaw {
     public fun run(
-        getKeyexpr: Long,
+        getKeyexpr__getStr: String,
         getParameters: String,
         getPayload: Long?,
         getEncoding__getId: Int?,
@@ -663,7 +663,7 @@ public fun interface QueryCallbackRaw {
 
 public fun QueryCallback.asRaw(): QueryCallbackRaw =
     QueryCallbackRaw {
-        getKeyexpr,
+        getKeyexpr__getStr,
         getParameters,
         getPayload,
         getEncoding__getId,
@@ -673,7 +673,7 @@ public fun QueryCallback.asRaw(): QueryCallbackRaw =
         getAcceptsReplies,
         handle ->
         run(
-            KeyExpr(getKeyexpr),
+            getKeyexpr__getStr,
             getParameters,
             getPayload?.let { ZBytes(it) },
             getEncoding__getId,
@@ -690,7 +690,7 @@ public fun interface ReplyCallback {
         getReplierZid: ZenohId?,
         getReplierEid: Int,
         isOk: Boolean,
-        getSample__getKeyExpr: KeyExpr?,
+        getSample__getKeyExpr__getStr: String?,
         getSample__getPayload: ZBytes?,
         getSample__getEncoding__getId: Int?,
         getSample__getEncoding__getSchema: String?,
@@ -717,7 +717,7 @@ public fun interface ReplyCallbackRaw {
         getReplierZid: ByteArray?,
         getReplierEid: Int,
         isOk: Boolean,
-        getSample__getKeyExpr: Long?,
+        getSample__getKeyExpr__getStr: String?,
         getSample__getPayload: Long?,
         getSample__getEncoding__getId: Int?,
         getSample__getEncoding__getSchema: String?,
@@ -744,7 +744,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
         getReplierZid,
         getReplierEid,
         isOk,
-        getSample__getKeyExpr,
+        getSample__getKeyExpr__getStr,
         getSample__getPayload,
         getSample__getEncoding__getId,
         getSample__getEncoding__getSchema,
@@ -767,7 +767,7 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getReplierZid?.let { ZenohId(it) },
             getReplierEid,
             isOk,
-            getSample__getKeyExpr?.let { KeyExpr(it) },
+            getSample__getKeyExpr__getStr,
             getSample__getPayload?.let { ZBytes(it) },
             getSample__getEncoding__getId,
             getSample__getEncoding__getSchema,
