@@ -23,6 +23,8 @@ package io.zenoh.jni.query
  * canonical state is the raw `a=b;c=d|e;f=g` string, exactly as it travels on
  * the wire, and every operation reproduces the Rust semantics —
  *
+ * - construction trims trailing `;`, `=`, `|` characters (Rust
+ *   `Parameters::from`'s `trim_end_matches`); the rest is stored verbatim.
  * - iteration splits on `;`, SKIPS empty chunks, and splits each chunk on the
  *   FIRST `=` (no `=` ⇒ empty value). There is NO percent-decoding.
  * - construction from any string is infallible: parameters arrive from the
@@ -49,8 +51,11 @@ public class Parameters private constructor(private var inner: String) {
         public const val FIELD_SEPARATOR: Char = '='
         public const val VALUE_SEPARATOR: Char = '|'
 
-        /** Wrap any string as parameters — infallible, stored verbatim. */
-        public fun fromString(s: String): Parameters = Parameters(s)
+        /** Wrap any string as parameters — infallible. As in Rust's
+         * `Parameters::from`, trailing `;`, `=`, `|` characters are trimmed
+         * at construction; the rest is stored verbatim. */
+        public fun fromString(s: String): Parameters =
+            Parameters(s.trimEnd(LIST_SEPARATOR, FIELD_SEPARATOR, VALUE_SEPARATOR))
 
         /** Empty parameters. */
         public fun empty(): Parameters = Parameters("")
