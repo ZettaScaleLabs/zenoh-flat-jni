@@ -51,9 +51,9 @@
 
 use prebindgen::{
     core::Registry,
-    enum_class, expand_param, expand_return, field, fun,
+    enum_class, expand_param, expand_return, fun,
     lang::{ConstDecl, FunctionDecl, JniGen},
-    package, path, ptr_class, ty, value_class,
+    package, ptr_class, sig, value_class,
 };
 use syn::parse_quote as pq;
 
@@ -393,10 +393,11 @@ fn main() {
             expand_return!(Encoding)
                 .field(fun!(encoding_get_id))
                 .field(fun!(encoding_get_schema))
-                .field(field!("handle").with(
-                    ty!(Option<&Encoding>),
-                    path!(crate::encoding_if_schema),
-                )),
+                .field(
+                    fun!(crate::encoding_if_schema)
+                        .sig(sig!((e: &Encoding) -> Option<&Encoding>))
+                        .name("handle"),
+                ),
         )
         // ── Time ──────────────────────────────────────────────────────────
         // Canonical output: a timestamp is its NTP64 value (`timestamp_get_ntp64`
