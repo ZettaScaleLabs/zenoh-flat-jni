@@ -310,6 +310,13 @@ internal object JNINative {
         errorSink: Any,
     )
     external fun open(config: Long, errorSink: Any): Long
+    external fun parametersContainsKey(s: String, k: String, errorSink: Any): Boolean
+    external fun parametersExtend(s: String, other: String, errorSink: Any): String
+    external fun parametersGet(s: String, k: String, errorSink: Any): String?
+    external fun parametersInsert(s: String, k: String, v: String, errorSink: Any): String
+    external fun parametersIsWellFormed(s: String, errorSink: Any): Boolean
+    external fun parametersRemove(s: String, k: String, errorSink: Any): String
+    external fun parametersValues(s: String, k: String, acc: Any?, fold: Any, errorSink: Any): Any?
     external fun publisherDelete(publisher: Long, attachment: ByteArray?, errorSink: Any)
     external fun publisherPut(
         publisher: Long,

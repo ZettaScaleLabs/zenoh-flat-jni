@@ -9,6 +9,7 @@ import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.VoidCallback
+import io.zenoh.jni.__StringFolderHolder
 import io.zenoh.jni.bytes.Encoding
 import io.zenoh.jni.bytes.ZBytes
 import io.zenoh.jni.config.ZenohId
@@ -175,7 +176,11 @@ public class Query(initialPtr: Long) : GcNativeHandle(initialPtr) {
         return __ret
     }
 
-    /** Return the parameters that refine the query selector. */
+    /**
+     * Return the parameters that refine the query selector.
+     *
+     * Process the returned string with the `parameters_*` functions.
+     */
     public fun getParameters(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __cap = JniErrorHandlerCapture.acquire()
@@ -776,3 +781,88 @@ public fun ReplyCallback.asRaw(): ReplyCallbackRaw =
             getErr__getEncoding__getSchema
         )
     }
+
+/**
+ * Get the value for a key according to the parameters format: entries split
+ * on `;`, key/value on the first `=`, the first matching key wins.
+ */
+public fun parametersGet(s: String, k: String, onError: JniErrorHandler<String?>): String? {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersGet(s, k, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Get the `|`-separated list of values for a key; empty when the key is
+ * absent.
+ */
+public fun parametersValues(
+    s: String,
+    k: String,
+    onError: JniErrorHandler<List<String>>,
+): List<String> {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = (JNINative.parametersValues(s, k, ArrayList<String>(), __StringFolderHolder.instance, __cap) as List<String>)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/** Return `true` if the parameters string contains the key. */
+public fun parametersContainsKey(s: String, k: String, onError: JniErrorHandler<Boolean>): Boolean {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersContainsKey(s, k, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Insert a key-value pair into a parameters string: every existing entry
+ * for the key is removed and the new pair appended at the end. Returns the
+ * resulting string.
+ */
+public fun parametersInsert(
+    s: String,
+    k: String,
+    v: String,
+    onError: JniErrorHandler<String>,
+): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersInsert(s, k, v, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Remove every entry for a key from a parameters string. Returns the
+ * resulting string.
+ */
+public fun parametersRemove(s: String, k: String, onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersRemove(s, k, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Extend a parameters string with the entries of another: each of `other`'s
+ * pairs is inserted, so on conflicting keys `other`'s values win. Returns
+ * the resulting string.
+ */
+public fun parametersExtend(s: String, other: String, onError: JniErrorHandler<String>): String {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersExtend(s, other, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
+
+/**
+ * Return `true` if the parameters string contains at least one entry and
+ * none of its keys are empty.
+ */
+public fun parametersIsWellFormed(s: String, onError: JniErrorHandler<Boolean>): Boolean {
+    val __cap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.parametersIsWellFormed(s, __cap)
+    if (__cap.failed) return onError.run(__cap.je)
+    return __ret
+}
