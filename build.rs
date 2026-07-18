@@ -499,14 +499,18 @@ fn main() {
         // ── Query / Queryable / Querier ───────────────────────────────────
         .package(
             package!("query")
-                // Native parameters oracle: used ONLY by the SDKs'
-                // correspondence tests to validate the shared pure-Kotlin
-                // `Parameters` (see kotlin/io/zenoh/jni/query/Parameters.kt)
-                // against the Rust semantics — the production parse never
-                // crosses JNI.
+                // The zenoh-flat parameters-processing API. The JVM SDKs run
+                // the same semantics in pure Kotlin on their production path
+                // (kotlin/io/zenoh/jni/query/Parameters.kt) — crossing JNI per
+                // string operation is expensive, a JNI peculiarity rather than
+                // a zenoh-flat design choice — and verify the correspondence
+                // against these functions in tests.
                 .fun(fun!(parameters_get))
+                .fun(fun!(parameters_values))
+                .fun(fun!(parameters_contains_key))
                 .fun(fun!(parameters_insert))
                 .fun(fun!(parameters_remove))
+                .fun(fun!(parameters_extend))
                 .fun(fun!(parameters_is_well_formed))
                 .class(ptr_class!(Queryable).gc_managed())
                 // `querier.get(...)` — receiver-style method on Querier.

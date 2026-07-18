@@ -38,11 +38,13 @@ package io.zenoh.jni.query
  * - [toMap] collects iteration order into a map, so for duplicated keys the
  *   LAST entry wins there (Rust's `HashMap` conversion), unlike [get].
  *
- * No JNI crossing on any path. The correspondence with the native
- * implementation is verified by the consuming SDK's test suite
- * (`ParametersCorrespondenceTest` in zenoh-java) against the
- * `parametersGet`/`parametersInsert`/`parametersRemove`/
- * `parametersIsWellFormed` oracle externs.
+ * No JNI crossing on any path: zenoh-flat exposes the same operations as
+ * regular API (the `parameters*` functions in this package), but calling
+ * them per string operation would cross JNI each time — a JNI peculiarity,
+ * not a zenoh-flat design choice — so the JVM production path runs this pure
+ * implementation instead. The correspondence between the two is verified by
+ * the consuming SDK's test suite (`ParametersCorrespondenceTest` in
+ * zenoh-java).
  */
 public class Parameters private constructor(private var inner: String) {
 

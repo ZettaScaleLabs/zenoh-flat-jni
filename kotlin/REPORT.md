@@ -119,10 +119,14 @@ Base package: `io.zenoh.jni`
 
 ## package `io.zenoh.jni.query`
 
+- `parameters_contains_key` — `fun parametersContainsKey(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
+- `parameters_extend` — `fun parametersExtend(s: String, other: String, onError: io.zenoh.jni.JniErrorHandler<String>): String`
 - `parameters_get` — `fun parametersGet(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<String?>): String?`
 - `parameters_insert` — `fun parametersInsert(s: String, k: String, v: String, onError: io.zenoh.jni.JniErrorHandler<String>): String`
 - `parameters_is_well_formed` — `fun parametersIsWellFormed(s: String, onError: io.zenoh.jni.JniErrorHandler<Boolean>): Boolean`
 - `parameters_remove` — `fun parametersRemove(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<String>): String`
+- `parameters_values` — `fun parametersValues(s: String, k: String, onError: io.zenoh.jni.JniErrorHandler<List<String>>): List<String>`
+  - shaped by: return `String` decomposed → [] (Callback delivery)
 
 ## package `io.zenoh.jni.sample`
 
