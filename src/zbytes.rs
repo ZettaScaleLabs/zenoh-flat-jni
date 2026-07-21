@@ -208,7 +208,7 @@ fn decode_token_type(env: &mut JNIEnv, type_obj: JObject) -> JResult<JavaType> {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_io_zenoh_jni_bytes_JNIBytes_serializeViaJNI(
+pub extern "C" fn Java_io_zenoh_jni_test_Serialization_serializeViaJNI(
     mut env: JNIEnv,
     _class: JClass,
     any: JObject,
@@ -352,7 +352,7 @@ fn serialize(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_io_zenoh_jni_bytes_JNIBytes_deserializeViaJNI(
+pub extern "C" fn Java_io_zenoh_jni_test_Serialization_deserializeViaJNI(
     mut env: JNIEnv,
     _class: JClass,
     bytes: JByteArray,
@@ -644,7 +644,7 @@ fn decode_ktype_arg(env: &mut JNIEnv, ktype: &JObject, idx: i32) -> JResult<Kotl
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_io_zenoh_jni_bytes_JNIBytes_serializeViaJNIKType(
+pub extern "C" fn Java_io_zenoh_jni_test_Serialization_serializeViaJNIKType(
     mut env: JNIEnv,
     _class: JClass,
     any: JObject,
@@ -854,7 +854,7 @@ fn serialize_ktype(
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_io_zenoh_jni_bytes_JNIBytes_deserializeViaJNIKType(
+pub extern "C" fn Java_io_zenoh_jni_test_Serialization_deserializeViaJNIKType(
     mut env: JNIEnv,
     _class: JClass,
     bytes: JByteArray,

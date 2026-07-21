@@ -23,7 +23,7 @@ import io.zenoh.jni.JniErrorHandler
  * The Zenoh serialization wire format ([RFC][1], implemented by
  * `zenoh_ext::{ZSerializer, ZDeserializer}`) is a simple byte format, so it is
  * reimplemented here in Kotlin and produces/consumes the `ByteArray` directly —
- * **no JNI crossing per element** (the previous [serializeViaJNI] path made a
+ * **no JNI crossing per element** (the previous `serializeViaJNI` path made a
  * native up-call for every scalar/leaf, which dominates small payloads). The
  * byte-for-byte correspondence with the native serializer is verified by the
  * consuming SDK's `ZSerdeCorrespondenceTest`.

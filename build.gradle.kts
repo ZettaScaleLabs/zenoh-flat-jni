@@ -47,6 +47,26 @@ kotlin {
     }
 }
 
+dependencies {
+    // Self-verification: the correspondence tests compare this crate's pure-Kotlin
+    // implementations against the native oracle it also ships (io.zenoh.jni.test).
+    // kotlin("test") with useJUnitPlatform() selects the JUnit5 integration.
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Guava TypeToken — the java.lang.reflect.Type serialization path.
+    testImplementation("com.google.guava:guava:33.3.1-jre")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    // The native lib must exist and be loadable. `NativeLibrary.ensureLoaded()`
+    // tries `System.loadLibrary("zenoh_flat_jni")` first, so point
+    // `java.library.path` at the freshly-built dylib in target/{debug,release}.
+    dependsOn("buildZenohFlatJni")
+    systemProperty("java.library.path", file(jarTarget).absolutePath)
+}
+
 // ============================================================================
 // Rust Build Configuration
 // ============================================================================
