@@ -46,14 +46,6 @@ zenoh-flat = { version = "1.9.0", path = "../zenoh-flat", features = ["unstable"
 prebindgen = { path = "../prebindgen/prebindgen" }
 syn = "2"
 
-# The debug cdylib link (Gradle `test` builds it via buildZenohFlatJni) links
-# every dependency object into one DLL. The dev default `codegen-units = 256`
-# × the ~250-crate zenoh graph exceeds Windows link.exe's 65535-object limit
-# (LNK1189). Cap it to the release default so the debug DLL links on Windows;
-# macOS/Linux are unaffected. (Release already sets codegen-units = 1 below.)
-[profile.dev]
-codegen-units = 16
-
 # panic = "abort" is required on the JNI boundary — a Rust panic crossing
 # into the JVM under unwind is UB.
 [profile.release]
