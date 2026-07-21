@@ -28,24 +28,24 @@ public class Timestamp(initialPtr: Long) : NativeHandle(initialPtr) {
     /** NTP64 time component of the timestamp. */
     public fun getNtp64(onError: JniErrorHandler<Long>): Long {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.timestampGetNtp64(this_ptr, __cap)
+            JNINative.timestampGetNtp64(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Raw bytes of the originating `TimestampId`. */
     public fun getId(onError: JniErrorHandler<ByteArray>): ByteArray {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.timestampGetId(this_ptr, __cap)
+            JNINative.timestampGetId(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 

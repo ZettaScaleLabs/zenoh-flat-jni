@@ -31,48 +31,48 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
     /** Return the numeric identifier of an encoding. */
     public fun getId(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.encodingGetId(this_ptr, __cap)
+            JNINative.encodingGetId(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the schema associated with an encoding, when present. */
     public fun getSchema(onError: JniErrorHandler<String?>): String? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.encodingGetSchema(this_ptr, __cap)
+            JNINative.encodingGetSchema(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the standard textual representation of an encoding. */
     public fun toStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.encodingToString(this_ptr, __cap)
+            JNINative.encodingToString(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Create an independent copy of an encoding. */
     public fun newClone(onError: JniErrorHandler<Encoding>): Encoding {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Encoding(JNINative.encodingNewClone(this_ptr, __cap))
+            Encoding(JNINative.encodingNewClone(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -99,7 +99,7 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
             if (e1 != null && e1.isClosed()) return onError.run(
                 "Operation on a closed native handle.",
             )
-            val __cap = JniErrorHandlerCapture.acquire()
+            val __bcap = JniErrorHandlerCapture.acquire()
             val __ret = run {
                 val __locks = ArrayList<NativeHandle>()
                 e1?.let { __locks.add(it) }
@@ -113,20 +113,20 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             e01,
                             e1_ptr,
                             schema,
-                            __cap,
+                            __bcap,
                         ),
                     )
                 }
             }
-            if (__cap.failed) return onError.run(__cap.je)
+            if (__bcap.failed) return onError.run(__bcap.ze0)
             return __ret
         }
 
         /** Create an encoding from its numeric identifier and optional schema. */
         public fun newFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __cap))
-            if (__cap.failed) return onError.run(__cap.je)
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __bcap))
+            if (__bcap.failed) return onError.run(__bcap.ze0)
             return __ret
         }
 
@@ -137,9 +137,9 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
          * preserved as custom encodings.
          */
         public fun newFromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingNewFromString(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je)
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __ret = Encoding(JNINative.encodingNewFromString(s, __bcap))
+            if (__bcap.failed) return onError.run(__bcap.ze0)
             return __ret
         }
     }
@@ -166,24 +166,24 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
     /** Return the payload as a contiguous sequence of bytes. */
     public fun asBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.zbytesAsBytes(this_ptr, __cap)
+            JNINative.zbytesAsBytes(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Create an independent copy of a payload. */
     public fun newClone(onError: JniErrorHandler<ZBytes>): ZBytes {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZBytes(JNINative.zbytesNewClone(this_ptr, __cap))
+            ZBytes(JNINative.zbytesNewClone(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -193,18 +193,18 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
 
         /** Create a payload from a byte sequence. */
         public fun newFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __cap))
-            if (__cap.failed) return onError.run(__cap.je)
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __bcap))
+            if (__bcap.failed) return onError.run(__bcap.ze0)
             return __ret
         }
     }
 }
 
 private fun constGetEncodingZenohBytes(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohBytes(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohBytes(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -212,9 +212,9 @@ private fun constGetEncodingZenohBytes(onError: JniErrorHandler<String>): String
 public val ENCODING_ZENOH_BYTES: String by lazy { constGetEncodingZenohBytes(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_BYTES: JNI getter failed") }) }
 
 private fun constGetEncodingZenohBytesId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohBytesId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohBytesId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -222,9 +222,9 @@ private fun constGetEncodingZenohBytesId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_ZENOH_BYTES_ID: Int by lazy { constGetEncodingZenohBytesId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_BYTES_ID: JNI getter failed") }) }
 
 private fun constGetEncodingZenohString(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohString(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohString(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -232,9 +232,9 @@ private fun constGetEncodingZenohString(onError: JniErrorHandler<String>): Strin
 public val ENCODING_ZENOH_STRING: String by lazy { constGetEncodingZenohString(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_STRING: JNI getter failed") }) }
 
 private fun constGetEncodingZenohStringId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohStringId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohStringId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -242,9 +242,9 @@ private fun constGetEncodingZenohStringId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_ZENOH_STRING_ID: Int by lazy { constGetEncodingZenohStringId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_STRING_ID: JNI getter failed") }) }
 
 private fun constGetEncodingZenohSerialized(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohSerialized(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohSerialized(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -252,9 +252,9 @@ private fun constGetEncodingZenohSerialized(onError: JniErrorHandler<String>): S
 public val ENCODING_ZENOH_SERIALIZED: String by lazy { constGetEncodingZenohSerialized(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_SERIALIZED: JNI getter failed") }) }
 
 private fun constGetEncodingZenohSerializedId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingZenohSerializedId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingZenohSerializedId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -262,9 +262,9 @@ private fun constGetEncodingZenohSerializedId(onError: JniErrorHandler<Int>): In
 public val ENCODING_ZENOH_SERIALIZED_ID: Int by lazy { constGetEncodingZenohSerializedId(JniErrorHandler { je -> error(je ?: "const ENCODING_ZENOH_SERIALIZED_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationOctetStream(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationOctetStream(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOctetStream(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -272,9 +272,9 @@ private fun constGetEncodingApplicationOctetStream(onError: JniErrorHandler<Stri
 public val ENCODING_APPLICATION_OCTET_STREAM: String by lazy { constGetEncodingApplicationOctetStream(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OCTET_STREAM: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationOctetStreamId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationOctetStreamId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOctetStreamId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -282,9 +282,9 @@ private fun constGetEncodingApplicationOctetStreamId(onError: JniErrorHandler<In
 public val ENCODING_APPLICATION_OCTET_STREAM_ID: Int by lazy { constGetEncodingApplicationOctetStreamId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OCTET_STREAM_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextPlain(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextPlain(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextPlain(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -292,9 +292,9 @@ private fun constGetEncodingTextPlain(onError: JniErrorHandler<String>): String 
 public val ENCODING_TEXT_PLAIN: String by lazy { constGetEncodingTextPlain(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_PLAIN: JNI getter failed") }) }
 
 private fun constGetEncodingTextPlainId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextPlainId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextPlainId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -302,9 +302,9 @@ private fun constGetEncodingTextPlainId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_PLAIN_ID: Int by lazy { constGetEncodingTextPlainId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_PLAIN_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJson(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJson(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJson(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -312,9 +312,9 @@ private fun constGetEncodingApplicationJson(onError: JniErrorHandler<String>): S
 public val ENCODING_APPLICATION_JSON: String by lazy { constGetEncodingApplicationJson(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -322,9 +322,9 @@ private fun constGetEncodingApplicationJsonId(onError: JniErrorHandler<Int>): In
 public val ENCODING_APPLICATION_JSON_ID: Int by lazy { constGetEncodingApplicationJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextJson(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJson(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -332,9 +332,9 @@ private fun constGetEncodingTextJson(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_JSON: String by lazy { constGetEncodingTextJson(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON: JNI getter failed") }) }
 
 private fun constGetEncodingTextJsonId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJsonId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJsonId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -342,9 +342,9 @@ private fun constGetEncodingTextJsonId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_JSON_ID: Int by lazy { constGetEncodingTextJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCdr(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCdr(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCdr(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -352,9 +352,9 @@ private fun constGetEncodingApplicationCdr(onError: JniErrorHandler<String>): St
 public val ENCODING_APPLICATION_CDR: String by lazy { constGetEncodingApplicationCdr(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CDR: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCdrId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCdrId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCdrId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -362,9 +362,9 @@ private fun constGetEncodingApplicationCdrId(onError: JniErrorHandler<Int>): Int
 public val ENCODING_APPLICATION_CDR_ID: Int by lazy { constGetEncodingApplicationCdrId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CDR_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCbor(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCbor(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCbor(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -372,9 +372,9 @@ private fun constGetEncodingApplicationCbor(onError: JniErrorHandler<String>): S
 public val ENCODING_APPLICATION_CBOR: String by lazy { constGetEncodingApplicationCbor(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CBOR: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCborId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCborId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCborId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -382,9 +382,9 @@ private fun constGetEncodingApplicationCborId(onError: JniErrorHandler<Int>): In
 public val ENCODING_APPLICATION_CBOR_ID: Int by lazy { constGetEncodingApplicationCborId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_CBOR_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationYaml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationYaml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYaml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -392,9 +392,9 @@ private fun constGetEncodingApplicationYaml(onError: JniErrorHandler<String>): S
 public val ENCODING_APPLICATION_YAML: String by lazy { constGetEncodingApplicationYaml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YAML: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationYamlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationYamlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYamlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -402,9 +402,9 @@ private fun constGetEncodingApplicationYamlId(onError: JniErrorHandler<Int>): In
 public val ENCODING_APPLICATION_YAML_ID: Int by lazy { constGetEncodingApplicationYamlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YAML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextYaml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextYaml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextYaml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -412,9 +412,9 @@ private fun constGetEncodingTextYaml(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_YAML: String by lazy { constGetEncodingTextYaml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_YAML: JNI getter failed") }) }
 
 private fun constGetEncodingTextYamlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextYamlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextYamlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -422,9 +422,9 @@ private fun constGetEncodingTextYamlId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_YAML_ID: Int by lazy { constGetEncodingTextYamlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_YAML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextJson5(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJson5(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson5(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -432,9 +432,9 @@ private fun constGetEncodingTextJson5(onError: JniErrorHandler<String>): String 
 public val ENCODING_TEXT_JSON5: String by lazy { constGetEncodingTextJson5(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JSON5: JNI getter failed") }) }
 
 private fun constGetEncodingTextJson5Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJson5Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJson5Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -444,9 +444,9 @@ public val ENCODING_TEXT_JSON5_ID: Int by lazy { constGetEncodingTextJson5Id(Jni
 private fun constGetEncodingApplicationPythonSerializedObject(
     onError: JniErrorHandler<String>,
 ): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObject(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObject(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -454,9 +454,9 @@ private fun constGetEncodingApplicationPythonSerializedObject(
 public val ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT: String by lazy { constGetEncodingApplicationPythonSerializedObject(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationPythonSerializedObjectId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObjectId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationPythonSerializedObjectId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -464,9 +464,9 @@ private fun constGetEncodingApplicationPythonSerializedObjectId(onError: JniErro
 public val ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT_ID: Int by lazy { constGetEncodingApplicationPythonSerializedObjectId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PYTHON_SERIALIZED_OBJECT_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationProtobuf(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationProtobuf(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationProtobuf(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -474,9 +474,9 @@ private fun constGetEncodingApplicationProtobuf(onError: JniErrorHandler<String>
 public val ENCODING_APPLICATION_PROTOBUF: String by lazy { constGetEncodingApplicationProtobuf(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_PROTOBUF: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationProtobufId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationProtobufId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationProtobufId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -486,9 +486,9 @@ public val ENCODING_APPLICATION_PROTOBUF_ID: Int by lazy { constGetEncodingAppli
 private fun constGetEncodingApplicationJavaSerializedObject(
     onError: JniErrorHandler<String>,
 ): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObject(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObject(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -496,9 +496,9 @@ private fun constGetEncodingApplicationJavaSerializedObject(
 public val ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT: String by lazy { constGetEncodingApplicationJavaSerializedObject(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJavaSerializedObjectId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObjectId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJavaSerializedObjectId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -506,9 +506,9 @@ private fun constGetEncodingApplicationJavaSerializedObjectId(onError: JniErrorH
 public val ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT_ID: Int by lazy { constGetEncodingApplicationJavaSerializedObjectId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JAVA_SERIALIZED_OBJECT_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationOpenmetricsText(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationOpenmetricsText(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOpenmetricsText(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -516,9 +516,9 @@ private fun constGetEncodingApplicationOpenmetricsText(onError: JniErrorHandler<
 public val ENCODING_APPLICATION_OPENMETRICS_TEXT: String by lazy { constGetEncodingApplicationOpenmetricsText(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OPENMETRICS_TEXT: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationOpenmetricsTextId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationOpenmetricsTextId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationOpenmetricsTextId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -526,9 +526,9 @@ private fun constGetEncodingApplicationOpenmetricsTextId(onError: JniErrorHandle
 public val ENCODING_APPLICATION_OPENMETRICS_TEXT_ID: Int by lazy { constGetEncodingApplicationOpenmetricsTextId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_OPENMETRICS_TEXT_ID: JNI getter failed") }) }
 
 private fun constGetEncodingImagePng(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImagePng(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImagePng(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -536,9 +536,9 @@ private fun constGetEncodingImagePng(onError: JniErrorHandler<String>): String {
 public val ENCODING_IMAGE_PNG: String by lazy { constGetEncodingImagePng(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_PNG: JNI getter failed") }) }
 
 private fun constGetEncodingImagePngId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImagePngId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImagePngId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -546,9 +546,9 @@ private fun constGetEncodingImagePngId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_IMAGE_PNG_ID: Int by lazy { constGetEncodingImagePngId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_PNG_ID: JNI getter failed") }) }
 
 private fun constGetEncodingImageJpeg(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageJpeg(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageJpeg(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -556,9 +556,9 @@ private fun constGetEncodingImageJpeg(onError: JniErrorHandler<String>): String 
 public val ENCODING_IMAGE_JPEG: String by lazy { constGetEncodingImageJpeg(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_JPEG: JNI getter failed") }) }
 
 private fun constGetEncodingImageJpegId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageJpegId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageJpegId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -566,9 +566,9 @@ private fun constGetEncodingImageJpegId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_IMAGE_JPEG_ID: Int by lazy { constGetEncodingImageJpegId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_JPEG_ID: JNI getter failed") }) }
 
 private fun constGetEncodingImageGif(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageGif(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageGif(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -576,9 +576,9 @@ private fun constGetEncodingImageGif(onError: JniErrorHandler<String>): String {
 public val ENCODING_IMAGE_GIF: String by lazy { constGetEncodingImageGif(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_GIF: JNI getter failed") }) }
 
 private fun constGetEncodingImageGifId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageGifId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageGifId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -586,9 +586,9 @@ private fun constGetEncodingImageGifId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_IMAGE_GIF_ID: Int by lazy { constGetEncodingImageGifId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_GIF_ID: JNI getter failed") }) }
 
 private fun constGetEncodingImageBmp(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageBmp(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageBmp(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -596,9 +596,9 @@ private fun constGetEncodingImageBmp(onError: JniErrorHandler<String>): String {
 public val ENCODING_IMAGE_BMP: String by lazy { constGetEncodingImageBmp(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_BMP: JNI getter failed") }) }
 
 private fun constGetEncodingImageBmpId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageBmpId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageBmpId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -606,9 +606,9 @@ private fun constGetEncodingImageBmpId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_IMAGE_BMP_ID: Int by lazy { constGetEncodingImageBmpId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_BMP_ID: JNI getter failed") }) }
 
 private fun constGetEncodingImageWebp(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageWebp(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageWebp(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -616,9 +616,9 @@ private fun constGetEncodingImageWebp(onError: JniErrorHandler<String>): String 
 public val ENCODING_IMAGE_WEBP: String by lazy { constGetEncodingImageWebp(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_WEBP: JNI getter failed") }) }
 
 private fun constGetEncodingImageWebpId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingImageWebpId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingImageWebpId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -626,9 +626,9 @@ private fun constGetEncodingImageWebpId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_IMAGE_WEBP_ID: Int by lazy { constGetEncodingImageWebpId(JniErrorHandler { je -> error(je ?: "const ENCODING_IMAGE_WEBP_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationXml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationXml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -636,9 +636,9 @@ private fun constGetEncodingApplicationXml(onError: JniErrorHandler<String>): St
 public val ENCODING_APPLICATION_XML: String by lazy { constGetEncodingApplicationXml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_XML: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationXmlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationXmlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXmlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -646,9 +646,9 @@ private fun constGetEncodingApplicationXmlId(onError: JniErrorHandler<Int>): Int
 public val ENCODING_APPLICATION_XML_ID: Int by lazy { constGetEncodingApplicationXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_XML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationXWwwFormUrlencoded(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencoded(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencoded(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -656,9 +656,9 @@ private fun constGetEncodingApplicationXWwwFormUrlencoded(onError: JniErrorHandl
 public val ENCODING_APPLICATION_X_WWW_FORM_URLENCODED: String by lazy { constGetEncodingApplicationXWwwFormUrlencoded(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_X_WWW_FORM_URLENCODED: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationXWwwFormUrlencodedId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencodedId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationXWwwFormUrlencodedId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -666,9 +666,9 @@ private fun constGetEncodingApplicationXWwwFormUrlencodedId(onError: JniErrorHan
 public val ENCODING_APPLICATION_X_WWW_FORM_URLENCODED_ID: Int by lazy { constGetEncodingApplicationXWwwFormUrlencodedId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_X_WWW_FORM_URLENCODED_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextHtml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextHtml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextHtml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -676,9 +676,9 @@ private fun constGetEncodingTextHtml(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_HTML: String by lazy { constGetEncodingTextHtml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_HTML: JNI getter failed") }) }
 
 private fun constGetEncodingTextHtmlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextHtmlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextHtmlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -686,9 +686,9 @@ private fun constGetEncodingTextHtmlId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_HTML_ID: Int by lazy { constGetEncodingTextHtmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_HTML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextXml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextXml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextXml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -696,9 +696,9 @@ private fun constGetEncodingTextXml(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_XML: String by lazy { constGetEncodingTextXml(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_XML: JNI getter failed") }) }
 
 private fun constGetEncodingTextXmlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextXmlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextXmlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -706,9 +706,9 @@ private fun constGetEncodingTextXmlId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_XML_ID: Int by lazy { constGetEncodingTextXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_XML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextCss(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextCss(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCss(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -716,9 +716,9 @@ private fun constGetEncodingTextCss(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_CSS: String by lazy { constGetEncodingTextCss(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSS: JNI getter failed") }) }
 
 private fun constGetEncodingTextCssId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextCssId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCssId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -726,9 +726,9 @@ private fun constGetEncodingTextCssId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_CSS_ID: Int by lazy { constGetEncodingTextCssId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSS_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextJavascript(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJavascript(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJavascript(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -736,9 +736,9 @@ private fun constGetEncodingTextJavascript(onError: JniErrorHandler<String>): St
 public val ENCODING_TEXT_JAVASCRIPT: String by lazy { constGetEncodingTextJavascript(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JAVASCRIPT: JNI getter failed") }) }
 
 private fun constGetEncodingTextJavascriptId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextJavascriptId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextJavascriptId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -746,9 +746,9 @@ private fun constGetEncodingTextJavascriptId(onError: JniErrorHandler<Int>): Int
 public val ENCODING_TEXT_JAVASCRIPT_ID: Int by lazy { constGetEncodingTextJavascriptId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_JAVASCRIPT_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextMarkdown(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextMarkdown(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextMarkdown(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -756,9 +756,9 @@ private fun constGetEncodingTextMarkdown(onError: JniErrorHandler<String>): Stri
 public val ENCODING_TEXT_MARKDOWN: String by lazy { constGetEncodingTextMarkdown(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_MARKDOWN: JNI getter failed") }) }
 
 private fun constGetEncodingTextMarkdownId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextMarkdownId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextMarkdownId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -766,9 +766,9 @@ private fun constGetEncodingTextMarkdownId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_MARKDOWN_ID: Int by lazy { constGetEncodingTextMarkdownId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_MARKDOWN_ID: JNI getter failed") }) }
 
 private fun constGetEncodingTextCsv(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextCsv(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCsv(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -776,9 +776,9 @@ private fun constGetEncodingTextCsv(onError: JniErrorHandler<String>): String {
 public val ENCODING_TEXT_CSV: String by lazy { constGetEncodingTextCsv(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSV: JNI getter failed") }) }
 
 private fun constGetEncodingTextCsvId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingTextCsvId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingTextCsvId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -786,9 +786,9 @@ private fun constGetEncodingTextCsvId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_TEXT_CSV_ID: Int by lazy { constGetEncodingTextCsvId(JniErrorHandler { je -> error(je ?: "const ENCODING_TEXT_CSV_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationSql(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationSql(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSql(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -796,9 +796,9 @@ private fun constGetEncodingApplicationSql(onError: JniErrorHandler<String>): St
 public val ENCODING_APPLICATION_SQL: String by lazy { constGetEncodingApplicationSql(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SQL: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationSqlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationSqlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSqlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -806,9 +806,9 @@ private fun constGetEncodingApplicationSqlId(onError: JniErrorHandler<Int>): Int
 public val ENCODING_APPLICATION_SQL_ID: Int by lazy { constGetEncodingApplicationSqlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SQL_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCoapPayload(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCoapPayload(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCoapPayload(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -816,9 +816,9 @@ private fun constGetEncodingApplicationCoapPayload(onError: JniErrorHandler<Stri
 public val ENCODING_APPLICATION_COAP_PAYLOAD: String by lazy { constGetEncodingApplicationCoapPayload(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_COAP_PAYLOAD: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationCoapPayloadId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationCoapPayloadId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationCoapPayloadId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -826,9 +826,9 @@ private fun constGetEncodingApplicationCoapPayloadId(onError: JniErrorHandler<In
 public val ENCODING_APPLICATION_COAP_PAYLOAD_ID: Int by lazy { constGetEncodingApplicationCoapPayloadId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_COAP_PAYLOAD_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonPatchJson(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonPatchJson(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonPatchJson(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -836,9 +836,9 @@ private fun constGetEncodingApplicationJsonPatchJson(onError: JniErrorHandler<St
 public val ENCODING_APPLICATION_JSON_PATCH_JSON: String by lazy { constGetEncodingApplicationJsonPatchJson(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_PATCH_JSON: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonPatchJsonId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonPatchJsonId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonPatchJsonId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -846,9 +846,9 @@ private fun constGetEncodingApplicationJsonPatchJsonId(onError: JniErrorHandler<
 public val ENCODING_APPLICATION_JSON_PATCH_JSON_ID: Int by lazy { constGetEncodingApplicationJsonPatchJsonId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_PATCH_JSON_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonSeq(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonSeq(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonSeq(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -856,9 +856,9 @@ private fun constGetEncodingApplicationJsonSeq(onError: JniErrorHandler<String>)
 public val ENCODING_APPLICATION_JSON_SEQ: String by lazy { constGetEncodingApplicationJsonSeq(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_SEQ: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonSeqId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonSeqId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonSeqId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -866,9 +866,9 @@ private fun constGetEncodingApplicationJsonSeqId(onError: JniErrorHandler<Int>):
 public val ENCODING_APPLICATION_JSON_SEQ_ID: Int by lazy { constGetEncodingApplicationJsonSeqId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSON_SEQ_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonpath(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonpath(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonpath(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -876,9 +876,9 @@ private fun constGetEncodingApplicationJsonpath(onError: JniErrorHandler<String>
 public val ENCODING_APPLICATION_JSONPATH: String by lazy { constGetEncodingApplicationJsonpath(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSONPATH: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJsonpathId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJsonpathId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJsonpathId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -886,9 +886,9 @@ private fun constGetEncodingApplicationJsonpathId(onError: JniErrorHandler<Int>)
 public val ENCODING_APPLICATION_JSONPATH_ID: Int by lazy { constGetEncodingApplicationJsonpathId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JSONPATH_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJwt(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJwt(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJwt(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -896,9 +896,9 @@ private fun constGetEncodingApplicationJwt(onError: JniErrorHandler<String>): St
 public val ENCODING_APPLICATION_JWT: String by lazy { constGetEncodingApplicationJwt(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JWT: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationJwtId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationJwtId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationJwtId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -906,9 +906,9 @@ private fun constGetEncodingApplicationJwtId(onError: JniErrorHandler<Int>): Int
 public val ENCODING_APPLICATION_JWT_ID: Int by lazy { constGetEncodingApplicationJwtId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_JWT_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationMp4(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationMp4(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationMp4(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -916,9 +916,9 @@ private fun constGetEncodingApplicationMp4(onError: JniErrorHandler<String>): St
 public val ENCODING_APPLICATION_MP4: String by lazy { constGetEncodingApplicationMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_MP4: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationMp4Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationMp4Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationMp4Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -926,9 +926,9 @@ private fun constGetEncodingApplicationMp4Id(onError: JniErrorHandler<Int>): Int
 public val ENCODING_APPLICATION_MP4_ID: Int by lazy { constGetEncodingApplicationMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_MP4_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationSoapXml(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationSoapXml(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSoapXml(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -936,9 +936,9 @@ private fun constGetEncodingApplicationSoapXml(onError: JniErrorHandler<String>)
 public val ENCODING_APPLICATION_SOAP_XML: String by lazy { constGetEncodingApplicationSoapXml(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SOAP_XML: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationSoapXmlId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationSoapXmlId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationSoapXmlId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -946,9 +946,9 @@ private fun constGetEncodingApplicationSoapXmlId(onError: JniErrorHandler<Int>):
 public val ENCODING_APPLICATION_SOAP_XML_ID: Int by lazy { constGetEncodingApplicationSoapXmlId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_SOAP_XML_ID: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationYang(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationYang(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYang(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -956,9 +956,9 @@ private fun constGetEncodingApplicationYang(onError: JniErrorHandler<String>): S
 public val ENCODING_APPLICATION_YANG: String by lazy { constGetEncodingApplicationYang(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YANG: JNI getter failed") }) }
 
 private fun constGetEncodingApplicationYangId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingApplicationYangId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingApplicationYangId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -966,9 +966,9 @@ private fun constGetEncodingApplicationYangId(onError: JniErrorHandler<Int>): In
 public val ENCODING_APPLICATION_YANG_ID: Int by lazy { constGetEncodingApplicationYangId(JniErrorHandler { je -> error(je ?: "const ENCODING_APPLICATION_YANG_ID: JNI getter failed") }) }
 
 private fun constGetEncodingAudioAac(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioAac(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioAac(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -976,9 +976,9 @@ private fun constGetEncodingAudioAac(onError: JniErrorHandler<String>): String {
 public val ENCODING_AUDIO_AAC: String by lazy { constGetEncodingAudioAac(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_AAC: JNI getter failed") }) }
 
 private fun constGetEncodingAudioAacId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioAacId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioAacId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -986,9 +986,9 @@ private fun constGetEncodingAudioAacId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_AUDIO_AAC_ID: Int by lazy { constGetEncodingAudioAacId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_AAC_ID: JNI getter failed") }) }
 
 private fun constGetEncodingAudioFlac(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioFlac(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioFlac(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -996,9 +996,9 @@ private fun constGetEncodingAudioFlac(onError: JniErrorHandler<String>): String 
 public val ENCODING_AUDIO_FLAC: String by lazy { constGetEncodingAudioFlac(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_FLAC: JNI getter failed") }) }
 
 private fun constGetEncodingAudioFlacId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioFlacId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioFlacId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1006,9 +1006,9 @@ private fun constGetEncodingAudioFlacId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_AUDIO_FLAC_ID: Int by lazy { constGetEncodingAudioFlacId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_FLAC_ID: JNI getter failed") }) }
 
 private fun constGetEncodingAudioMp4(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioMp4(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioMp4(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1016,9 +1016,9 @@ private fun constGetEncodingAudioMp4(onError: JniErrorHandler<String>): String {
 public val ENCODING_AUDIO_MP4: String by lazy { constGetEncodingAudioMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_MP4: JNI getter failed") }) }
 
 private fun constGetEncodingAudioMp4Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioMp4Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioMp4Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1026,9 +1026,9 @@ private fun constGetEncodingAudioMp4Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_AUDIO_MP4_ID: Int by lazy { constGetEncodingAudioMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_MP4_ID: JNI getter failed") }) }
 
 private fun constGetEncodingAudioOgg(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioOgg(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioOgg(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1036,9 +1036,9 @@ private fun constGetEncodingAudioOgg(onError: JniErrorHandler<String>): String {
 public val ENCODING_AUDIO_OGG: String by lazy { constGetEncodingAudioOgg(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_OGG: JNI getter failed") }) }
 
 private fun constGetEncodingAudioOggId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioOggId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioOggId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1046,9 +1046,9 @@ private fun constGetEncodingAudioOggId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_AUDIO_OGG_ID: Int by lazy { constGetEncodingAudioOggId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_OGG_ID: JNI getter failed") }) }
 
 private fun constGetEncodingAudioVorbis(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioVorbis(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioVorbis(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1056,9 +1056,9 @@ private fun constGetEncodingAudioVorbis(onError: JniErrorHandler<String>): Strin
 public val ENCODING_AUDIO_VORBIS: String by lazy { constGetEncodingAudioVorbis(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_VORBIS: JNI getter failed") }) }
 
 private fun constGetEncodingAudioVorbisId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingAudioVorbisId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingAudioVorbisId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1066,9 +1066,9 @@ private fun constGetEncodingAudioVorbisId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_AUDIO_VORBIS_ID: Int by lazy { constGetEncodingAudioVorbisId(JniErrorHandler { je -> error(je ?: "const ENCODING_AUDIO_VORBIS_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH261(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH261(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH261(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1076,9 +1076,9 @@ private fun constGetEncodingVideoH261(onError: JniErrorHandler<String>): String 
 public val ENCODING_VIDEO_H261: String by lazy { constGetEncodingVideoH261(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H261: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH261Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH261Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH261Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1086,9 +1086,9 @@ private fun constGetEncodingVideoH261Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_H261_ID: Int by lazy { constGetEncodingVideoH261Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H261_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH263(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH263(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH263(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1096,9 +1096,9 @@ private fun constGetEncodingVideoH263(onError: JniErrorHandler<String>): String 
 public val ENCODING_VIDEO_H263: String by lazy { constGetEncodingVideoH263(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H263: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH263Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH263Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH263Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1106,9 +1106,9 @@ private fun constGetEncodingVideoH263Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_H263_ID: Int by lazy { constGetEncodingVideoH263Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H263_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH264(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH264(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH264(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1116,9 +1116,9 @@ private fun constGetEncodingVideoH264(onError: JniErrorHandler<String>): String 
 public val ENCODING_VIDEO_H264: String by lazy { constGetEncodingVideoH264(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H264: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH264Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH264Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH264Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1126,9 +1126,9 @@ private fun constGetEncodingVideoH264Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_H264_ID: Int by lazy { constGetEncodingVideoH264Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H264_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH265(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH265(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH265(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1136,9 +1136,9 @@ private fun constGetEncodingVideoH265(onError: JniErrorHandler<String>): String 
 public val ENCODING_VIDEO_H265: String by lazy { constGetEncodingVideoH265(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H265: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH265Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH265Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH265Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1146,9 +1146,9 @@ private fun constGetEncodingVideoH265Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_H265_ID: Int by lazy { constGetEncodingVideoH265Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H265_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH266(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH266(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH266(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1156,9 +1156,9 @@ private fun constGetEncodingVideoH266(onError: JniErrorHandler<String>): String 
 public val ENCODING_VIDEO_H266: String by lazy { constGetEncodingVideoH266(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H266: JNI getter failed") }) }
 
 private fun constGetEncodingVideoH266Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoH266Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoH266Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1166,9 +1166,9 @@ private fun constGetEncodingVideoH266Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_H266_ID: Int by lazy { constGetEncodingVideoH266Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_H266_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoMp4(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoMp4(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoMp4(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1176,9 +1176,9 @@ private fun constGetEncodingVideoMp4(onError: JniErrorHandler<String>): String {
 public val ENCODING_VIDEO_MP4: String by lazy { constGetEncodingVideoMp4(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_MP4: JNI getter failed") }) }
 
 private fun constGetEncodingVideoMp4Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoMp4Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoMp4Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1186,9 +1186,9 @@ private fun constGetEncodingVideoMp4Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_MP4_ID: Int by lazy { constGetEncodingVideoMp4Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_MP4_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoOgg(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoOgg(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoOgg(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1196,9 +1196,9 @@ private fun constGetEncodingVideoOgg(onError: JniErrorHandler<String>): String {
 public val ENCODING_VIDEO_OGG: String by lazy { constGetEncodingVideoOgg(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_OGG: JNI getter failed") }) }
 
 private fun constGetEncodingVideoOggId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoOggId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoOggId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1206,9 +1206,9 @@ private fun constGetEncodingVideoOggId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_OGG_ID: Int by lazy { constGetEncodingVideoOggId(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_OGG_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoRaw(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoRaw(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoRaw(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1216,9 +1216,9 @@ private fun constGetEncodingVideoRaw(onError: JniErrorHandler<String>): String {
 public val ENCODING_VIDEO_RAW: String by lazy { constGetEncodingVideoRaw(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_RAW: JNI getter failed") }) }
 
 private fun constGetEncodingVideoRawId(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoRawId(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoRawId(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1226,9 +1226,9 @@ private fun constGetEncodingVideoRawId(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_RAW_ID: Int by lazy { constGetEncodingVideoRawId(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_RAW_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoVp8(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoVp8(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp8(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1236,9 +1236,9 @@ private fun constGetEncodingVideoVp8(onError: JniErrorHandler<String>): String {
 public val ENCODING_VIDEO_VP8: String by lazy { constGetEncodingVideoVp8(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP8: JNI getter failed") }) }
 
 private fun constGetEncodingVideoVp8Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoVp8Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp8Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1246,9 +1246,9 @@ private fun constGetEncodingVideoVp8Id(onError: JniErrorHandler<Int>): Int {
 public val ENCODING_VIDEO_VP8_ID: Int by lazy { constGetEncodingVideoVp8Id(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP8_ID: JNI getter failed") }) }
 
 private fun constGetEncodingVideoVp9(onError: JniErrorHandler<String>): String {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoVp9(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp9(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -1256,9 +1256,9 @@ private fun constGetEncodingVideoVp9(onError: JniErrorHandler<String>): String {
 public val ENCODING_VIDEO_VP9: String by lazy { constGetEncodingVideoVp9(JniErrorHandler { je -> error(je ?: "const ENCODING_VIDEO_VP9: JNI getter failed") }) }
 
 private fun constGetEncodingVideoVp9Id(onError: JniErrorHandler<Int>): Int {
-    val __cap = JniErrorHandlerCapture.acquire()
-    val __ret = JNINative.constGetEncodingVideoVp9Id(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __ret = JNINative.constGetEncodingVideoVp9Id(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
