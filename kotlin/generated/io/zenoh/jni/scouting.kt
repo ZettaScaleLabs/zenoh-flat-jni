@@ -38,36 +38,36 @@ public class Hello(initialPtr: Long) : NativeHandle(initialPtr) {
     /** Node type that emitted this hello message. */
     public fun getWhatami(onError: JniErrorHandler<WhatAmI>): WhatAmI {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            WhatAmI.fromInt(JNINative.helloGetWhatami(this_ptr, __cap))
+            io.zenoh.jni.config.WhatAmI.fromInt(JNINative.helloGetWhatami(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Zenoh id of the node that emitted this hello message. */
     public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZenohId(JNINative.helloGetZid(this_ptr, __cap))
+            ZenohId(JNINative.helloGetZid(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Locators advertised in this hello message. */
     public fun getLocators(onError: JniErrorHandler<List<String>>): List<String> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.helloGetLocators(this_ptr, ArrayList<String>(), __StringFolderHolder.instance, __cap) as List<String>)
+            (JNINative.helloGetLocators(this_ptr, ArrayList<String>(), __StringFolderHolder.instance, __bcap) as List<String>)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -130,28 +130,30 @@ public fun HelloCallback.asRaw(): HelloCallbackRaw =
  *
  * The close callback is called when scouting ends.
  *
- * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+ * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
  */
 public fun scout(
     whatami: Int,
     config: Config?,
     callback: HelloCallback,
     onClose: VoidCallback,
+    onBindingError: JniErrorHandler<Scout>,
     onError: ErrorHandler<Scout>,
 ): Scout {
-    if (config != null && config.isClosed()) return onError.run(
+    if (config != null && config.isClosed()) return onBindingError.run(
         "Operation on a closed native handle.",
-        "",
     )
-    val __cap = ErrorHandlerCapture.acquire()
+    val __bcap = JniErrorHandlerCapture.acquire()
+    val __dcap = ErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         config?.let { __locks.add(it) }
         withSortedHandleLocks(__locks) {
             val config_ptr = config?.ptr ?: 0L
-            Scout(JNINative.scout(whatami, config_ptr, callback.asRaw(), onClose, __cap))
+            Scout(JNINative.scout(whatami, config_ptr, callback.asRaw(), onClose, __bcap, __dcap))
         }
     }
-    if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+    if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+    if (__dcap.failed) return onError.run(__dcap.ze0!!)
     return __ret
 }

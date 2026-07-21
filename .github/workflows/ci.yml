@@ -143,6 +143,68 @@ jobs:
       - name: Run tests
         run: cargo test --all --all-features --verbose
 
+  gradle-test:
+    name: Gradle test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: zenoh-flat-jni
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: zenoh-flat-jni
+
+      - name: Check out zenoh-flat
+        uses: actions/checkout@v4
+        with:
+          repository: ZettaScaleLabs/zenoh-flat
+          ref: 1ece3df5e64db63f980a43e8ae661bdd5ed760c2
+          path: zenoh-flat
+
+      - name: Use prebindgen from GitHub main
+        shell: bash
+        run: |
+          sed -i.bak \
+            -e 's|prebindgen = { path = "../prebindgen/prebindgen" }|prebindgen = { git = "https://github.com/milyin/prebindgen.git", branch = "main" }|g' \
+            -e 's|prebindgen-proc-macro = { path = "../prebindgen/prebindgen-proc-macro",|prebindgen-proc-macro = { git = "https://github.com/milyin/prebindgen.git", branch = "main",|g' \
+            Cargo.toml ../zenoh-flat/Cargo.toml
+          rm Cargo.toml.bak ../zenoh-flat/Cargo.toml.bak
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.93.0
+
+      - name: Install JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: zenoh-flat-jni/target
+          key: ${{ runner.os }}-gradle-test-target-${{ hashFiles('zenoh-flat-jni/Cargo.toml', 'zenoh-flat-jni/Cargo.lock', 'zenoh-flat/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-test-target-
+
+      # Runs the Kotlin correspondence tests: each verifies a pure-Kotlin
+      # implementation (Parameters, SerializationCodec, EncodingCodec, ZenohId)
+      # against the native oracle in `io.zenoh.jni.test`. The `test` task builds
+      # the native lib (dependsOn buildZenohFlatJni) and puts it on
+      # java.library.path, so no separate cargo build step is needed.
+      - name: Run Gradle tests
+        run: gradle test --info
+
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}

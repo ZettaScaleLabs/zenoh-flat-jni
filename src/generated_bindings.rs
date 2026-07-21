@@ -38,40 +38,47 @@ impl<T: ?Sized> OwnedObject<T> {
     }
 }
 #[allow(non_snake_case, dead_code)]
-pub(crate) fn signal_error(
+pub(crate) fn signal_binding_error(
     env: &mut jni::JNIEnv,
     sink: &jni::objects::JObject,
     mid: &::prebindgen::lang::CachedIfaceMethod,
     fqn: &str,
     descr: &str,
-    je: ::core::option::Option<&str>,
+    je: &str,
+) {
+    if env.exception_check().unwrap_or(false) {
+        return;
+    }
+    let __je: jni::objects::JObject = match env.new_string(je) {
+        Ok(s) => s.into(),
+        Err(e) => {
+            tracing::error!("signal_binding_error: new_string failed: {}", e);
+            return;
+        }
+    };
+    let __args = [
+        jni::sys::jvalue {
+            l: __je.as_raw(),
+        },
+    ];
+    if let Err(e) = mid.call_object(env, fqn, "run", descr, sink, &__args) {
+        tracing::error!("signal_binding_error: error-callback invoke failed: {}", e);
+    }
+}
+#[allow(non_snake_case, dead_code)]
+pub(crate) fn signal_domain_error(
+    env: &mut jni::JNIEnv,
+    sink: &jni::objects::JObject,
+    mid: &::prebindgen::lang::CachedIfaceMethod,
+    fqn: &str,
+    descr: &str,
     ze: &[jni::sys::jvalue],
 ) {
     if env.exception_check().unwrap_or(false) {
         return;
     }
-    let __je: jni::objects::JObject = match je {
-        ::core::option::Option::Some(__m) => {
-            match env.new_string(__m) {
-                Ok(s) => s.into(),
-                Err(e) => {
-                    tracing::error!("signal_error: new_string failed: {}", e);
-                    return;
-                }
-            }
-        }
-        ::core::option::Option::None => jni::objects::JObject::null(),
-    };
-    let mut __args: ::std::vec::Vec<jni::sys::jvalue> = ::std::vec::Vec::with_capacity(
-        1 + ze.len(),
-    );
-    __args
-        .push(jni::sys::jvalue {
-            l: __je.as_raw(),
-        });
-    __args.extend_from_slice(ze);
-    if let Err(e) = mid.call_object(env, fqn, "run", descr, sink, &__args) {
-        tracing::error!("signal_error: error-callback invoke failed: {}", e);
+    if let Err(e) = mid.call_object(env, fqn, "run", descr, sink, ze) {
+        tracing::error!("signal_domain_error: error-callback invoke failed: {}", e);
     }
 }
 #[no_mangle]
@@ -357,10 +364,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohBytes<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -373,15 +376,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohBytes<
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -394,10 +395,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohBytesI
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -410,15 +407,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohBytesI
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -431,10 +426,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohString
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -447,15 +438,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohString
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -468,10 +457,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohString
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -484,15 +469,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohString
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -505,10 +488,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohSerial
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -521,15 +500,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohSerial
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -544,10 +521,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohSerial
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -560,15 +533,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingZenohSerial
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -583,10 +554,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -599,15 +566,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -622,10 +587,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -638,15 +599,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -659,10 +618,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextPlain<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -675,15 +630,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextPlain<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -696,10 +649,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextPlainId
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -712,15 +661,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextPlainId
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -733,10 +680,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -749,15 +692,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -772,10 +713,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -788,15 +725,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -809,10 +744,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -825,15 +756,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -846,10 +775,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJsonId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -862,15 +787,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJsonId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -883,10 +806,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -899,15 +818,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -922,10 +839,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -938,15 +851,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -959,10 +870,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -975,15 +882,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -998,10 +903,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1014,15 +915,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1035,10 +934,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1051,15 +946,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1074,10 +967,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1090,15 +979,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1111,10 +998,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextYaml<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1127,15 +1010,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextYaml<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1148,10 +1029,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextYamlId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1164,15 +1041,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextYamlId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1185,10 +1060,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson5<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1201,15 +1072,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson5<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1222,10 +1091,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson5Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1238,15 +1103,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJson5Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1261,10 +1124,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1277,15 +1136,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1300,10 +1157,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1316,15 +1169,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1339,10 +1190,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1355,15 +1202,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1378,10 +1223,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1394,15 +1235,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1417,10 +1256,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1433,15 +1268,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1456,10 +1289,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1472,15 +1301,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1495,10 +1322,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1511,15 +1334,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1534,10 +1355,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1550,15 +1367,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1571,10 +1386,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImagePng<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1587,15 +1398,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImagePng<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1608,10 +1417,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImagePngId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1624,15 +1429,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImagePngId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1645,10 +1448,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageJpeg<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1661,15 +1460,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageJpeg<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1682,10 +1479,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageJpegId
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1698,15 +1491,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageJpegId
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1719,10 +1510,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageGif<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1735,15 +1522,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageGif<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1756,10 +1541,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageGifId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1772,15 +1553,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageGifId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1793,10 +1572,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageBmp<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1809,15 +1584,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageBmp<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1830,10 +1603,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageBmpId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1846,15 +1615,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageBmpId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1867,10 +1634,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageWebp<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1883,15 +1646,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageWebp<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1904,10 +1665,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageWebpId
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1920,15 +1677,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingImageWebpId
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -1941,10 +1696,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1957,15 +1708,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -1980,10 +1729,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -1996,15 +1741,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2019,10 +1762,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2035,15 +1774,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2058,10 +1795,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2074,15 +1807,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2095,10 +1826,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextHtml<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2111,15 +1838,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextHtml<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2132,10 +1857,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextHtmlId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2148,15 +1869,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextHtmlId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2169,10 +1888,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextXml<'a>
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2185,15 +1900,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextXml<'a>
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2206,10 +1919,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextXmlId<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2222,15 +1931,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextXmlId<'
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2243,10 +1950,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCss<'a>
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2259,15 +1962,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCss<'a>
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2280,10 +1981,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCssId<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2296,15 +1993,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCssId<'
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2317,10 +2012,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJavascr
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2333,15 +2024,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJavascr
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2356,10 +2045,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJavascr
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2372,15 +2057,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextJavascr
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2393,10 +2076,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextMarkdow
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2409,15 +2088,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextMarkdow
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2430,10 +2107,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextMarkdow
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2446,15 +2119,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextMarkdow
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2467,10 +2138,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCsv<'a>
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2483,15 +2150,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCsv<'a>
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2504,10 +2169,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCsvId<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2520,15 +2181,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingTextCsvId<'
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2541,10 +2200,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2557,15 +2212,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2580,10 +2233,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2596,15 +2245,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2619,10 +2266,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2635,15 +2278,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2658,10 +2299,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2674,15 +2311,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2697,10 +2332,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2713,15 +2344,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2736,10 +2365,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2752,15 +2377,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2775,10 +2398,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2791,15 +2410,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2814,10 +2431,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2830,15 +2443,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2853,10 +2464,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2869,15 +2476,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2892,10 +2497,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2908,15 +2509,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -2929,10 +2528,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2945,15 +2540,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -2968,10 +2561,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -2984,15 +2573,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3005,10 +2592,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3021,15 +2604,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3044,10 +2625,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3060,15 +2637,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3083,10 +2658,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3099,15 +2670,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3122,10 +2691,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3138,15 +2703,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3159,10 +2722,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3175,15 +2734,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3198,10 +2755,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3214,15 +2767,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingApplication
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3235,10 +2786,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioAac<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3251,15 +2798,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioAac<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3272,10 +2817,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioAacId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3288,15 +2829,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioAacId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3309,10 +2848,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioFlac<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3325,15 +2860,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioFlac<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3346,10 +2879,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioFlacId
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3362,15 +2891,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioFlacId
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3383,10 +2910,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioMp4<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3399,15 +2922,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioMp4<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3420,10 +2941,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioMp4Id<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3436,15 +2953,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioMp4Id<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3457,10 +2972,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioOgg<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3473,15 +2984,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioOgg<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3494,10 +3003,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioOggId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3510,15 +3015,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioOggId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3531,10 +3034,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioVorbis
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3547,15 +3046,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioVorbis
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3568,10 +3065,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioVorbis
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3584,15 +3077,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingAudioVorbis
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3605,10 +3096,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH261<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3621,15 +3108,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH261<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3642,10 +3127,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH261Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3658,15 +3139,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH261Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3679,10 +3158,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH263<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3695,15 +3170,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH263<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3716,10 +3189,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH263Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3732,15 +3201,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH263Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3753,10 +3220,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH264<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3769,15 +3232,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH264<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3790,10 +3251,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH264Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3806,15 +3263,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH264Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3827,10 +3282,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH265<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3843,15 +3294,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH265<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3864,10 +3313,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH265Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3880,15 +3325,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH265Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3901,10 +3344,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH266<'
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3917,15 +3356,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH266<'
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -3938,10 +3375,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH266Id
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3954,15 +3387,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoH266Id
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -3975,10 +3406,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoMp4<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -3991,15 +3418,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoMp4<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -4012,10 +3437,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoMp4Id<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4028,15 +3449,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoMp4Id<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -4049,10 +3468,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoOgg<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4065,15 +3480,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoOgg<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -4086,10 +3499,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoOggId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4102,15 +3511,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoOggId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -4123,10 +3530,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoRaw<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4139,15 +3542,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoRaw<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -4160,10 +3561,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoRawId<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4176,15 +3573,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoRawId<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -4197,10 +3592,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp8<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4213,15 +3604,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp8<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -4234,10 +3623,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp8Id<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4250,15 +3635,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp8Id<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -4271,10 +3654,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp9<'a
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4287,15 +3666,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp9<'a
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -4308,10 +3685,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp9Id<
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -4324,15 +3697,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_constGetEncodingVideoVp9Id<
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -7138,30 +6509,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
     c: jni::sys::jlong,
     key: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -7169,15 +6536,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
     let key = match JString_to_String_c7f3ca43(&mut env, &key) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -7192,28 +6557,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return jni::objects::JObject::null().into();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7226,15 +6588,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configGetJson<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -7249,30 +6609,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
     key: jni::objects::JString<'a>,
     value: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let mut c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -7280,15 +6636,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
     let key = match JString_to_String_c7f3ca43(&mut env, &key) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -7296,15 +6650,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
     let value = match JString_to_String_c7f3ca43(&mut env, &value) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -7319,28 +6671,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7353,15 +6702,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configInsertJson5<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -7375,10 +6722,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewClone<'a>(
     c: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7386,15 +6729,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewClone<'a>(
     let c = match jlong_to_Config_d1f60c7d(&mut env, &c) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7403,15 +6744,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewClone<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7424,10 +6763,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewDefault<'a>(
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7436,15 +6771,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewDefault<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7457,30 +6790,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromFile<'a>(
     _class: jni::objects::JClass<'a>,
     path: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let path = match JString_to_String_c7f3ca43(&mut env, &path) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7495,28 +6824,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromFile<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7529,15 +6855,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromFile<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7550,30 +6874,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson<'a>(
     _class: jni::objects::JClass<'a>,
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7588,28 +6908,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7622,15 +6939,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7643,30 +6958,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson5<'a>(
     _class: jni::objects::JClass<'a>,
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7681,28 +6992,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson5<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7715,15 +7023,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromJson5<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7736,30 +7042,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromYaml<'a>(
     _class: jni::objects::JClass<'a>,
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7774,28 +7076,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromYaml<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -7808,15 +7107,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_configNewFromYaml<'a>(
     match Config_to_jlong_d1f60c7d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7830,10 +7127,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetId<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7841,15 +7134,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetId<'a>(
     let e = match jlong_to_Encoding_e0e31e0d(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -7858,15 +7149,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetId<'a>(
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -7880,10 +7169,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetSchema<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7891,15 +7176,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetSchema<'a>(
     let e = match jlong_to_Encoding_e0e31e0d(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -7908,15 +7191,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingGetSchema<'a>(
     match Option_String_to_JString_56d5e304(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -7930,10 +7211,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewClone<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7941,15 +7218,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewClone<'a>(
     let e = match jlong_to_Encoding_e0e31e0d(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -7958,15 +7233,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewClone<'a>(
     match Encoding_to_jlong_e0e31e0d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -7981,10 +7254,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromId<'a>(
     schema: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -7992,15 +7261,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromId<'a>(
     let id = match jint_to_i32_a3e3b6ef(&mut env, &id) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8008,15 +7275,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromId<'a>(
     let schema = match JString_to_Option_String_56d5e304(&mut env, &schema) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8025,15 +7290,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromId<'a>(
     match Encoding_to_jlong_e0e31e0d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -8047,10 +7310,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromString<'a>(
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8058,15 +7317,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromString<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8075,15 +7332,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewFromString<'a>(
     match Encoding_to_jlong_e0e31e0d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -8102,10 +7357,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     schema: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8113,15 +7364,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     let __exp_e_sel = match jint_to_i32_a3e3b6ef(&mut env, &e_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8130,15 +7379,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &e_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -8150,15 +7397,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     let __exp_e_0_1 = match JString_to_Option_String_56d5e304(&mut env, &e_0_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8166,15 +7411,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     let __exp_e_1 = match jlong_to_Option_Encoding_e89ec09d(&mut env, &e_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8221,15 +7464,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8237,15 +7478,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     let schema = match JString_to_String_c7f3ca43(&mut env, &schema) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -8254,15 +7493,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingNewWithSchema<'a>(
     match Encoding_to_jlong_e0e31e0d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -8276,10 +7513,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingToString<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8287,15 +7520,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingToString<'a>(
     let e = match jlong_to_Encoding_e0e31e0d(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -8304,15 +7535,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_encodingToString<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -8328,10 +7557,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
     __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8339,15 +7564,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
     let h = match jlong_to_Hello_bbd3fc65(&mut env, &h) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -8362,15 +7585,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
         let __enc = match String_to_JString_c7f3ca43(&mut env, __elem) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -8399,15 +7620,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetLocators<'a>(
                 let __e2 = <__JniErr as ::core::convert::From<
                     String,
                 >>::from(__e.to_string());
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e2.to_string()),
-                    &__zd,
+                    &__e2.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -8423,10 +7642,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetWhatami<'a>(
     h: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8434,15 +7649,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetWhatami<'a>(
     let h = match jlong_to_Hello_bbd3fc65(&mut env, &h) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -8451,15 +7664,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetWhatami<'a>(
     match WhatAmI_to_jint_4c5d5738(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -8473,10 +7684,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetZid<'a>(
     h: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8484,15 +7691,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetZid<'a>(
     let h = match jlong_to_Hello_bbd3fc65(&mut env, &h) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -8501,15 +7706,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_helloGetZid<'a>(
     match ZenohId_to_JByteArray_2caee6f1(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -8523,10 +7726,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initAndroidLogs<'a>(
     filter: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8534,15 +7733,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initAndroidLogs<'a>(
     let filter = match JString_to_String_c7f3ca43(&mut env, &filter) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -8551,15 +7748,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initAndroidLogs<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -8573,10 +7768,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initZenohLogsFromEnvOr<'a>(
     fallback_filter: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8584,15 +7775,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initZenohLogsFromEnvOr<'a>(
     let fallback_filter = match JString_to_String_c7f3ca43(&mut env, &fallback_filter) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -8601,15 +7790,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_initZenohLogsFromEnvOr<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -8623,10 +7810,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprGetStr<'a>(
     ke: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8634,15 +7817,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprGetStr<'a>(
     let ke = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &ke) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -8651,15 +7832,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprGetStr<'a>(
     match str_to_JString_7b77dc67(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -8676,10 +7855,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     b_1: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8687,15 +7862,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8703,15 +7876,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     let __exp_b_sel = match jint_to_i32_a3e3b6ef(&mut env, &b_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8719,15 +7890,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     let __exp_b_0 = match JString_to_Option_String_56d5e304(&mut env, &b_0) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8735,15 +7904,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     let __exp_b_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &b_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8789,15 +7956,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8806,15 +7971,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIncludes<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -8831,10 +7994,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     b_1: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -8842,15 +8001,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8858,15 +8015,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     let __exp_b_sel = match jint_to_i32_a3e3b6ef(&mut env, &b_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8874,15 +8029,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     let __exp_b_0 = match JString_to_Option_String_56d5e304(&mut env, &b_0) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8890,15 +8043,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     let __exp_b_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &b_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8944,15 +8095,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -8961,15 +8110,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprIntersects<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -8982,30 +8129,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewAutocanonize<'a>(
     _class: jni::objects::JClass<'a>,
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9020,28 +8163,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewAutocanonize<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -9054,15 +8194,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewAutocanonize<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -9076,10 +8214,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewClone<'a>(
     ke: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -9087,15 +8221,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewClone<'a>(
     let ke = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &ke) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9104,15 +8236,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewClone<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -9128,30 +8258,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     a_1: jni::sys::jlong,
     b: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9159,15 +8285,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     let __exp_a_0 = match JString_to_Option_String_56d5e304(&mut env, &a_0) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9175,15 +8299,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     let __exp_a_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &a_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9229,15 +8351,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9245,15 +8365,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     let b = match JString_to_String_c7f3ca43(&mut env, &b) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9268,28 +8386,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -9302,15 +8417,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewConcat<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -9326,30 +8439,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     a_1: jni::sys::jlong,
     b: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let __exp_a_sel = match jint_to_i32_a3e3b6ef(&mut env, &a_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9357,15 +8466,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     let __exp_a_0 = match JString_to_Option_String_56d5e304(&mut env, &a_0) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9373,15 +8480,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     let __exp_a_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &a_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9427,15 +8532,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9443,15 +8546,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     let b = match JString_to_String_c7f3ca43(&mut env, &b) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9466,28 +8567,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -9500,15 +8598,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewJoin<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -9521,30 +8617,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewTryFrom<'a>(
     _class: jni::objects::JClass<'a>,
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9559,28 +8651,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewTryFrom<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -9593,15 +8682,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprNewTryFrom<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -9618,10 +8705,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     b_1: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -9629,15 +8712,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     let a = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &a) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -9645,15 +8726,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     let __exp_b_sel = match jint_to_i32_a3e3b6ef(&mut env, &b_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -9661,15 +8740,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     let __exp_b_0 = match JString_to_Option_String_56d5e304(&mut env, &b_0) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -9677,15 +8754,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     let __exp_b_1 = match jlong_to_Option_KeyExpr_d960fa7d(&mut env, &b_1) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -9731,15 +8806,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -9748,15 +8821,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprRelationTo<'a>(
     match SetIntersectionLevel_to_jint_0e49fc84(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -9770,10 +8841,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprToString<'a>(
     ke: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -9781,15 +8848,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprToString<'a>(
     let ke = match jlong_to_KeyExpr_5d6bcc5b(&mut env, &ke) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -9798,15 +8863,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_keyexprToString<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -9825,30 +8888,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9856,15 +8915,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9875,15 +8932,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9894,15 +8949,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9946,15 +8999,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9962,15 +9013,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     let history = match jboolean_to_bool_31306d98(&mut env, &history) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -9981,15 +9030,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10000,15 +9047,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10029,28 +9074,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -10063,15 +9105,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareSubscriber
     match Subscriber_to_jlong_73e1b4a2(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -10087,30 +9127,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     key_expr_0: jni::objects::JString<'a>,
     key_expr_1: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10118,15 +9154,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10137,15 +9171,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10156,15 +9188,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10208,15 +9238,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -10231,28 +9259,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -10265,15 +9290,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessDeclareToken<'a>(
     match LivelinessToken_to_jlong_d3477f0e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -10292,30 +9315,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10323,15 +9342,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10342,15 +9359,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10361,15 +9376,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10415,15 +9428,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -10431,15 +9442,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     let timeout_ms = match jlong_to_i64_fbf9a9bc(&mut env, &timeout_ms) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10450,15 +9459,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10469,15 +9476,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -10498,28 +9503,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -10532,15 +9534,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_livelinessGet<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -10553,28 +9553,24 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_open<'a>(
     _class: jni::objects::JClass<'a>,
     config: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     if config == 0 || (config & 1) == 1 {
-        let __zd = __ze_defaults(&mut env);
-        signal_error(
+        signal_binding_error(
             &mut env,
             &__error_sink,
             &__SINK_MID,
             __SINK_FQN,
             __SINK_DESCR,
-            ::core::option::Option::Some("Operation on a closed native handle."),
-            &__zd,
+            "Operation on a closed native handle.",
         );
         return 0 as jni::sys::jlong;
     }
@@ -10591,28 +9587,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_open<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -10625,15 +9618,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_open<'a>(
     match Session_to_jlong_4d3982f6(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -10648,10 +9639,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersContainsKey<'a>(
     k: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10659,15 +9646,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersContainsKey<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -10675,15 +9660,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersContainsKey<'a>(
     let k = match JString_to_String_c7f3ca43(&mut env, &k) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -10692,15 +9675,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersContainsKey<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -10715,10 +9696,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersExtend<'a>(
     other: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10726,15 +9703,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersExtend<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10742,15 +9717,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersExtend<'a>(
     let other = match JString_to_String_c7f3ca43(&mut env, &other) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10759,15 +9732,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersExtend<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -10782,10 +9753,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersGet<'a>(
     k: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10793,15 +9760,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersGet<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10809,15 +9774,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersGet<'a>(
     let k = match JString_to_String_c7f3ca43(&mut env, &k) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10826,15 +9789,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersGet<'a>(
     match Option_String_to_JString_56d5e304(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -10850,10 +9811,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersInsert<'a>(
     v: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10861,15 +9818,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersInsert<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10877,15 +9832,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersInsert<'a>(
     let k = match JString_to_String_c7f3ca43(&mut env, &k) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10893,15 +9846,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersInsert<'a>(
     let v = match JString_to_String_c7f3ca43(&mut env, &v) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -10910,15 +9861,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersInsert<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -10932,10 +9881,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersIsWellFormed<'a>(
     s: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10943,15 +9888,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersIsWellFormed<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -10960,15 +9903,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersIsWellFormed<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -10983,10 +9924,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersRemove<'a>(
     k: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -10994,15 +9931,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersRemove<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -11010,15 +9945,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersRemove<'a>(
     let k = match JString_to_String_c7f3ca43(&mut env, &k) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -11027,15 +9960,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersRemove<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -11052,10 +9983,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersValues<'a>(
     __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -11063,15 +9990,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersValues<'a>(
     let s = match JString_to_String_c7f3ca43(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -11079,15 +10004,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersValues<'a>(
     let k = match JString_to_String_c7f3ca43(&mut env, &k) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -11102,15 +10025,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersValues<'a>(
         let __enc = match String_to_JString_c7f3ca43(&mut env, __elem) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -11139,15 +10060,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_parametersValues<'a>(
                 let __e2 = <__JniErr as ::core::convert::From<
                     String,
                 >>::from(__e.to_string());
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e2.to_string()),
-                    &__zd,
+                    &__e2.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -11163,30 +10082,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
     publisher: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let publisher = match jlong_to_Publisher_7bfc8296(&mut env, &publisher) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11197,15 +10112,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11224,15 +10137,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11247,28 +10158,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -11281,15 +10189,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherDelete<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -11309,30 +10215,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     encoding_1: jni::sys::jlong,
     attachment: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let publisher = match jlong_to_Publisher_7bfc8296(&mut env, &publisher) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11340,15 +10242,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     let __exp_payload = match JByteArray_to_Vec_u8_7936d5de(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11361,15 +10261,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11377,15 +10275,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11394,15 +10290,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -11417,15 +10311,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11436,15 +10328,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11500,15 +10390,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11519,15 +10407,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11546,15 +10432,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11574,28 +10458,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -11608,15 +10489,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_publisherPut<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -11639,30 +10518,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let querier = match jlong_to_Querier_9db85a56(&mut env, &querier) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11670,15 +10545,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     let parameters = match JString_to_Option_String_56d5e304(&mut env, &parameters) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11686,15 +10559,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     let __exp_payload = match JByteArray_to_Option_Vec_u8_6f4428ab(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11713,15 +10584,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11729,15 +10598,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11746,15 +10613,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -11769,15 +10634,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11788,15 +10651,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11852,15 +10713,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11871,15 +10730,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11898,15 +10755,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -11917,15 +10772,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11936,15 +10789,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -11967,28 +10818,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -12001,15 +10849,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_querierGet<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -12023,10 +10869,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAcceptsReplies<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12034,15 +10876,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAcceptsReplies<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -12051,15 +10891,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAcceptsReplies<'a>(
     match ReplyKeyExpr_to_jint_0d9719f5(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -12073,10 +10911,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAttachment<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12084,15 +10918,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAttachment<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -12101,15 +10933,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetAttachment<'a>(
     match Option_ZBytes_to_jlong_c521cd2f(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -12123,10 +10953,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetEncoding<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12134,15 +10960,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetEncoding<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -12151,15 +10975,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetEncoding<'a>(
     match Option_Encoding_to_jlong_e89ec09d(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -12173,10 +10995,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetKeyexpr<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12184,15 +11002,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetKeyexpr<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -12201,15 +11017,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetKeyexpr<'a>(
     match KeyExpr_to_jlong_57109ee0(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -12223,10 +11037,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetParameters<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12234,15 +11044,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetParameters<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -12251,15 +11059,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetParameters<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -12273,10 +11079,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetPayload<'a>(
     q: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -12284,15 +11086,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetPayload<'a>(
     let q = match jlong_to_Query_3af47090(&mut env, &q) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -12301,15 +11101,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryGetPayload<'a>(
     match Option_ZBytes_to_jlong_c521cd2f(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -12330,30 +11128,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     express_present: jni::sys::jboolean,
     express_value: jni::sys::jboolean,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12361,15 +11155,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12380,15 +11172,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12399,15 +11189,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12453,15 +11241,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -12473,15 +11259,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -12496,15 +11280,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12523,15 +11305,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -12540,15 +11320,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -12573,28 +11351,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -12607,15 +11382,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyDelete<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -12634,30 +11407,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     encoding_0_1: jni::objects::JString<'a>,
     encoding_1: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12665,15 +11434,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     let __exp_payload = match JByteArray_to_Vec_u8_7936d5de(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12686,15 +11453,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -12702,15 +11467,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12719,15 +11482,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -12742,15 +11503,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12761,15 +11520,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -12825,15 +11582,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -12852,28 +11607,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -12886,15 +11638,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplyError<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -12908,44 +11658,38 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
     query: jni::sys::jlong,
     sample: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
     };
     if sample == 0 || (sample & 1) == 1 {
-        let __zd = __ze_defaults(&mut env);
-        signal_error(
+        signal_binding_error(
             &mut env,
             &__error_sink,
             &__SINK_MID,
             __SINK_FQN,
             __SINK_DESCR,
-            ::core::option::Option::Some("Operation on a closed native handle."),
-            &__zd,
+            "Operation on a closed native handle.",
         );
         return ();
     }
@@ -12962,28 +11706,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -12996,15 +11737,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySample<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -13031,30 +11770,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     express_present: jni::sys::jboolean,
     express_value: jni::sys::jboolean,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let query = match jlong_to_Query_3af47090(&mut env, &query) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13062,15 +11797,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13081,15 +11814,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13100,15 +11831,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13154,15 +11883,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -13170,15 +11897,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     let __exp_payload = match JByteArray_to_Vec_u8_7936d5de(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13191,15 +11916,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -13207,15 +11930,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13224,15 +11945,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -13247,15 +11966,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13266,15 +11983,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13330,15 +12045,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -13350,15 +12063,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -13373,15 +12084,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -13400,15 +12109,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -13417,15 +12124,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -13452,28 +12157,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -13486,15 +12188,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_queryReplySuccess<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -13508,10 +12208,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetEncoding<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13519,15 +12215,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetEncoding<'a>(
     let e = match jlong_to_ReplyError_9db9d1a6(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13536,15 +12230,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetEncoding<'a>(
     match Encoding_to_jlong_072adb3b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -13558,10 +12250,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetPayload<'a>(
     e: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13569,15 +12257,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetPayload<'a>(
     let e = match jlong_to_ReplyError_9db9d1a6(&mut env, &e) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13586,15 +12272,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyErrorGetPayload<'a>(
     match ZBytes_to_jlong_56134c74(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -13608,10 +12292,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetErr<'a>(
     r: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13619,15 +12299,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetErr<'a>(
     let r = match jlong_to_Reply_8e506ce5(&mut env, &r) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13636,15 +12314,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetErr<'a>(
     match Option_ReplyError_to_jlong_d3e8c438(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -13658,10 +12334,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierEid<'a>(
     r: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13669,15 +12341,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierEid<'a>(
     let r = match jlong_to_Reply_8e506ce5(&mut env, &r) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -13686,15 +12356,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierEid<'a>(
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -13708,10 +12376,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierZid<'a>(
     r: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13719,15 +12383,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierZid<'a>(
     let r = match jlong_to_Reply_8e506ce5(&mut env, &r) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -13736,15 +12398,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetReplierZid<'a>(
     match Option_ZenohId_to_JByteArray_6880b2ba(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -13758,10 +12418,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetSample<'a>(
     r: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13769,15 +12425,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetSample<'a>(
     let r = match jlong_to_Reply_8e506ce5(&mut env, &r) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13786,15 +12440,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyGetSample<'a>(
     match Option_Sample_to_jlong_e48d7024(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -13808,10 +12460,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyIsOk<'a>(
     r: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13819,15 +12467,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyIsOk<'a>(
     let r = match jlong_to_Reply_8e506ce5(&mut env, &r) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -13836,15 +12482,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_replyIsOk<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -13858,10 +12502,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetAttachment<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13869,15 +12509,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetAttachment<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13886,15 +12524,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetAttachment<'a>(
     match Option_ZBytes_to_jlong_c521cd2f(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -13908,10 +12544,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetCongestionControl<
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13919,15 +12551,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetCongestionControl<
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -13936,15 +12566,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetCongestionControl<
     match CongestionControl_to_jint_62e38379(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -13958,10 +12586,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetEncoding<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -13969,15 +12593,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetEncoding<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -13986,15 +12608,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetEncoding<'a>(
     match Encoding_to_jlong_072adb3b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -14008,10 +12628,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetExpress<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jboolean {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14019,15 +12635,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetExpress<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jboolean;
         }
@@ -14036,15 +12650,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetExpress<'a>(
     match bool_to_jboolean_31306d98(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jboolean
         }
@@ -14058,10 +12670,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKeyExpr<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14069,15 +12677,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKeyExpr<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -14086,15 +12692,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKeyExpr<'a>(
     match KeyExpr_to_jlong_57109ee0(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -14108,10 +12712,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKind<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14119,15 +12719,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKind<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -14136,15 +12734,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetKind<'a>(
     match SampleKind_to_jint_d7ea75a8(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -14158,10 +12754,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPayload<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14169,15 +12761,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPayload<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -14186,15 +12776,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPayload<'a>(
     match ZBytes_to_jlong_56134c74(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -14208,10 +12796,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPriority<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14219,15 +12803,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPriority<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -14236,15 +12818,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetPriority<'a>(
     match Priority_to_jint_447102d2(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -14258,10 +12838,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetReliability<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14269,15 +12845,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetReliability<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -14286,15 +12860,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetReliability<'a>(
     match Reliability_to_jint_5d4a96c8(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -14308,10 +12880,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceEid<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jint {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14319,15 +12887,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceEid<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jint;
         }
@@ -14336,15 +12902,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceEid<'a>(
     match i32_to_jint_a3e3b6ef(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jint
         }
@@ -14358,10 +12922,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceSn<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14369,15 +12929,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceSn<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -14386,15 +12944,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceSn<'a>(
     match i64_to_jlong_fbf9a9bc(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -14408,10 +12964,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceZid<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14419,15 +12971,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceZid<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14436,15 +12986,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetSourceZid<'a>(
     match Option_ZenohId_to_JByteArray_6880b2ba(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -14458,10 +13006,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetTimestamp<'a>(
     s: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14469,15 +13013,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetTimestamp<'a>(
     let s = match jlong_to_Sample_f8134321(&mut env, &s) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -14486,15 +13028,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleGetTimestamp<'a>(
     match Option_Timestamp_to_jlong_880c755c(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -14522,10 +13062,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -14533,15 +13069,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14552,15 +13086,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14571,15 +13103,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14623,15 +13153,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14643,15 +13171,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14666,15 +13192,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14693,15 +13217,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -14713,15 +13235,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14734,15 +13254,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14755,15 +13273,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14779,15 +13295,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14816,15 +13330,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14838,15 +13350,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14860,15 +13370,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14882,15 +13390,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14905,15 +13411,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             ) {
                 ::core::result::Result::Ok(__w) => __w,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -14921,15 +13425,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             match ::prebindgen::lang::box_jlong(&mut env, __enc5) {
                 ::core::result::Result::Ok(__o) => __o,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e),
-                        &__zd,
+                        &__e,
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -14944,15 +13446,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14966,15 +13466,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -14988,15 +13486,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15010,15 +13506,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15032,15 +13526,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15054,15 +13546,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15076,15 +13566,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15098,15 +13586,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15118,15 +13604,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             let __h9: jni::sys::jlong = match ZBytes_to_jlong_56134c74(&mut env, __n0) {
                 ::core::result::Result::Ok(__w) => __w,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -15134,15 +13618,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             match ::prebindgen::lang::box_jlong(&mut env, __h9) {
                 ::core::result::Result::Ok(__o) => __o,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -15191,15 +13673,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewDelete<'a>(
             let __e2 = <__JniErr as ::core::convert::From<
                 String,
             >>::from(__e.to_string());
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
-                &__zd,
+                &__e2.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -15233,10 +13713,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     __builder: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -15244,15 +13720,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15263,15 +13737,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15282,15 +13754,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15334,15 +13804,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15350,15 +13818,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     let __exp_payload = match JByteArray_to_Vec_u8_7936d5de(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15371,15 +13837,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15387,15 +13851,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15404,15 +13866,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15427,15 +13887,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15446,15 +13904,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15510,15 +13966,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15530,15 +13984,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15553,15 +14005,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15580,15 +14030,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -15600,15 +14048,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15621,15 +14067,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15642,15 +14086,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15666,15 +14108,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15705,15 +14145,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15727,15 +14165,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15749,15 +14185,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15771,15 +14205,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15794,15 +14226,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             ) {
                 ::core::result::Result::Ok(__w) => __w,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -15810,15 +14240,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             match ::prebindgen::lang::box_jlong(&mut env, __enc5) {
                 ::core::result::Result::Ok(__o) => __o,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e),
-                        &__zd,
+                        &__e,
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -15833,15 +14261,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15855,15 +14281,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15877,15 +14301,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15899,15 +14321,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15921,15 +14341,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15943,15 +14361,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15965,15 +14381,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -15987,15 +14401,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
         ) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -16007,15 +14419,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __h9: jni::sys::jlong = match ZBytes_to_jlong_56134c74(&mut env, __n0) {
                 ::core::result::Result::Ok(__w) => __w,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -16023,15 +14433,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             match ::prebindgen::lang::box_jlong(&mut env, __h9) {
                 ::core::result::Result::Ok(__o) => __o,
                 ::core::result::Result::Err(__e) => {
-                    let __zd = __ze_defaults(&mut env);
-                    signal_error(
+                    signal_binding_error(
                         &mut env,
                         &__error_sink,
                         &__SINK_MID,
                         __SINK_FQN,
                         __SINK_DESCR,
-                        ::core::option::Option::Some(&__e.to_string()),
-                        &__zd,
+                        &__e.to_string(),
                     );
                     return jni::objects::JObject::null().into();
                 }
@@ -16080,15 +14488,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sampleNewPut<'a>(
             let __e2 = <__JniErr as ::core::convert::From<
                 String,
             >>::from(__e.to_string());
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e2.to_string()),
-                &__zd,
+                &__e2.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -16104,30 +14510,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let whatami = match jint_to_i32_a3e3b6ef(&mut env, &whatami) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16135,15 +14537,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     let config = match jlong_to_Option_Config_61908788(&mut env, &config) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16154,15 +14554,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16173,15 +14571,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16196,28 +14592,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -16230,15 +14623,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_scout<'a>(
     match Scout_to_jlong_794eae84(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -16252,30 +14643,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareKeyexpr<'a>(
     session: jni::sys::jlong,
     key_expr: jni::objects::JString<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16283,15 +14670,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareKeyexpr<'a>(
     let key_expr = match JString_to_String_c7f3ca43(&mut env, &key_expr) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16306,28 +14691,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareKeyexpr<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -16340,15 +14722,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareKeyexpr<'a>(
     match KeyExpr_to_jlong_5d6bcc5b(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -16377,30 +14757,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     reliability_present: jni::sys::jboolean,
     reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16408,15 +14784,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16427,15 +14801,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16446,15 +14818,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16498,15 +14868,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16514,15 +14882,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16531,15 +14897,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16554,15 +14918,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16573,15 +14935,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16637,15 +14997,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16657,15 +15015,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16678,15 +15034,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16699,15 +15053,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16723,15 +15075,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16758,28 +15108,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -16792,15 +15139,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclarePublisher<'a>
     match Publisher_to_jlong_7bfc8296(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -16830,30 +15175,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     accept_replies_present: jni::sys::jboolean,
     accept_replies_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16861,15 +15202,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16880,15 +15219,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16899,15 +15236,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16951,15 +15286,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -16968,15 +15301,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         let __target_val = match jint_to_QueryTarget_71d4db6a(&mut env, &target_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -16992,15 +15323,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17016,15 +15345,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17037,15 +15364,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17058,15 +15383,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17079,15 +15402,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         let __timeout_ms_val = match jlong_to_i64_fbf9a9bc(&mut env, &timeout_ms_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17103,15 +15424,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17140,28 +15459,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -17174,15 +15490,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQuerier<'a>(
     match Querier_to_jlong_9db85a56(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -17202,30 +15516,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17233,15 +15543,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17252,15 +15560,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17271,15 +15577,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17323,15 +15627,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17340,15 +15642,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
         let __complete_val = match jboolean_to_bool_31306d98(&mut env, &complete_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return 0 as jni::sys::jlong;
             }
@@ -17363,15 +15663,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17382,15 +15680,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17411,28 +15707,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -17445,15 +15738,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareQueryable<'a>
     match Queryable_to_jlong_f7f9bb6c(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -17471,30 +15762,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17502,15 +15789,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17521,15 +15806,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17540,15 +15823,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17592,15 +15873,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17611,15 +15890,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17630,15 +15907,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -17658,28 +15933,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return 0 as jni::sys::jlong;
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -17692,15 +15964,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDeclareSubscriber<'a
     match Subscriber_to_jlong_73e1b4a2(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -17725,30 +15995,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     reliability_present: jni::sys::jboolean,
     reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -17756,15 +16022,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -17775,15 +16039,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -17794,15 +16056,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -17848,15 +16108,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -17868,15 +16126,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -17889,15 +16145,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -17910,15 +16164,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -17933,15 +16185,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -17960,15 +16210,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -17980,15 +16228,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18015,28 +16261,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -18049,15 +16292,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionDelete<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -18097,30 +16338,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     callback: jni::objects::JObject<'a>,
     on_close: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18128,15 +16365,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18147,15 +16382,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18166,15 +16399,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18220,15 +16451,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -18236,15 +16465,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     let parameters = match JString_to_Option_String_56d5e304(&mut env, &parameters) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18253,15 +16480,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         let __timeout_ms_val = match jlong_to_i64_fbf9a9bc(&mut env, &timeout_ms_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18274,15 +16499,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         let __target_val = match jint_to_QueryTarget_71d4db6a(&mut env, &target_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18298,15 +16521,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18322,15 +16543,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18346,15 +16565,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18367,15 +16584,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18388,15 +16603,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18408,15 +16621,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     let __exp_payload = match JByteArray_to_Option_Vec_u8_6f4428ab(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18435,15 +16646,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -18451,15 +16660,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18468,15 +16675,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -18491,15 +16696,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18510,15 +16713,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18574,15 +16775,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -18593,15 +16792,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18620,15 +16817,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -18639,15 +16834,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18658,15 +16851,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -18697,28 +16888,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -18731,15 +16919,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGet<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -18755,10 +16941,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
     __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -18766,15 +16948,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -18789,15 +16969,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
         let __enc = match ZenohId_to_JByteArray_2caee6f1(&mut env, __elem) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -18826,15 +17004,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetPeersZid<'a>(
                 let __e2 = <__JniErr as ::core::convert::From<
                     String,
                 >>::from(__e.to_string());
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e2.to_string()),
-                    &__zd,
+                    &__e2.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -18852,10 +17028,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
     __fold: jni::objects::JObject<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JObject<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -18863,15 +17035,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -18886,15 +17056,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
         let __enc = match ZenohId_to_JByteArray_2caee6f1(&mut env, __elem) {
             ::core::result::Result::Ok(__w) => __w,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -18923,15 +17091,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetRoutersZid<'a>(
                 let __e2 = <__JniErr as ::core::convert::From<
                     String,
                 >>::from(__e.to_string());
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e2.to_string()),
-                    &__zd,
+                    &__e2.to_string(),
                 );
                 return jni::objects::JObject::null().into();
             }
@@ -18947,10 +17113,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetZid<'a>(
     session: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -18958,15 +17120,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetZid<'a>(
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -18975,15 +17135,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionGetZid<'a>(
     match ZenohId_to_JByteArray_2caee6f1(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -19014,30 +17172,26 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     reliability_present: jni::sys::jboolean,
     reliability_value: jni::sys::jint,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19045,15 +17199,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     let __exp_key_expr_sel = match jint_to_i32_a3e3b6ef(&mut env, &key_expr_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19064,15 +17216,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19083,15 +17233,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19137,15 +17285,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -19153,15 +17299,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     let __exp_payload = match JByteArray_to_Vec_u8_7936d5de(&mut env, &payload) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19174,15 +17318,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -19190,15 +17332,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     let __exp_encoding_sel = match jint_to_i32_a3e3b6ef(&mut env, &encoding_sel) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19207,15 +17347,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
         let __v = match jint_to_i32_a3e3b6ef(&mut env, &encoding_0_0_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -19230,15 +17368,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19249,15 +17385,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19313,15 +17447,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -19333,15 +17465,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -19354,15 +17484,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
         let __priority_val = match jint_to_Priority_447102d2(&mut env, &priority_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -19375,15 +17503,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
         let __express_val = match jboolean_to_bool_31306d98(&mut env, &express_value) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -19398,15 +17524,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     ) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
@@ -19425,15 +17549,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
             let __je = <__JniErr as ::core::convert::From<
                 ::std::string::String,
             >>::from(__e);
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__je.to_string()),
-                &__zd,
+                &__je.to_string(),
             );
             return ();
         }
@@ -19445,15 +17567,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
         ) {
             ::core::result::Result::Ok(__v) => __v,
             ::core::result::Result::Err(__e) => {
-                let __zd = __ze_defaults(&mut env);
-                signal_error(
+                signal_binding_error(
                     &mut env,
                     &__error_sink,
                     &__SINK_MID,
                     __SINK_FQN,
                     __SINK_DESCR,
-                    ::core::option::Option::Some(&__e.to_string()),
-                    &__zd,
+                    &__e.to_string(),
                 );
                 return ();
             }
@@ -19482,28 +17602,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -19516,15 +17633,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionPut<'a>(
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -19538,44 +17653,38 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionUndeclareKeyexpr<'a>
     session: jni::sys::jlong,
     key_expr: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
+    __domain_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![
-            env.new_string("").map(| __s | jni::sys::jvalue { l : __s.into_raw() })
-            .unwrap_or(jni::sys::jvalue { l : ::std::ptr::null_mut() })
-        ]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
-    const __SINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
-    const __SINK_DESCR: &str = "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;";
+    const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
+    const __SINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
+    #[allow(non_upper_case_globals)]
+    static __DSINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
+    const __DSINK_FQN: &str = "io/zenoh/jni/ErrorHandler";
+    const __DSINK_DESCR: &str = "(Ljava/lang/String;)Ljava/lang/Object;";
     let session = match jlong_to_Session_4d3982f6(&mut env, &session) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return ();
         }
     };
     if key_expr == 0 || (key_expr & 1) == 1 {
-        let __zd = __ze_defaults(&mut env);
-        signal_error(
+        signal_binding_error(
             &mut env,
             &__error_sink,
             &__SINK_MID,
             __SINK_FQN,
             __SINK_DESCR,
-            ::core::option::Option::Some("Operation on a closed native handle."),
-            &__zd,
+            "Operation on a closed native handle.",
         );
         return ();
     }
@@ -19592,28 +17701,25 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionUndeclareKeyexpr<'a>
                 ) {
                     ::core::result::Result::Ok(__w) => __w,
                     ::core::result::Result::Err(__e) => {
-                        let __zd = __ze_defaults(&mut env);
-                        signal_error(
+                        signal_binding_error(
                             &mut env,
                             &__error_sink,
                             &__SINK_MID,
                             __SINK_FQN,
                             __SINK_DESCR,
-                            ::core::option::Option::Some(&__e.to_string()),
-                            &__zd,
+                            &__e.to_string(),
                         );
                         return ();
                     }
                 };
                 __enc0.into()
             };
-            signal_error(
+            signal_domain_error(
                 &mut env,
-                &__error_sink,
-                &__SINK_MID,
-                __SINK_FQN,
-                __SINK_DESCR,
-                ::core::option::Option::None,
+                &__domain_sink,
+                &__DSINK_MID,
+                __DSINK_FQN,
+                __DSINK_DESCR,
                 &[
                     jni::sys::jvalue {
                         l: __eze0.as_raw(),
@@ -19626,15 +17732,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_sessionUndeclareKeyexpr<'a>
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -19648,10 +17752,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetId<'a>(
     t: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19659,15 +17759,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetId<'a>(
     let t = match jlong_to_Timestamp_bfea2165(&mut env, &t) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -19676,15 +17774,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetId<'a>(
     match Vec_u8_to_JByteArray_7936d5de(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -19698,10 +17794,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetNtp64<'a>(
     t: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19709,15 +17801,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetNtp64<'a>(
     let t = match jlong_to_Timestamp_bfea2165(&mut env, &t) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -19726,15 +17816,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_timestampGetNtp64<'a>(
     match i64_to_jlong_fbf9a9bc(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -19747,10 +17835,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_tryInitZenohLogsFromEnv<'a>
     _class: jni::objects::JClass<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> () {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19759,15 +17843,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_tryInitZenohLogsFromEnv<'a>
     match unit_to_unit_9ecccf8e(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             ()
         }
@@ -19781,10 +17863,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesAsBytes<'a>(
     z: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19792,15 +17870,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesAsBytes<'a>(
     let z = match jlong_to_ZBytes_141dc9e1(&mut env, &z) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -19809,15 +17885,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesAsBytes<'a>(
     match std_borrow_Cow_u8_to_JByteArray_c6a6bddf(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -19831,10 +17905,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewClone<'a>(
     z: jni::sys::jlong,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19842,15 +17912,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewClone<'a>(
     let z = match jlong_to_ZBytes_141dc9e1(&mut env, &z) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -19859,15 +17927,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewClone<'a>(
     match ZBytes_to_jlong_141dc9e1(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -19881,10 +17947,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewFromVec<'a>(
     bytes: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::sys::jlong {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19892,15 +17954,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewFromVec<'a>(
     let bytes = match JByteArray_to_Vec_u8_7936d5de(&mut env, &bytes) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return 0 as jni::sys::jlong;
         }
@@ -19909,15 +17969,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zbytesNewFromVec<'a>(
     match ZBytes_to_jlong_141dc9e1(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             0 as jni::sys::jlong
         }
@@ -19931,10 +17989,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToBytes<'a>(
     z: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JByteArray<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19942,15 +17996,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToBytes<'a>(
     let z = match JByteArray_to_ZenohId_2caee6f1(&mut env, &z) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -19959,15 +18011,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToBytes<'a>(
     match Vec_u8_to_JByteArray_7936d5de(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }
@@ -19981,10 +18031,6 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToString<'a>(
     z: jni::objects::JByteArray<'a>,
     __error_sink: jni::objects::JObject<'a>,
 ) -> jni::objects::JString<'a> {
-    #[allow(unused_variables)]
-    let __ze_defaults = |env: &mut jni::JNIEnv| -> ::std::vec::Vec<jni::sys::jvalue> {
-        ::std::vec![]
-    };
     #[allow(non_upper_case_globals)]
     static __SINK_MID: ::prebindgen::lang::CachedIfaceMethod = ::prebindgen::lang::CachedIfaceMethod::new();
     const __SINK_FQN: &str = "io/zenoh/jni/JniErrorHandler";
@@ -19992,15 +18038,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToString<'a>(
     let z = match JByteArray_to_ZenohId_2caee6f1(&mut env, &z) {
         ::core::result::Result::Ok(__v) => __v,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             return jni::objects::JObject::null().into();
         }
@@ -20009,15 +18053,13 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_zenohIdToString<'a>(
     match String_to_JString_c7f3ca43(&mut env, __out) {
         ::core::result::Result::Ok(__w) => __w,
         ::core::result::Result::Err(__e) => {
-            let __zd = __ze_defaults(&mut env);
-            signal_error(
+            signal_binding_error(
                 &mut env,
                 &__error_sink,
                 &__SINK_MID,
                 __SINK_FQN,
                 __SINK_DESCR,
-                ::core::option::Option::Some(&__e.to_string()),
-                &__zd,
+                &__e.to_string(),
             );
             jni::objects::JObject::null().into()
         }

@@ -47,6 +47,32 @@ kotlin {
     }
 }
 
+dependencies {
+    // Self-verification: the correspondence tests compare this crate's pure-Kotlin
+    // implementations against the native oracle it also ships (io.zenoh.jni.test).
+    // kotlin("test") with useJUnitPlatform() selects the JUnit5 integration.
+    testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Guava TypeToken — the java.lang.reflect.Type serialization path.
+    testImplementation("com.google.guava:guava:33.3.1-jre")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    // The native lib must exist and be loadable. `NativeLibrary.ensureLoaded()`
+    // tries `System.loadLibrary("zenoh_flat_jni")` first, so point
+    // `java.library.path` at the freshly-built RELEASE dylib in target/release.
+    //
+    // The tests always use the *release* dylib, never debug: linking the debug
+    // cdylib on Windows exceeds link.exe's 65535-object limit (LNK1189) because
+    // the ~250-crate zenoh graph is linked object-by-object with no LTO. The
+    // release profile (`lto = "fat"` + `codegen-units = 1`) collapses the graph
+    // and links cleanly — this is the same dylib the `Build` CI job produces.
+    dependsOn("buildZenohFlatJniRelease")
+    systemProperty("java.library.path", file("target/release").absolutePath)
+}
+
 // ============================================================================
 // Rust Build Configuration
 // ============================================================================
@@ -58,14 +84,29 @@ tasks.register("buildZenohFlatJni") {
         if (buildMode == BuildMode.RELEASE) {
             cargoCommand.add("--release")
         }
-        
+
         val result = project.exec {
             commandLine(*(cargoCommand.toTypedArray()))
             isIgnoreExitValue = true
         }
-        
+
         if (result.exitValue != 0) {
             throw GradleException("Failed to build zenoh-flat-jni. Exit code: ${result.exitValue}")
+        }
+    }
+}
+
+// Release build used by the `test` task (see the LNK1189 note there); always
+// `--release` regardless of the `-Prelease` property.
+tasks.register("buildZenohFlatJniRelease") {
+    description = "Build the release zenoh-flat-jni Rust library for the test suite"
+    doLast {
+        val result = project.exec {
+            commandLine("cargo", "build", "--release")
+            isIgnoreExitValue = true
+        }
+        if (result.exitValue != 0) {
+            throw GradleException("Failed to build zenoh-flat-jni (release). Exit code: ${result.exitValue}")
         }
     }
 }

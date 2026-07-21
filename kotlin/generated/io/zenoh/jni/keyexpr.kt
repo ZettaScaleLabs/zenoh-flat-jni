@@ -52,36 +52,36 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
     /** Return the canonical text of a key expression. */
     public fun getStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.keyexprGetStr(this_ptr, __cap)
+            JNINative.keyexprGetStr(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Create an independent copy of a key expression. */
     public fun newClone(onError: JniErrorHandler<KeyExpr>): KeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.keyexprNewClone(this_ptr, __cap))
+            KeyExpr(JNINative.keyexprNewClone(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the canonical text of a key expression. */
     public fun toStr(onError: JniErrorHandler<String>): String {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.keyexprToString(this_ptr, __cap)
+            JNINative.keyexprToString(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -102,7 +102,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
     ): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -110,10 +110,10 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val b1_ptr = b1?.ptr ?: 0L
-                JNINative.keyexprIntersects(this_ptr, bSel, b0, b1_ptr, __cap)
+                JNINative.keyexprIntersects(this_ptr, bSel, b0, b1_ptr, __bcap)
             }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -134,7 +134,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
     ): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -142,10 +142,10 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val b1_ptr = b1?.ptr ?: 0L
-                JNINative.keyexprIncludes(this_ptr, bSel, b0, b1_ptr, __cap)
+                JNINative.keyexprIncludes(this_ptr, bSel, b0, b1_ptr, __bcap)
             }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -174,7 +174,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
     ): SetIntersectionLevel {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -182,12 +182,12 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val b1_ptr = b1?.ptr ?: 0L
-                SetIntersectionLevel.fromInt(
-                    JNINative.keyexprRelationTo(this_ptr, bSel, b0, b1_ptr, __cap),
+                io.zenoh.jni.keyexpr.SetIntersectionLevel.fromInt(
+                    JNINative.keyexprRelationTo(this_ptr, bSel, b0, b1_ptr, __bcap),
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -200,12 +200,18 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
          *
          * Use [`keyexpr_new_autocanonize`] to canonicalize the text before validation.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newTryFrom(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newTryFrom(
+            s: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
@@ -215,18 +221,34 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
          * Unlike [`keyexpr_new_try_from`], this accepts valid non-canonical forms such
          * as redundant wildcards and normalizes them.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newAutocanonize(s: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newAutocanonize(
+            s: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
-        public fun newJoin(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newJoin(0, s, null, b, onError)
+        public fun newJoin(
+            s: String,
+            b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr = newJoin(0, s, null, b, onBindingError, onError)
 
-        public fun newJoin(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newJoin(1, null, a, b, onError)
+        public fun newJoin(
+            a: KeyExpr,
+            b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr = newJoin(1, null, a, b, onBindingError, onError)
 
         /**
          * Join a key expression and a suffix with a `/` separator.
@@ -234,35 +256,47 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
          * Returns an error if the result is not a valid key expression.
          *
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
         public fun newJoin(
             aSel: Int,
             a0: String?,
             a1: KeyExpr?,
             b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
             onError: ErrorHandler<KeyExpr>,
         ): KeyExpr {
-            if (a1 != null && a1.isClosed()) return onError.run(
+            if (a1 != null && a1.isClosed()) return onBindingError.run(
                 "Operation on a closed native handle.",
-                "",
             )
-            val __cap = ErrorHandlerCapture.acquire()
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
             val __ret = run {
                 val __locks = ArrayList<NativeHandle>()
                 a1?.let { __locks.add(it) }
                 withSortedHandleLocks(__locks) {
                     val a1_ptr = a1?.ptr ?: 0L
-                    KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __cap))
+                    KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __bcap, __dcap))
                 }
             }
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
-        public fun newConcat(s: String, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newConcat(0, s, null, b, onError)
+        public fun newConcat(
+            s: String,
+            b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr = newConcat(0, s, null, b, onBindingError, onError)
 
-        public fun newConcat(a: KeyExpr, b: String, onError: ErrorHandler<KeyExpr>): KeyExpr = newConcat(1, null, a, b, onError)
+        public fun newConcat(
+            a: KeyExpr,
+            b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
+            onError: ErrorHandler<KeyExpr>,
+        ): KeyExpr = newConcat(1, null, a, b, onBindingError, onError)
 
         /**
          * Append text directly to a key expression and validate the result.
@@ -271,29 +305,31 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
          * segments.
          *
          * Parameter `a` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `aSel`, `a0`, `a1`).
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
         public fun newConcat(
             aSel: Int,
             a0: String?,
             a1: KeyExpr?,
             b: String,
+            onBindingError: JniErrorHandler<KeyExpr>,
             onError: ErrorHandler<KeyExpr>,
         ): KeyExpr {
-            if (a1 != null && a1.isClosed()) return onError.run(
+            if (a1 != null && a1.isClosed()) return onBindingError.run(
                 "Operation on a closed native handle.",
-                "",
             )
-            val __cap = ErrorHandlerCapture.acquire()
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
             val __ret = run {
                 val __locks = ArrayList<NativeHandle>()
                 a1?.let { __locks.add(it) }
                 withSortedHandleLocks(__locks) {
                     val a1_ptr = a1?.ptr ?: 0L
-                    KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __cap))
+                    KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __bcap, __dcap))
                 }
             }
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
     }

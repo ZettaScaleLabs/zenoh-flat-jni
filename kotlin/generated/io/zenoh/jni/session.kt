@@ -55,12 +55,12 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
     /** Return the identifier of this session. */
     public fun getZid(onError: JniErrorHandler<ZenohId>): ZenohId {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZenohId(JNINative.sessionGetZid(this_ptr, __cap))
+            ZenohId(JNINative.sessionGetZid(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -74,8 +74,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Publisher>,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(0, s, null, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(0, s, null, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onBindingError, onError)
 
     public fun declarePublisher(
         keyExpr: KeyExpr,
@@ -87,8 +88,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Publisher>,
         onError: ErrorHandler<Publisher>,
-    ): Publisher = declarePublisher(1, null, keyExpr, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onError)
+    ): Publisher = declarePublisher(1, null, keyExpr, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, onBindingError, onError)
 
     /**
      * Declare a publisher for the given key expression.
@@ -101,7 +103,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      *
      * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declarePublisher(
         keyExprSel: Int,
@@ -115,18 +117,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         priority: Priority?,
         express: Boolean?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Publisher>,
         onError: ErrorHandler<Publisher>,
     ): Publisher {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        if (encoding1 != null && encoding1.isClosed()) return onError.run(
+        if (encoding1 != null && encoding1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -156,7 +158,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             express ?: false,
                             reliability != null,
                             reliability?.value ?: 0,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -164,7 +167,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -180,8 +184,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = put(0, s, null, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(0, s, null, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onBindingError, onError)
 
     public fun put(
         keyExpr: KeyExpr,
@@ -195,8 +200,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = put(1, null, keyExpr, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onError)
+    ) = put(1, null, keyExpr, payload, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, attachment, reliability, onBindingError, onError)
 
     /**
      * Publish data on a key expression.
@@ -209,7 +215,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun put(
         keyExprSel: Int,
@@ -225,16 +231,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
     ) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
         if (keyExpr1 != null && keyExpr1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
         if (encoding1 != null && encoding1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -264,11 +272,13 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                     attachment,
                     reliability != null,
                     reliability?.value ?: 0,
-                    __cap,
+                    __bcap,
+                    __dcap,
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public fun delete(
@@ -278,8 +288,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = delete(0, s, null, congestionControl, priority, express, attachment, reliability, onError)
+    ) = delete(0, s, null, congestionControl, priority, express, attachment, reliability, onBindingError, onError)
 
     public fun delete(
         keyExpr: KeyExpr,
@@ -288,8 +299,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = delete(1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onError)
+    ) = delete(1, null, keyExpr, congestionControl, priority, express, attachment, reliability, onBindingError, onError)
 
     /**
      * Publish a deletion notification on a key expression.
@@ -300,7 +312,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      *
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun delete(
         keyExprSel: Int,
@@ -311,13 +323,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         attachment: ByteArray?,
         reliability: Reliability?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
     ) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
         if (keyExpr1 != null && keyExpr1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -339,26 +353,30 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                     attachment,
                     reliability != null,
                     reliability?.value ?: 0,
-                    __cap,
+                    __bcap,
+                    __dcap,
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public fun declareSubscriber(
         s: String,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
-    ): Subscriber = declareSubscriber(0, s, null, callback, onClose, onError)
+    ): Subscriber = declareSubscriber(0, s, null, callback, onClose, onBindingError, onError)
 
     public fun declareSubscriber(
         keyExpr: KeyExpr,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
-    ): Subscriber = declareSubscriber(1, null, keyExpr, callback, onClose, onError)
+    ): Subscriber = declareSubscriber(1, null, keyExpr, callback, onClose, onBindingError, onError)
 
     /**
      * Subscribe to samples whose key expressions match the supplied expression.
@@ -367,7 +385,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * the subscription ends.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declareSubscriber(
         keyExprSel: Int,
@@ -375,14 +393,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         keyExpr1: KeyExpr?,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
     ): Subscriber {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -399,7 +418,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             keyExpr1_ptr,
                             callback.asRaw(),
                             onClose,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -407,7 +427,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -420,8 +441,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         timeoutMs: Long?,
         acceptReplies: ReplyKeyExpr?,
+        onBindingError: JniErrorHandler<Querier>,
         onError: ErrorHandler<Querier>,
-    ): Querier = declareQuerier(0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+    ): Querier = declareQuerier(0, s, null, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onBindingError, onError)
 
     public fun declareQuerier(
         keyExpr: KeyExpr,
@@ -432,8 +454,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         timeoutMs: Long?,
         acceptReplies: ReplyKeyExpr?,
+        onBindingError: JniErrorHandler<Querier>,
         onError: ErrorHandler<Querier>,
-    ): Querier = declareQuerier(1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onError)
+    ): Querier = declareQuerier(1, null, keyExpr, target, consolidation, congestionControl, priority, express, timeoutMs, acceptReplies, onBindingError, onError)
 
     /**
      * Declare a reusable querier for the given key expression.
@@ -442,7 +465,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * delivery quality, timeout, and accepted reply key expressions.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declareQuerier(
         keyExprSel: Int,
@@ -455,14 +478,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         express: Boolean?,
         timeoutMs: Long?,
         acceptReplies: ReplyKeyExpr?,
+        onBindingError: JniErrorHandler<Querier>,
         onError: ErrorHandler<Querier>,
     ): Querier {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -491,7 +515,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             timeoutMs ?: 0L,
                             acceptReplies != null,
                             acceptReplies?.value ?: 0,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -499,7 +524,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -508,16 +534,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         complete: Boolean?,
         callback: QueryCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Queryable>,
         onError: ErrorHandler<Queryable>,
-    ): Queryable = declareQueryable(0, s, null, complete, callback, onClose, onError)
+    ): Queryable = declareQueryable(0, s, null, complete, callback, onClose, onBindingError, onError)
 
     public fun declareQueryable(
         keyExpr: KeyExpr,
         complete: Boolean?,
         callback: QueryCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Queryable>,
         onError: ErrorHandler<Queryable>,
-    ): Queryable = declareQueryable(1, null, keyExpr, complete, callback, onClose, onError)
+    ): Queryable = declareQueryable(1, null, keyExpr, complete, callback, onClose, onBindingError, onError)
 
     /**
      * Declare a queryable for queries matching the supplied key expression.
@@ -527,7 +555,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * callback is called when the queryable ends.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declareQueryable(
         keyExprSel: Int,
@@ -536,14 +564,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         complete: Boolean?,
         callback: QueryCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Queryable>,
         onError: ErrorHandler<Queryable>,
     ): Queryable {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -562,7 +591,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             complete ?: false,
                             callback.asRaw(),
                             onClose,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -570,7 +600,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -579,16 +610,22 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      *
      * Release the registration with [`session_undeclare_keyexpr`].
      *
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
-    public fun declareKeyexpr(keyExpr: String, onError: ErrorHandler<KeyExpr>): KeyExpr {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        val __cap = ErrorHandlerCapture.acquire()
+    public fun declareKeyexpr(
+        keyExpr: String,
+        onBindingError: JniErrorHandler<KeyExpr>,
+        onError: ErrorHandler<KeyExpr>,
+    ): KeyExpr {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.sessionDeclareKeyexpr(this_ptr, keyExpr, __cap))
+            KeyExpr(JNINative.sessionDeclareKeyexpr(this_ptr, keyExpr, __bcap, __dcap))
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -596,22 +633,30 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * Release a key expression previously registered with
      * [`session_declare_keyexpr`].
      *
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
-    public fun undeclareKeyexpr(keyExpr: KeyExpr, onError: ErrorHandler<Unit>) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-        if (keyExpr.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-        val __cap = ErrorHandlerCapture.acquire()
+    public fun undeclareKeyexpr(
+        keyExpr: KeyExpr,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        if (keyExpr.isClosed()) {
+            onBindingError.run("Operation on a closed native handle."); return
+        }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         withSortedHandleLocks(this, keyExpr) {
             val this_ptr = this.ptr
             val keyExpr_ptr = keyExpr.ptr
             try {
-                JNINative.sessionUndeclareKeyexpr(this_ptr, keyExpr_ptr, __cap)
+                JNINative.sessionUndeclareKeyexpr(this_ptr, keyExpr_ptr, __bcap, __dcap)
             } finally {
                 keyExpr.markConsumed()
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public fun get(
@@ -632,8 +677,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
+    ) = get(0, s, null, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onBindingError, onError)
 
     public fun get(
         keyExpr: KeyExpr,
@@ -653,8 +699,9 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onError)
+    ) = get(1, null, keyExpr, parameters, timeoutMs, target, consolidation, acceptReplies, congestionControl, priority, express, payload, encodingSel, encoding00, encoding01, encoding1, attachment, callback, onClose, onBindingError, onError)
 
     /**
      * Send a query to matching queryables.
@@ -668,7 +715,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun get(
         keyExprSel: Int,
@@ -690,16 +737,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         attachment: ByteArray?,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
     ) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
         if (keyExpr1 != null && keyExpr1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
         if (encoding1 != null && encoding1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -738,46 +787,50 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                     attachment,
                     callback.asRaw(),
                     onClose,
-                    __cap,
+                    __bcap,
+                    __dcap,
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     /** Return the identifiers of peers currently connected to this session. */
     public fun getPeersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.sessionGetPeersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+            (JNINative.sessionGetPeersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __bcap) as List<ZenohId>)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the identifiers of routers currently connected to this session. */
     public fun getRoutersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.sessionGetRoutersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __cap) as List<ZenohId>)
+            (JNINative.sessionGetRoutersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __bcap) as List<ZenohId>)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     public fun livelinessDeclareToken(
         s: String,
+        onBindingError: JniErrorHandler<LivelinessToken>,
         onError: ErrorHandler<LivelinessToken>,
-    ): LivelinessToken = livelinessDeclareToken(0, s, null, onError)
+    ): LivelinessToken = livelinessDeclareToken(0, s, null, onBindingError, onError)
 
     public fun livelinessDeclareToken(
         keyExpr: KeyExpr,
+        onBindingError: JniErrorHandler<LivelinessToken>,
         onError: ErrorHandler<LivelinessToken>,
-    ): LivelinessToken = livelinessDeclareToken(1, null, keyExpr, onError)
+    ): LivelinessToken = livelinessDeclareToken(1, null, keyExpr, onBindingError, onError)
 
     /**
      * Declare a liveliness token on the supplied key expression.
@@ -786,20 +839,21 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * is undeclared.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun livelinessDeclareToken(
         keyExprSel: Int,
         keyExpr0: String?,
         keyExpr1: KeyExpr?,
+        onBindingError: JniErrorHandler<LivelinessToken>,
         onError: ErrorHandler<LivelinessToken>,
     ): LivelinessToken {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -814,7 +868,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             keyExprSel,
                             keyExpr0,
                             keyExpr1_ptr,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -822,7 +877,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -831,16 +887,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         timeoutMs: Long,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = livelinessGet(0, s, null, timeoutMs, callback, onClose, onError)
+    ) = livelinessGet(0, s, null, timeoutMs, callback, onClose, onBindingError, onError)
 
     public fun livelinessGet(
         keyExpr: KeyExpr,
         timeoutMs: Long,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
-    ) = livelinessGet(1, null, keyExpr, timeoutMs, callback, onClose, onError)
+    ) = livelinessGet(1, null, keyExpr, timeoutMs, callback, onClose, onBindingError, onError)
 
     /**
      * Query liveliness tokens matching the supplied key expression.
@@ -849,7 +907,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * the reply stream ends.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun livelinessGet(
         keyExprSel: Int,
@@ -858,13 +916,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         timeoutMs: Long,
         callback: ReplyCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
     ) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
         if (keyExpr1 != null && keyExpr1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -880,11 +940,13 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                     timeoutMs,
                     callback.asRaw(),
                     onClose,
-                    __cap,
+                    __bcap,
+                    __dcap,
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public fun livelinessDeclareSubscriber(
@@ -892,16 +954,18 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         history: Boolean,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
-    ): Subscriber = livelinessDeclareSubscriber(0, s, null, history, callback, onClose, onError)
+    ): Subscriber = livelinessDeclareSubscriber(0, s, null, history, callback, onClose, onBindingError, onError)
 
     public fun livelinessDeclareSubscriber(
         keyExpr: KeyExpr,
         history: Boolean,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
-    ): Subscriber = livelinessDeclareSubscriber(1, null, keyExpr, history, callback, onClose, onError)
+    ): Subscriber = livelinessDeclareSubscriber(1, null, keyExpr, history, callback, onClose, onBindingError, onError)
 
     /**
      * Subscribe to liveliness changes matching the supplied key expression.
@@ -911,7 +975,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * ends.
      *
      * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun livelinessDeclareSubscriber(
         keyExprSel: Int,
@@ -920,14 +984,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         history: Boolean,
         callback: SampleCallback,
         onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Subscriber>,
         onError: ErrorHandler<Subscriber>,
     ): Subscriber {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
             "Operation on a closed native handle.",
-            "",
         )
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -945,7 +1010,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                             history,
                             callback.asRaw(),
                             onClose,
-                            __cap,
+                            __bcap,
+                            __dcap,
                         ),
                     )
                 } finally {
@@ -953,7 +1019,8 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 }
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
@@ -966,20 +1033,26 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
          *
          * The configuration is consumed by this operation.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun open(config: Config, onError: ErrorHandler<Session>): Session {
-            if (config.isClosed()) return onError.run("Operation on a closed native handle.", "")
-            val __cap = ErrorHandlerCapture.acquire()
+        public fun open(
+            config: Config,
+            onBindingError: JniErrorHandler<Session>,
+            onError: ErrorHandler<Session>,
+        ): Session {
+            if (config.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
             val __ret = withSortedHandleLocks(config) {
                 val config_ptr = config.ptr
                 try {
-                    Session(JNINative.open(config_ptr, __cap))
+                    Session(JNINative.open(config_ptr, __bcap, __dcap))
                 } finally {
                     config.markConsumed()
                 }
             }
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
     }

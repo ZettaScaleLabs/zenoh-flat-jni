@@ -496,22 +496,28 @@ fn main() {
                 )
                 .class(ptr_class!(Subscriber).gc_managed()),
         )
-        // ── Query / Queryable / Querier ───────────────────────────────────
+        // ── Test-only correspondence oracle ───────────────────────────────
+        // The zenoh-flat parameters-processing API, exposed in a dedicated
+        // `io.zenoh.jni.test` package that the SDKs (zenoh-java, zenoh-kotlin)
+        // are NOT meant to import. Their production path uses the pure-Kotlin
+        // `io.zenoh.jni.query.Parameters` instead — crossing JNI per string
+        // operation is expensive, a JNI peculiarity rather than a zenoh-flat
+        // design choice. These native functions exist solely so this crate's
+        // own `ParametersCorrespondenceTest` can verify the pure implementation
+        // against the real zenoh-flat semantics.
         .package(
-            package!("query")
-                // The zenoh-flat parameters-processing API. The JVM SDKs run
-                // the same semantics in pure Kotlin on their production path
-                // (kotlin/io/zenoh/jni/query/Parameters.kt) — crossing JNI per
-                // string operation is expensive, a JNI peculiarity rather than
-                // a zenoh-flat design choice — and verify the correspondence
-                // against these functions in tests.
+            package!("test")
                 .fun(fun!(parameters_get))
                 .fun(fun!(parameters_values))
                 .fun(fun!(parameters_contains_key))
                 .fun(fun!(parameters_insert))
                 .fun(fun!(parameters_remove))
                 .fun(fun!(parameters_extend))
-                .fun(fun!(parameters_is_well_formed))
+                .fun(fun!(parameters_is_well_formed)),
+        )
+        // ── Query / Queryable / Querier ───────────────────────────────────
+        .package(
+            package!("query")
                 .class(ptr_class!(Queryable).gc_managed())
                 // `querier.get(...)` — receiver-style method on Querier.
                 .class(ptr_class!(Querier).gc_managed().method(fun!(querier_get)))
