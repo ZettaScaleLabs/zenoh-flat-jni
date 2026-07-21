@@ -23,6 +23,7 @@ import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Self-verification of the pure-Kotlin [SerializationCodec] against the native
@@ -127,6 +128,24 @@ class SerializationCorrespondenceTest {
             val s = buildString { repeat(rng.nextInt(0, 32)) { append(rng.nextInt(0x20, 0x7E).toChar()) } }
             assertCorresponds(s, SerdeType.Str)
         }
+    }
+
+    @Test
+    fun invalidUtf8StringRejectedLikeNative() {
+        // A length-1 string whose single byte (0xFF) is not valid UTF-8:
+        // `VarInt(1)` then `0xFF`. Native `String::from_utf8` errors on this, so
+        // the pure codec must reject it too (route to onError) rather than lossily
+        // decode it — otherwise a Kotlin receiver would accept a frame a Rust one
+        // rejects.
+        val buf = byteArrayOf(1, 0xFF.toByte())
+        var pureFailed = false
+        var nativeFailed = false
+        val pureSink = JniErrorHandler<Any> { _ -> pureFailed = true; "" }
+        val nativeSink = JniErrorHandler<Any> { _ -> nativeFailed = true; "" }
+        SerializationCodec.deserialize(buf, SerdeType.Str, pureSink)
+        deserializeViaJNIKType(buf, typeOf<String>(), nativeSink)
+        assertTrue(nativeFailed, "native serializer should reject invalid UTF-8")
+        assertTrue(pureFailed, "pure codec should reject invalid UTF-8 to match native")
     }
 
     // ── Containers, tuples, nesting ─────────────────────────────────────────

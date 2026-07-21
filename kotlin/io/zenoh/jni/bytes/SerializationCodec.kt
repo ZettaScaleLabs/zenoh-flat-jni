@@ -25,8 +25,9 @@ import io.zenoh.jni.JniErrorHandler
  * reimplemented here in Kotlin and produces/consumes the `ByteArray` directly —
  * **no JNI crossing per element** (the previous `serializeViaJNI` path made a
  * native up-call for every scalar/leaf, which dominates small payloads). The
- * byte-for-byte correspondence with the native serializer is verified by the
- * consuming SDK's `ZSerdeCorrespondenceTest`.
+ * byte-for-byte correspondence with the native serializer is verified by
+ * `SerializationCorrespondenceTest` in this module's test suite (against the
+ * native oracle in `io.zenoh.jni.test`).
  *
  * **Error model** — like every other zenoh-flat-jni function (the generated
  * wrappers and the hand-written surface alike), these functions **never throw**:
@@ -130,7 +131,14 @@ object SerializationCodec {
             SerdeType.F32 -> w.putLe32((value as Float).toRawBits())
             SerdeType.F64 -> w.putLe64((value as Double).toRawBits())
             SerdeType.Str -> {
-                val bytes = (value as String).encodeToByteArray()
+                // Strict, matching the native serializer (Rust `String` is always
+                // valid UTF-8): fail on unpaired surrogates rather than emit
+                // replacement bytes that would not round-trip.
+                val bytes = try {
+                    (value as String).encodeToByteArray(throwOnInvalidSequence = true)
+                } catch (e: CharacterCodingException) {
+                    throw SerdeException("invalid UTF-8 in string")
+                }
                 w.putVarInt(bytes.size.toLong())
                 w.putBytes(bytes)
             }
@@ -185,8 +193,14 @@ object SerializationCodec {
         SerdeType.F32 -> Float.fromBits(r.getLe32())
         SerdeType.F64 -> Double.fromBits(r.getLe64())
         SerdeType.Str -> {
-            val len = r.getVarIntAsInt()
-            r.getBytes(len).decodeToString()
+            // Strict, matching the native `String::from_utf8` deserializer, which
+            // errors on invalid UTF-8 rather than lossily replacing it.
+            val raw = r.getBytes(r.getVarIntAsInt())
+            try {
+                raw.decodeToString(throwOnInvalidSequence = true)
+            } catch (e: CharacterCodingException) {
+                throw SerdeException("invalid UTF-8 in string")
+            }
         }
         SerdeType.Bytes -> {
             val len = r.getVarIntAsInt()
