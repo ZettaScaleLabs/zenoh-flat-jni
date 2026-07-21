@@ -15,16 +15,16 @@ import io.zenoh.jni.JniErrorHandlerCapture
  * accepted filter format.
  */
 public fun initAndroidLogs(filter: String, onError: JniErrorHandler<Unit>) {
-    val __cap = JniErrorHandlerCapture.acquire()
-    JNINative.initAndroidLogs(filter, __cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    JNINative.initAndroidLogs(filter, __bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
 }
 
 /** Try to initialize zenoh logging from environment variables. */
 public fun tryInitZenohLogsFromEnv(onError: JniErrorHandler<Unit>) {
-    val __cap = JniErrorHandlerCapture.acquire()
-    JNINative.tryInitZenohLogsFromEnv(__cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    JNINative.tryInitZenohLogsFromEnv(__bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
 }
 
 /**
@@ -32,7 +32,7 @@ public fun tryInitZenohLogsFromEnv(onError: JniErrorHandler<Unit>) {
  * `fallback_filter` when the environment is unset.
  */
 public fun initZenohLogsFromEnvOr(fallbackFilter: String, onError: JniErrorHandler<Unit>) {
-    val __cap = JniErrorHandlerCapture.acquire()
-    JNINative.initZenohLogsFromEnvOr(fallbackFilter, __cap)
-    if (__cap.failed) return onError.run(__cap.je)
+    val __bcap = JniErrorHandlerCapture.acquire()
+    JNINative.initZenohLogsFromEnvOr(fallbackFilter, __bcap)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
 }

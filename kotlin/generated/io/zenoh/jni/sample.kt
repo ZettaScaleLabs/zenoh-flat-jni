@@ -51,112 +51,114 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
     /** Return the key expression on which the sample was published. */
     public fun getKeyExpr(onError: JniErrorHandler<KeyExpr>): KeyExpr {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.sampleGetKeyExpr(this_ptr, __cap))
+            KeyExpr(JNINative.sampleGetKeyExpr(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the sample payload. */
     public fun getPayload(onError: JniErrorHandler<ZBytes>): ZBytes {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZBytes(JNINative.sampleGetPayload(this_ptr, __cap))
+            ZBytes(JNINative.sampleGetPayload(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return format information associated with the payload. */
     public fun getEncoding(onError: JniErrorHandler<Encoding>): Encoding {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Encoding(JNINative.sampleGetEncoding(this_ptr, __cap))
+            Encoding(JNINative.sampleGetEncoding(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return whether the sample publishes a value or announces a deletion. */
     public fun getKind(onError: JniErrorHandler<SampleKind>): SampleKind {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            SampleKind.fromInt(JNINative.sampleGetKind(this_ptr, __cap))
+            io.zenoh.jni.sample.SampleKind.fromInt(JNINative.sampleGetKind(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the publication timestamp, when present. */
     public fun getTimestamp(onError: JniErrorHandler<Timestamp?>): Timestamp? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetTimestamp(this_ptr, __cap).let {
+            JNINative.sampleGetTimestamp(this_ptr, __bcap).let {
                 if (it == 0L) null else Timestamp(it)
             }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return whether express delivery was requested. */
     public fun getExpress(onError: JniErrorHandler<Boolean>): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetExpress(this_ptr, __cap)
+            JNINative.sampleGetExpress(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the sample's delivery priority. */
     public fun getPriority(onError: JniErrorHandler<Priority>): Priority {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Priority.fromInt(JNINative.sampleGetPriority(this_ptr, __cap))
+            io.zenoh.jni.qos.Priority.fromInt(JNINative.sampleGetPriority(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return the congestion-control policy used for the sample. */
     public fun getCongestionControl(onError: JniErrorHandler<CongestionControl>): CongestionControl {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            CongestionControl.fromInt(JNINative.sampleGetCongestionControl(this_ptr, __cap))
+            io.zenoh.jni.qos.CongestionControl.fromInt(
+                JNINative.sampleGetCongestionControl(this_ptr, __bcap),
+            )
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Return user-defined metadata associated with the sample, when present. */
     public fun getAttachment(onError: JniErrorHandler<ZBytes?>): ZBytes? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetAttachment(this_ptr, __cap).let {
+            JNINative.sampleGetAttachment(this_ptr, __bcap).let {
                 if (it == 0L) null else ZBytes(it)
             }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -167,12 +169,12 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
      */
     public fun getReliability(onError: JniErrorHandler<Reliability>): Reliability {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Reliability.fromInt(JNINative.sampleGetReliability(this_ptr, __cap))
+            io.zenoh.jni.qos.Reliability.fromInt(JNINative.sampleGetReliability(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -183,12 +185,12 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
      */
     public fun getSourceZid(onError: JniErrorHandler<ZenohId?>): ZenohId? {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceZid(this_ptr, __cap)?.let { ZenohId(it) }
+            JNINative.sampleGetSourceZid(this_ptr, __bcap)?.let { ZenohId(it) }
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -199,12 +201,12 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
      */
     public fun getSourceEid(onError: JniErrorHandler<Int>): Int {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceEid(this_ptr, __cap)
+            JNINative.sampleGetSourceEid(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -215,12 +217,12 @@ public class Sample(initialPtr: Long) : NativeHandle(initialPtr) {
      */
     public fun getSourceSn(onError: JniErrorHandler<Long>): Long {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.sampleGetSourceSn(this_ptr, __cap)
+            JNINative.sampleGetSourceSn(this_ptr, __bcap)
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
@@ -412,7 +414,7 @@ public fun <R> sampleNewPut(
     if (encoding1 != null && encoding1.isClosed()) return onError.run(
         "Operation on a closed native handle.",
     )
-    val __cap = JniErrorHandlerCapture.acquire()
+    val __bcap = JniErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         keyExpr1?.let { __locks.add(it) }
@@ -421,13 +423,13 @@ public fun <R> sampleNewPut(
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             val encoding1_ptr = encoding1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingSel, encoding00 != null, encoding00 ?: 0, encoding01, encoding1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewPut(keyExprSel, keyExpr0, keyExpr1_ptr, payload, encodingSel, encoding00 != null, encoding00 ?: 0, encoding01, encoding1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __bcap) as R)
             } finally {
                 keyExpr1?.markConsumed()
             }
         }
     }
-    if (__cap.failed) return onError.run(__cap.je)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }
 
@@ -458,19 +460,19 @@ public fun <R> sampleNewDelete(
     if (keyExpr1 != null && keyExpr1.isClosed()) return onError.run(
         "Operation on a closed native handle.",
     )
-    val __cap = JniErrorHandlerCapture.acquire()
+    val __bcap = JniErrorHandlerCapture.acquire()
     val __ret = run {
         val __locks = ArrayList<NativeHandle>()
         keyExpr1?.let { __locks.add(it) }
         withSortedHandleLocks(__locks) {
             val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
             try {
-                (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __cap) as R)
+                (JNINative.sampleNewDelete(keyExprSel, keyExpr0, keyExpr1_ptr, timestampNtp64 != null, timestampNtp64 ?: 0L, attachment, congestionControl != null, congestionControl?.value ?: 0, priority != null, priority?.value ?: 0, express != null, express ?: false, reliability != null, reliability?.value ?: 0, build.asRaw(), __bcap) as R)
             } finally {
                 keyExpr1?.markConsumed()
             }
         }
     }
-    if (__cap.failed) return onError.run(__cap.je)
+    if (__bcap.failed) return onError.run(__bcap.ze0)
     return __ret
 }

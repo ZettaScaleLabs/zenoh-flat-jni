@@ -35,17 +35,17 @@ public enum class WhatAmI(public val value: Int) {
 public value class ZenohId(public val bytes: ByteArray) {
     /** Serialize a Zenoh node identifier as raw bytes (16 bytes, little-endian). */
     public fun toBytes(onError: JniErrorHandler<ByteArray>): ByteArray {
-        val __cap = JniErrorHandlerCapture.acquire()
-        val __ret = JNINative.zenohIdToBytes(this.bytes, __cap)
-        if (__cap.failed) return onError.run(__cap.je)
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __ret = JNINative.zenohIdToBytes(this.bytes, __bcap)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /** Format a Zenoh node identifier as its standard string form. */
     public fun toStr(onError: JniErrorHandler<String>): String {
-        val __cap = JniErrorHandlerCapture.acquire()
-        val __ret = JNINative.zenohIdToString(this.bytes, __cap)
-        if (__cap.failed) return onError.run(__cap.je)
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __ret = JNINative.zenohIdToString(this.bytes, __bcap)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 }
@@ -71,44 +71,57 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
     /**
      * Return the JSON value associated with `key` in the configuration.
      *
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
-    public fun getJson(key: String, onError: ErrorHandler<String>): String {
-        if (this.isClosed()) return onError.run("Operation on a closed native handle.", "")
-        val __cap = ErrorHandlerCapture.acquire()
+    public fun getJson(
+        key: String,
+        onBindingError: JniErrorHandler<String>,
+        onError: ErrorHandler<String>,
+    ): String {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.configGetJson(this_ptr, key, __cap)
+            JNINative.configGetJson(this_ptr, key, __bcap, __dcap)
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
         return __ret
     }
 
     /** Create an independent copy of a configuration. */
     public fun newClone(onError: JniErrorHandler<Config>): Config {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        val __cap = JniErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Config(JNINative.configNewClone(this_ptr, __cap))
+            Config(JNINative.configNewClone(this_ptr, __bcap))
         }
-        if (__cap.failed) return onError.run(__cap.je)
+        if (__bcap.failed) return onError.run(__bcap.ze0)
         return __ret
     }
 
     /**
      * Insert a JSON5-formatted value at `key` in the configuration.
      *
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
-    public fun insertJson5(key: String, value: String, onError: ErrorHandler<Unit>) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-        val __cap = ErrorHandlerCapture.acquire()
+    public fun insertJson5(
+        key: String,
+        value: String,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.configInsertJson5(this_ptr, key, value, __cap)
+            JNINative.configInsertJson5(this_ptr, key, value, __bcap, __dcap)
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public companion object {
@@ -117,9 +130,9 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
 
         /** Create a configuration with default settings. */
         public fun newDefault(onError: JniErrorHandler<Config>): Config {
-            val __cap = JniErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewDefault(__cap))
-            if (__cap.failed) return onError.run(__cap.je)
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewDefault(__bcap))
+            if (__bcap.failed) return onError.run(__bcap.ze0)
             return __ret
         }
 
@@ -127,48 +140,72 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
          * Load a configuration from a file path. The file extension determines
          * the format (JSON, JSON5, or YAML).
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newFromFile(path: String, onError: ErrorHandler<Config>): Config {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromFile(path, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newFromFile(
+            path: String,
+            onBindingError: JniErrorHandler<Config>,
+            onError: ErrorHandler<Config>,
+        ): Config {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromFile(path, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
         /**
          * Parse a configuration from JSON text.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newFromJson(s: String, onError: ErrorHandler<Config>): Config {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newFromJson(
+            s: String,
+            onBindingError: JniErrorHandler<Config>,
+            onError: ErrorHandler<Config>,
+        ): Config {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromJson(s, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
         /**
          * Parse a configuration from a JSON5-formatted string.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newFromJson5(s: String, onError: ErrorHandler<Config>): Config {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson5(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newFromJson5(
+            s: String,
+            onBindingError: JniErrorHandler<Config>,
+            onError: ErrorHandler<Config>,
+        ): Config {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromJson5(s, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
 
         /**
          * Parse a configuration from a YAML-formatted string.
          *
-         * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+         * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
          */
-        public fun newFromYaml(s: String, onError: ErrorHandler<Config>): Config {
-            val __cap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromYaml(s, __cap))
-            if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        public fun newFromYaml(
+            s: String,
+            onBindingError: JniErrorHandler<Config>,
+            onError: ErrorHandler<Config>,
+        ): Config {
+            val __bcap = JniErrorHandlerCapture.acquire()
+            val __dcap = ErrorHandlerCapture.acquire()
+            val __ret = Config(JNINative.configNewFromYaml(s, __bcap, __dcap))
+            if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+            if (__dcap.failed) return onError.run(__dcap.ze0!!)
             return __ret
         }
     }

@@ -5,6 +5,8 @@ import io.zenoh.jni.ErrorHandler
 import io.zenoh.jni.ErrorHandlerCapture
 import io.zenoh.jni.GcNativeHandle
 import io.zenoh.jni.JNINative
+import io.zenoh.jni.JniErrorHandler
+import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
 import io.zenoh.jni.bytes.Encoding
 import io.zenoh.jni.registerGcHandle
@@ -39,7 +41,7 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
      * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
      * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun put(
         payload: ByteArray,
@@ -48,13 +50,15 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
         encoding01: String?,
         encoding1: Encoding?,
         attachment: ByteArray?,
+        onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
     ) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
         if (encoding1 != null && encoding1.isClosed()) {
-            onError.run("Operation on a closed native handle.", ""); return
+            onBindingError.run("Operation on a closed native handle."); return
         }
-        val __cap = ErrorHandlerCapture.acquire()
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         run {
             val __locks = ArrayList<NativeHandle>()
             __locks.add(this)
@@ -71,11 +75,13 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
                     encoding01,
                     encoding1_ptr,
                     attachment,
-                    __cap,
+                    __bcap,
+                    __dcap,
                 )
             }
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     /**
@@ -85,16 +91,22 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * user-defined metadata.
      *
      * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
-     * On failure `onError` receives `je` plus the decomposed Rust `Error` error (`message`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
-    public fun delete(attachment: ByteArray?, onError: ErrorHandler<Unit>) {
-        if (this.isClosed()) { onError.run("Operation on a closed native handle.", ""); return }
-        val __cap = ErrorHandlerCapture.acquire()
+    public fun delete(
+        attachment: ByteArray?,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
         withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            JNINative.publisherDelete(this_ptr, attachment, __cap)
+            JNINative.publisherDelete(this_ptr, attachment, __bcap, __dcap)
         }
-        if (__cap.failed) return onError.run(__cap.je, __cap.ze0!!)
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
     }
 
     public companion object {
