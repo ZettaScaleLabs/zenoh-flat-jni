@@ -146,6 +146,34 @@ Base package: `io.zenoh.jni`
 - `parameters_values` — `fun parametersValues(s: String, k: String, onError: JniErrorHandler<List<String>>): List<String>`
   - shaped by: return `String` decomposed → [] (Callback delivery)
 
+## class `io.zenoh.jni.pubsub.AdvancedPublisher` (ptr_class, Rust `AdvancedPublisher`)
+
+- `advanced_publisher_declare_background_matching_listener` — `fun declareBackgroundMatchingListener(callback: boolCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_publisher_declare_matching_listener` — `fun declareMatchingListener(callback: boolCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<MatchingListener>, onError: ErrorHandler<MatchingListener>): MatchingListener`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_publisher_delete` — `fun delete(attachment: ByteArray?, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_publisher_matching_status` — `fun matchingStatus(onBindingError: JniErrorHandler<Boolean>, onError: ErrorHandler<Boolean>): Boolean`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_publisher_put` — `fun put(payload: ByteArray, encodingSel: Int, encoding00: Int?, encoding01: String?, encoding1: Encoding?, attachment: ByteArray?, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+  - shaped by: param `attachment` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id, self]
+  - shaped by: param `payload` expanded from `ZBytes` — variants [zbytes_new_from_vec]
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+
+## class `io.zenoh.jni.pubsub.AdvancedSubscriber` (ptr_class, Rust `AdvancedSubscriber`)
+
+- `advanced_subscriber_declare_background_detect_publishers_subscriber` — `fun declareBackgroundDetectPublishersSubscriber(callback: SampleCallback, onClose: VoidCallback, history: Boolean?, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_subscriber_declare_background_sample_miss_listener` — `fun declareBackgroundSampleMissListener(callback: SampleMissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_subscriber_declare_detect_publishers_subscriber` — `fun declareDetectPublishersSubscriber(callback: SampleCallback, onClose: VoidCallback, history: Boolean?, onBindingError: JniErrorHandler<Subscriber>, onError: ErrorHandler<Subscriber>): Subscriber`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `advanced_subscriber_declare_sample_miss_listener` — `fun declareSampleMissListener(callback: SampleMissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<SampleMissListener>, onError: ErrorHandler<SampleMissListener>): SampleMissListener`
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+
 ## class `io.zenoh.jni.config.Config` (ptr_class, Rust `Config`)
 
 - `config_get_json` — `fun getJson(key: String, onBindingError: JniErrorHandler<String>, onError: ErrorHandler<String>): String`
@@ -289,6 +317,13 @@ Base package: `io.zenoh.jni`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
 - `open` — `fun open(config: Config, onBindingError: JniErrorHandler<Session>, onError: ErrorHandler<Session>): Session`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `session_declare_advanced_publisher` — `fun declareAdvancedPublisher(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, encodingSel: Int, encoding00: Int?, encoding01: String?, encoding1: Encoding?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, sampleMissDetection: MissDetectionConfig?, publisherDetection: Boolean?, cache: CacheConfig?, onBindingError: JniErrorHandler<AdvancedPublisher>, onError: ErrorHandler<AdvancedPublisher>): AdvancedPublisher`
+  - shaped by: param `encoding` expanded from `Encoding` — variants [encoding_new_from_id, self]
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
+- `session_declare_advanced_subscriber` — `fun declareAdvancedSubscriber(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, callback: SampleCallback, onClose: VoidCallback, history: HistoryConfig?, recovery: RecoveryConfig?, queryTimeout: ULong?, subscriberDetection: Boolean?, onBindingError: JniErrorHandler<AdvancedSubscriber>, onError: ErrorHandler<AdvancedSubscriber>): AdvancedSubscriber`
+  - shaped by: param `key_expr` expanded from `KeyExpr` — variants [keyexpr_new_try_from, self]
+  - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
 - `session_declare_keyexpr` — `fun declareKeyexpr(keyExpr: String, onBindingError: JniErrorHandler<KeyExpr>, onError: ErrorHandler<KeyExpr>): KeyExpr`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
 - `session_declare_publisher` — `fun declarePublisher(keyExprSel: Int, keyExpr0: String?, keyExpr1: KeyExpr?, encodingSel: Int, encoding00: Int?, encoding01: String?, encoding1: Encoding?, congestionControl: CongestionControl?, priority: Priority?, express: Boolean?, reliability: Reliability?, onBindingError: JniErrorHandler<Publisher>, onError: ErrorHandler<Publisher>): Publisher`
@@ -346,25 +381,35 @@ Base package: `io.zenoh.jni`
 
 ## types
 
+- `AdvancedPublisher`: ptr_class → `io.zenoh.jni.pubsub.AdvancedPublisher` (wire `jni :: sys :: jlong`)
+- `AdvancedSubscriber`: ptr_class → `io.zenoh.jni.pubsub.AdvancedSubscriber` (wire `jni :: sys :: jlong`)
+- `CacheConfig`: data_class → `io.zenoh.jni.pubsub.CacheConfig` (wire `jni :: objects :: JObject`)
 - `Config`: ptr_class → `io.zenoh.jni.config.Config` (wire `jni :: sys :: jlong`)
 - `CongestionControl`: enum_class → `io.zenoh.jni.qos.CongestionControl` (wire `jni :: sys :: jint`)
 - `ConsolidationMode`: enum_class → `io.zenoh.jni.query.ConsolidationMode` (wire `jni :: sys :: jint`)
 - `Encoding`: ptr_class → `io.zenoh.jni.bytes.Encoding` (wire `jni :: sys :: jlong`)
 - `Hello`: ptr_class → `io.zenoh.jni.scouting.Hello` (wire `jni :: sys :: jlong`)
+- `HistoryConfig`: data_class → `io.zenoh.jni.pubsub.HistoryConfig` (wire `jni :: objects :: JObject`)
 - `KeyExpr`: ptr_class → `io.zenoh.jni.keyexpr.KeyExpr` (wire `jni :: sys :: jlong`)
 - `LivelinessToken`: ptr_class → `io.zenoh.jni.liveliness.LivelinessToken` (wire `jni :: sys :: jlong`)
+- `MatchingListener`: ptr_class → `io.zenoh.jni.pubsub.MatchingListener` (wire `jni :: sys :: jlong`)
+- `MissDetectionConfig`: data_class → `io.zenoh.jni.pubsub.MissDetectionConfig` (wire `jni :: objects :: JObject`)
 - `Priority`: enum_class → `io.zenoh.jni.qos.Priority` (wire `jni :: sys :: jint`)
 - `Publisher`: ptr_class → `io.zenoh.jni.pubsub.Publisher` (wire `jni :: sys :: jlong`)
 - `Querier`: ptr_class → `io.zenoh.jni.query.Querier` (wire `jni :: sys :: jlong`)
 - `Query`: ptr_class → `io.zenoh.jni.query.Query` (wire `jni :: sys :: jlong`)
 - `QueryTarget`: enum_class → `io.zenoh.jni.query.QueryTarget` (wire `jni :: sys :: jint`)
 - `Queryable`: ptr_class → `io.zenoh.jni.query.Queryable` (wire `jni :: sys :: jlong`)
+- `RecoveryConfig`: data_class → `io.zenoh.jni.pubsub.RecoveryConfig` (wire `jni :: objects :: JObject`)
 - `Reliability`: enum_class → `io.zenoh.jni.qos.Reliability` (wire `jni :: sys :: jint`)
+- `RepliesConfig`: data_class → `io.zenoh.jni.pubsub.RepliesConfig` (wire `jni :: objects :: JObject`)
 - `Reply`: ptr_class → `io.zenoh.jni.query.Reply` (wire `jni :: sys :: jlong`)
 - `ReplyError`: ptr_class → `io.zenoh.jni.query.ReplyError` (wire `jni :: sys :: jlong`)
 - `ReplyKeyExpr`: enum_class → `io.zenoh.jni.query.ReplyKeyExpr` (wire `jni :: sys :: jint`)
 - `Sample`: ptr_class → `io.zenoh.jni.sample.Sample` (wire `jni :: sys :: jlong`)
 - `SampleKind`: enum_class → `io.zenoh.jni.sample.SampleKind` (wire `jni :: sys :: jint`)
+- `SampleMiss`: data_class → `io.zenoh.jni.pubsub.SampleMiss` (wire `jni :: objects :: JObject`)
+- `SampleMissListener`: ptr_class → `io.zenoh.jni.pubsub.SampleMissListener` (wire `jni :: sys :: jlong`)
 - `Scout`: ptr_class → `io.zenoh.jni.scouting.Scout` (wire `jni :: sys :: jlong`)
 - `Session`: ptr_class → `io.zenoh.jni.session.Session` (wire `jni :: sys :: jlong`)
 - `SetIntersectionLevel`: enum_class → `io.zenoh.jni.keyexpr.SetIntersectionLevel` (wire `jni :: sys :: jint`)
@@ -373,6 +418,10 @@ Base package: `io.zenoh.jni`
 - `WhatAmI`: enum_class → `io.zenoh.jni.config.WhatAmI` (wire `jni :: sys :: jint`)
 - `ZBytes`: ptr_class → `io.zenoh.jni.bytes.ZBytes` (wire `jni :: sys :: jlong`)
 - `ZenohId`: value_class → `io.zenoh.jni.config.ZenohId` (wire `jni :: objects :: JByteArray`)
+
+## conversions
+
+- `convert!(Duration)`: input `#[prebindgen]` fn `duration_from_millis`, output `#[prebindgen]` fn `duration_to_millis`
 
 ## rust-side-only types
 

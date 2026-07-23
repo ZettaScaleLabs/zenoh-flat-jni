@@ -8,10 +8,473 @@ import io.zenoh.jni.JNINative
 import io.zenoh.jni.JniErrorHandler
 import io.zenoh.jni.JniErrorHandlerCapture
 import io.zenoh.jni.NativeHandle
+import io.zenoh.jni.VoidCallback
+import io.zenoh.jni.boolCallback
 import io.zenoh.jni.bytes.Encoding
+import io.zenoh.jni.config.ZenohId
+import io.zenoh.jni.qos.CongestionControl
+import io.zenoh.jni.qos.Priority
 import io.zenoh.jni.registerGcHandle
 import io.zenoh.jni.releaseCell
+import io.zenoh.jni.sample.SampleCallback
+import io.zenoh.jni.sample.asRaw
 import io.zenoh.jni.withSortedHandleLocks
+
+/** Configuration of an advanced publisher's retransmission cache. */
+public data class CacheConfig(val maxSamples: ULong, val replies: RepliesConfig) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(
+            maxSamples: Long,
+            replies_priority: Int,
+            replies_congestionControl: Int,
+            replies_isExpress: Boolean,
+        ): CacheConfig = CacheConfig(maxSamples.toULong(), RepliesConfig.fromParts(replies_priority, replies_congestionControl, replies_isExpress))
+    }
+}
+
+/**
+ * Query configuration for an advanced subscriber's historical data.
+ *
+ * History can only be retransmitted by advanced publishers that enable a
+ * [`crate::CacheConfig`]; late-joiner detection additionally requires their
+ * publisher detection.
+ */
+public data class HistoryConfig(val detectLatePublishers: Boolean, val maxSamples: ULong?, val maxAge: Double?) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(
+            detectLatePublishers: Boolean,
+            maxSamples: Long?,
+            maxAge: Double?,
+        ): HistoryConfig = HistoryConfig(detectLatePublishers, maxSamples?.toULong(), maxAge)
+    }
+}
+
+/**
+ * Configuration enabling sample-miss detection on an advanced publisher.
+ *
+ * A `heartbeat` period lets advanced subscribers recover the last sample;
+ * `None` enables miss detection without a heartbeat.
+ */
+public data class MissDetectionConfig(val heartbeat: ULong?, val sporadic: Boolean) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(heartbeat: Long, sporadic: Boolean): MissDetectionConfig = MissDetectionConfig(if (heartbeat == -1L) null else heartbeat.toULong(), sporadic)
+    }
+}
+
+/**
+ * Retransmission (missed-sample recovery) configuration for an advanced
+ * subscriber.
+ *
+ * At most one recovery mode applies: a `periodic_queries` period, or
+ * `heartbeat` subscription. If neither is set, recovery uses its defaults.
+ */
+public data class RecoveryConfig(val periodicQueries: ULong?, val heartbeat: Boolean) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(periodicQueries: Long, heartbeat: Boolean): RecoveryConfig = RecoveryConfig(if (periodicQueries == -1L) null else periodicQueries.toULong(), heartbeat)
+    }
+}
+
+/**
+ * Delivery quality applied to the replies served from an advanced publisher's
+ * cache.
+ */
+public data class RepliesConfig(val priority: Priority, val congestionControl: CongestionControl, val isExpress: Boolean) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(
+            priority: Int,
+            congestionControl: Int,
+            isExpress: Boolean,
+        ): RepliesConfig = RepliesConfig(Priority.fromInt(priority), CongestionControl.fromInt(congestionControl), isExpress)
+    }
+}
+
+/**
+ * A report of samples missed from one source, delivered to a sample-miss
+ * listener.
+ */
+public data class SampleMiss(val sourceZid: ZenohId, val sourceEid: Long, val nb: Long) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(sourceZid: ByteArray, sourceEid: Long, nb: Long): SampleMiss = SampleMiss(ZenohId(sourceZid), sourceEid, nb)
+    }
+}
+
+/** Typed handle for a native Zenoh `AdvancedPublisher`. */
+public class AdvancedPublisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
+    @Synchronized
+    override fun close() {
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
+    }
+
+    @Synchronized
+    public fun take(): AdvancedPublisher {
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return AdvancedPublisher(if (p != 0L) p else cell.get())
+    }
+
+    /**
+     * Publish data on the advanced publisher's key expression.
+     *
+     * The encoding applies to this publication; the attachment carries
+     * user-defined metadata. Available only when unstable features are enabled.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+     * Parameter `payload` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `payload`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun put(
+        payload: ByteArray,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
+        attachment: ByteArray?,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        if (encoding1?.isClosed() == true) {
+            onBindingError.run("Operation on a closed native handle."); return
+        }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            encoding1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val encoding1_ptr = encoding1?.ptr ?: 0L
+                JNINative.advancedPublisherPut(
+                    this_ptr,
+                    payload,
+                    encodingSel,
+                    encoding00 != null,
+                    encoding00 ?: 0,
+                    encoding01,
+                    encoding1_ptr,
+                    attachment,
+                    __bcap,
+                    __dcap,
+                )
+            }
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+    }
+
+    /**
+     * Publish a deletion notification on the advanced publisher's key expression.
+     *
+     * Available only when unstable features are enabled.
+     *
+     * Parameter `attachment` is the Rust `ZBytes` argument, expanded: its `zbytes_new_from_vec` inputs (crosses as `attachment`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun delete(
+        attachment: ByteArray?,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedPublisherDelete(this_ptr, attachment, __bcap, __dcap)
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+    }
+
+    /**
+     * Return whether the advanced publisher currently has matching subscribers.
+     *
+     * Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun matchingStatus(
+        onBindingError: JniErrorHandler<Boolean>,
+        onError: ErrorHandler<Boolean>,
+    ): Boolean {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedPublisherMatchingStatus(this_ptr, __bcap, __dcap)
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return __ret
+    }
+
+    /**
+     * Declare a matching listener that is notified when the publisher's matching
+     * status changes.
+     *
+     * The callback receives the new matching status (`true` if matching
+     * subscribers exist). The close callback is called when the listener ends.
+     * Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareMatchingListener(
+        callback: boolCallback,
+        onClose: VoidCallback,
+        onBindingError: JniErrorHandler<MatchingListener>,
+        onError: ErrorHandler<MatchingListener>,
+    ): MatchingListener {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedPublisherDeclareMatchingListener(
+                this_ptr,
+                callback,
+                onClose,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return MatchingListener(__ret)
+    }
+
+    /**
+     * Declare a background matching listener that runs until the publisher is
+     * undeclared.
+     *
+     * Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareBackgroundMatchingListener(
+        callback: boolCallback,
+        onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedPublisherDeclareBackgroundMatchingListener(
+                this_ptr,
+                callback,
+                onClose,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+    }
+
+    public companion object {
+        @JvmStatic
+        external fun freePtr(ptr: Long)
+    }
+}
+
+/** Typed handle for a native Zenoh `AdvancedSubscriber`. */
+public class AdvancedSubscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
+    @Synchronized
+    override fun close() {
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
+    }
+
+    @Synchronized
+    public fun take(): AdvancedSubscriber {
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return AdvancedSubscriber(if (p != 0L) p else cell.get())
+    }
+
+    /**
+     * Declare a sample-miss listener that reports samples missed from advanced
+     * publishers with sample-miss detection enabled.
+     *
+     * The callback is called for each miss; the close callback is called when the
+     * listener ends. Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareSampleMissListener(
+        callback: SampleMissCallback,
+        onClose: VoidCallback,
+        onBindingError: JniErrorHandler<SampleMissListener>,
+        onError: ErrorHandler<SampleMissListener>,
+    ): SampleMissListener {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedSubscriberDeclareSampleMissListener(
+                this_ptr,
+                callback,
+                onClose,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return SampleMissListener(__ret)
+    }
+
+    /**
+     * Declare a background sample-miss listener that runs until the subscriber is
+     * undeclared.
+     *
+     * Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareBackgroundSampleMissListener(
+        callback: SampleMissCallback,
+        onClose: VoidCallback,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedSubscriberDeclareBackgroundSampleMissListener(
+                this_ptr,
+                callback,
+                onClose,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+    }
+
+    /**
+     * Declare a subscriber that detects the advanced publishers matching this
+     * advanced subscriber's key expression.
+     *
+     * Only advanced publishers that enable publisher detection are detected. When
+     * `history` is set, already-present publishers are reported too. The callback
+     * receives a sample per detection event; the close callback is called when the
+     * subscription ends. Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareDetectPublishersSubscriber(
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        history: Boolean?,
+        onBindingError: JniErrorHandler<Subscriber>,
+        onError: ErrorHandler<Subscriber>,
+    ): Subscriber {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedSubscriberDeclareDetectPublishersSubscriber(
+                this_ptr,
+                callback.asRaw(),
+                onClose,
+                history != null,
+                history ?: false,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return Subscriber(__ret)
+    }
+
+    /**
+     * Declare a background detect-publishers subscriber that runs until the
+     * advanced subscriber is undeclared.
+     *
+     * Available only when unstable features are enabled.
+     *
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareBackgroundDetectPublishersSubscriber(
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        history: Boolean?,
+        onBindingError: JniErrorHandler<Unit>,
+        onError: ErrorHandler<Unit>,
+    ) {
+        if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        withSortedHandleLocks(this) {
+            val this_ptr = this.ptr
+            JNINative.advancedSubscriberDeclareBackgroundDetectPublishersSubscriber(
+                this_ptr,
+                callback.asRaw(),
+                onClose,
+                history != null,
+                history ?: false,
+                __bcap,
+                __dcap,
+            )
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+    }
+
+    public companion object {
+        @JvmStatic
+        external fun freePtr(ptr: Long)
+    }
+}
+
+/** Typed handle for a native Zenoh `MatchingListener`. */
+public class MatchingListener(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
+    @Synchronized
+    override fun close() {
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
+    }
+
+    @Synchronized
+    public fun take(): MatchingListener {
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return MatchingListener(if (p != 0L) p else cell.get())
+    }
+
+    public companion object {
+        @JvmStatic
+        external fun freePtr(ptr: Long)
+    }
+}
 
 /** Typed handle for a native Zenoh `Publisher`. */
 public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
@@ -54,7 +517,7 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
-        if (encoding1 != null && encoding1.isClosed()) {
+        if (encoding1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -115,6 +578,30 @@ public class Publisher(initialPtr: Long) : GcNativeHandle(initialPtr) {
     }
 }
 
+/** Typed handle for a native Zenoh `SampleMissListener`. */
+public class SampleMissListener(initialPtr: Long) : GcNativeHandle(initialPtr) {
+    private val __cleanable = registerGcHandle(this) { freePtr(it) }
+
+    @Synchronized
+    override fun close() {
+        val p = releaseCell(cell)
+        if (p != 0L) freePtr(p)
+        __cleanable?.clean()
+    }
+
+    @Synchronized
+    public fun take(): SampleMissListener {
+        val p = releaseCell(cell)
+        __cleanable?.clean()
+        return SampleMissListener(if (p != 0L) p else cell.get())
+    }
+
+    public companion object {
+        @JvmStatic
+        external fun freePtr(ptr: Long)
+    }
+}
+
 /** Typed handle for a native Zenoh `Subscriber`. */
 public class Subscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
     private val __cleanable = registerGcHandle(this) { freePtr(it) }
@@ -137,4 +624,8 @@ public class Subscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
         @JvmStatic
         external fun freePtr(ptr: Long)
     }
+}
+
+public fun interface SampleMissCallback {
+    public fun run(sampleMiss: SampleMiss)
 }

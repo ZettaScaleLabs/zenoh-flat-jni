@@ -96,10 +96,10 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Config(JNINative.configNewClone(this_ptr, __bcap))
+            JNINative.configNewClone(this_ptr, __bcap)
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return Config(__ret)
     }
 
     /**
@@ -131,9 +131,9 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         /** Create a configuration with default settings. */
         public fun newDefault(onError: JniErrorHandler<Config>): Config {
             val __bcap = JniErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewDefault(__bcap))
+            val __ret = JNINative.configNewDefault(__bcap)
             if (__bcap.failed) return onError.run(__bcap.ze0)
-            return __ret
+            return Config(__ret)
         }
 
         /**
@@ -149,10 +149,10 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): Config {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromFile(path, __bcap, __dcap))
+            val __ret = JNINative.configNewFromFile(path, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return Config(__ret)
         }
 
         /**
@@ -167,10 +167,10 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): Config {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson(s, __bcap, __dcap))
+            val __ret = JNINative.configNewFromJson(s, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return Config(__ret)
         }
 
         /**
@@ -185,10 +185,10 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): Config {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromJson5(s, __bcap, __dcap))
+            val __ret = JNINative.configNewFromJson5(s, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return Config(__ret)
         }
 
         /**
@@ -203,10 +203,10 @@ public class Config(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): Config {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = Config(JNINative.configNewFromYaml(s, __bcap, __dcap))
+            val __ret = JNINative.configNewFromYaml(s, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return Config(__ret)
         }
     }
 }

@@ -67,10 +67,10 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.keyexprNewClone(this_ptr, __bcap))
+            JNINative.keyexprNewClone(this_ptr, __bcap)
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return KeyExpr(__ret)
     }
 
     /** Return the canonical text of a key expression. */
@@ -101,7 +101,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: JniErrorHandler<Boolean>,
     ): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
+        if (b1?.isClosed() == true) return onError.run("Operation on a closed native handle.")
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
@@ -133,7 +133,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: JniErrorHandler<Boolean>,
     ): Boolean {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
+        if (b1?.isClosed() == true) return onError.run("Operation on a closed native handle.")
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
@@ -173,7 +173,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: JniErrorHandler<SetIntersectionLevel>,
     ): SetIntersectionLevel {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
-        if (b1 != null && b1.isClosed()) return onError.run("Operation on a closed native handle.")
+        if (b1?.isClosed() == true) return onError.run("Operation on a closed native handle.")
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = run {
             val __locks = ArrayList<NativeHandle>()
@@ -182,13 +182,11 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             withSortedHandleLocks(__locks) {
                 val this_ptr = this.ptr
                 val b1_ptr = b1?.ptr ?: 0L
-                io.zenoh.jni.keyexpr.SetIntersectionLevel.fromInt(
-                    JNINative.keyexprRelationTo(this_ptr, bSel, b0, b1_ptr, __bcap),
-                )
+                JNINative.keyexprRelationTo(this_ptr, bSel, b0, b1_ptr, __bcap)
             }
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return io.zenoh.jni.keyexpr.SetIntersectionLevel.fromInt(__ret)
     }
 
     public companion object {
@@ -209,10 +207,10 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): KeyExpr {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = KeyExpr(JNINative.keyexprNewTryFrom(s, __bcap, __dcap))
+            val __ret = JNINative.keyexprNewTryFrom(s, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return KeyExpr(__ret)
         }
 
         /**
@@ -230,10 +228,10 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
         ): KeyExpr {
             val __bcap = JniErrorHandlerCapture.acquire()
             val __dcap = ErrorHandlerCapture.acquire()
-            val __ret = KeyExpr(JNINative.keyexprNewAutocanonize(s, __bcap, __dcap))
+            val __ret = JNINative.keyexprNewAutocanonize(s, __bcap, __dcap)
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return KeyExpr(__ret)
         }
 
         public fun newJoin(
@@ -266,7 +264,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             onBindingError: JniErrorHandler<KeyExpr>,
             onError: ErrorHandler<KeyExpr>,
         ): KeyExpr {
-            if (a1 != null && a1.isClosed()) return onBindingError.run(
+            if (a1?.isClosed() == true) return onBindingError.run(
                 "Operation on a closed native handle.",
             )
             val __bcap = JniErrorHandlerCapture.acquire()
@@ -276,12 +274,12 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 a1?.let { __locks.add(it) }
                 withSortedHandleLocks(__locks) {
                     val a1_ptr = a1?.ptr ?: 0L
-                    KeyExpr(JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __bcap, __dcap))
+                    JNINative.keyexprNewJoin(aSel, a0, a1_ptr, b, __bcap, __dcap)
                 }
             }
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return KeyExpr(__ret)
         }
 
         public fun newConcat(
@@ -315,7 +313,7 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
             onBindingError: JniErrorHandler<KeyExpr>,
             onError: ErrorHandler<KeyExpr>,
         ): KeyExpr {
-            if (a1 != null && a1.isClosed()) return onBindingError.run(
+            if (a1?.isClosed() == true) return onBindingError.run(
                 "Operation on a closed native handle.",
             )
             val __bcap = JniErrorHandlerCapture.acquire()
@@ -325,12 +323,12 @@ public class KeyExpr(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 a1?.let { __locks.add(it) }
                 withSortedHandleLocks(__locks) {
                     val a1_ptr = a1?.ptr ?: 0L
-                    KeyExpr(JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __bcap, __dcap))
+                    JNINative.keyexprNewConcat(aSel, a0, a1_ptr, b, __bcap, __dcap)
                 }
             }
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return KeyExpr(__ret)
         }
     }
 }
