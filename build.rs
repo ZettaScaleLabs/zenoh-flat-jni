@@ -520,7 +520,10 @@ fn main() {
                 .class(data_class!(CacheConfig))
                 .class(data_class!(HistoryConfig))
                 .class(data_class!(RecoveryConfig))
-                .class(data_class!(SampleMiss))
+                // `EntityGlobalId` is declared before `Miss`, which nests it as a
+                // field; its `zid` is the `ZenohId` value class declared above.
+                .class(data_class!(EntityGlobalId))
+                .class(data_class!(Miss))
                 // Advanced publisher: put/delete + matching status/listeners
                 // (the matching callback delivers a plain `bool`).
                 .class(
@@ -536,7 +539,7 @@ fn main() {
                 )
                 .class(ptr_class!(MatchingListener).gc_managed())
                 // Advanced subscriber: sample-miss listeners (callback delivers a
-                // `SampleMiss` data class) + detect-publishers subscribers.
+                // `Miss` data class) + detect-publishers subscribers.
                 .class(
                     ptr_class!(AdvancedSubscriber)
                         .gc_managed()
