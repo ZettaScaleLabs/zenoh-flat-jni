@@ -3996,6 +3996,44 @@ pub(crate) unsafe fn Encoding_to_jlong_e0e31e0d<'a>(
     clippy::nonminimal_bool,
     clippy::eq_op
 )]
+pub(crate) unsafe fn EntityGlobalId_to_JObject_42df3b10<'a>(
+    env: &mut jni::JNIEnv<'a>,
+    v: zenoh_flat::EntityGlobalId,
+) -> ::core::result::Result<jni::objects::JObject<'a>, __JniErr> {
+    Ok({
+        let ___zid: jni::objects::JObject = {
+            ZenohId_to_JByteArray_2caee6f1(env, v.zid.clone())?
+        }
+            .into();
+        let ___eid: jni::sys::jlong = u32_to_jlong_9594a230(env, v.eid.clone())?;
+        let __obj = env
+            .call_static_method(
+                "io/zenoh/jni/pubsub/EntityGlobalId",
+                "fromParts",
+                "([BJ)Lio/zenoh/jni/pubsub/EntityGlobalId;",
+                &[
+                    jni::objects::JValue::Object(&___zid),
+                    jni::objects::JValue::from(___eid),
+                ],
+            )
+            .and_then(|__v| __v.l())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("encode struct via fromParts: {}", e)))?;
+        __obj
+    })
+}
+#[allow(
+    non_snake_case,
+    unused_mut,
+    unused_variables,
+    unused_braces,
+    dead_code,
+    clippy::needless_question_mark,
+    clippy::let_and_return,
+    clippy::nonminimal_bool,
+    clippy::eq_op
+)]
 pub(crate) unsafe fn Hello_to_jlong_bbd3fc65<'a>(
     env: &mut jni::JNIEnv<'a>,
     v: zenoh_flat::Hello,
@@ -4171,6 +4209,43 @@ pub(crate) unsafe fn JObject_to_CacheConfig_db89a97c<'env, 'v>(
     clippy::nonminimal_bool,
     clippy::eq_op
 )]
+pub(crate) unsafe fn JObject_to_EntityGlobalId_42df3b10<'env, 'v>(
+    env: &mut jni::JNIEnv<'env>,
+    v: &jni::objects::JObject<'v>,
+) -> ::core::result::Result<zenoh_flat::EntityGlobalId, __JniErr> {
+    Ok({
+        let __zid_jobj: jni::objects::JObject = env
+            .get_field(v, "zid", "[B")
+            .and_then(|val| val.l())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("EntityGlobalId.zid: {}", e)))?;
+        let __zid_raw: jni::objects::JByteArray = __zid_jobj.into();
+        let zid = JByteArray_to_ZenohId_2caee6f1(env, &__zid_raw)?;
+        let __eid_raw: jni::sys::jlong = env
+            .get_field(v, "eid", "J")
+            .and_then(|val| val.j())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("EntityGlobalId.eid: {}", e)))? as _;
+        let eid = jlong_to_u32_9594a230(env, &__eid_raw)?;
+        zenoh_flat::EntityGlobalId {
+            zid,
+            eid,
+        }
+    })
+}
+#[allow(
+    non_snake_case,
+    unused_mut,
+    unused_variables,
+    unused_braces,
+    dead_code,
+    clippy::needless_question_mark,
+    clippy::let_and_return,
+    clippy::nonminimal_bool,
+    clippy::eq_op
+)]
 pub(crate) unsafe fn JObject_to_HistoryConfig_9af92cec<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::objects::JObject<'v>,
@@ -4261,6 +4336,39 @@ pub(crate) unsafe fn JObject_to_MissDetectionConfig_5213dfb7<'env, 'v>(
             heartbeat,
             sporadic,
         }
+    })
+}
+#[allow(
+    non_snake_case,
+    unused_mut,
+    unused_variables,
+    unused_braces,
+    dead_code,
+    clippy::needless_question_mark,
+    clippy::let_and_return,
+    clippy::nonminimal_bool,
+    clippy::eq_op
+)]
+pub(crate) unsafe fn JObject_to_Miss_e2758329<'env, 'v>(
+    env: &mut jni::JNIEnv<'env>,
+    v: &jni::objects::JObject<'v>,
+) -> ::core::result::Result<zenoh_flat::Miss, __JniErr> {
+    Ok({
+        let __source_raw: jni::objects::JObject = env
+            .get_field(v, "source", "Lio/zenoh/jni/pubsub/EntityGlobalId;")
+            .and_then(|val| val.l())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("Miss.source: {}", e)))?;
+        let source = JObject_to_EntityGlobalId_42df3b10(env, &__source_raw)?;
+        let __nb_raw: jni::sys::jlong = env
+            .get_field(v, "nb", "J")
+            .and_then(|val| val.j())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("Miss.nb: {}", e)))? as _;
+        let nb = jlong_to_u32_9594a230(env, &__nb_raw)?;
+        zenoh_flat::Miss { source, nb }
     })
 }
 #[allow(
@@ -4793,51 +4901,6 @@ pub(crate) unsafe fn JObject_to_RepliesConfig_eb8e9079<'env, 'v>(
     clippy::nonminimal_bool,
     clippy::eq_op
 )]
-pub(crate) unsafe fn JObject_to_SampleMiss_b8bbec5d<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::objects::JObject<'v>,
-) -> ::core::result::Result<zenoh_flat::SampleMiss, __JniErr> {
-    Ok({
-        let __source_zid_jobj: jni::objects::JObject = env
-            .get_field(v, "sourceZid", "[B")
-            .and_then(|val| val.l())
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("SampleMiss.sourceZid: {}", e)))?;
-        let __source_zid_raw: jni::objects::JByteArray = __source_zid_jobj.into();
-        let source_zid = JByteArray_to_ZenohId_2caee6f1(env, &__source_zid_raw)?;
-        let __source_eid_raw: jni::sys::jlong = env
-            .get_field(v, "sourceEid", "J")
-            .and_then(|val| val.j())
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("SampleMiss.sourceEid: {}", e)))? as _;
-        let source_eid = jlong_to_u32_9594a230(env, &__source_eid_raw)?;
-        let __nb_raw: jni::sys::jlong = env
-            .get_field(v, "nb", "J")
-            .and_then(|val| val.j())
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("SampleMiss.nb: {}", e)))? as _;
-        let nb = jlong_to_u32_9594a230(env, &__nb_raw)?;
-        zenoh_flat::SampleMiss {
-            source_zid,
-            source_eid,
-            nb,
-        }
-    })
-}
-#[allow(
-    non_snake_case,
-    unused_mut,
-    unused_variables,
-    unused_braces,
-    dead_code,
-    clippy::needless_question_mark,
-    clippy::let_and_return,
-    clippy::nonminimal_bool,
-    clippy::eq_op
-)]
 pub(crate) unsafe fn JObject_to_impl_Fn_Hello_Send_Sync_static_d937ec1a<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::objects::JObject<'v>,
@@ -4964,6 +5027,96 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Hello_Send_Sync_static_d937ec1a<'env, 'v
                 Ok(())
             })()
                 .map_err(|e| tracing::error!("{} callback error: {e}", "Fn(Hello)"));
+        })
+    })
+}
+#[allow(
+    non_snake_case,
+    unused_mut,
+    unused_variables,
+    unused_braces,
+    dead_code,
+    clippy::needless_question_mark,
+    clippy::let_and_return,
+    clippy::nonminimal_bool,
+    clippy::eq_op
+)]
+pub(crate) unsafe fn JObject_to_impl_Fn_Miss_Send_Sync_static_192e5ce2<'env, 'v>(
+    env: &mut jni::JNIEnv<'env>,
+    v: &jni::objects::JObject<'v>,
+) -> ::core::result::Result<
+    impl Fn(zenoh_flat::Miss) + Send + Sync + 'static,
+    __JniErr,
+> {
+    Ok({
+        use std::sync::Arc;
+        let java_vm = Arc::new(
+            env
+                .get_java_vm()
+                .map_err(|e| <__JniErr as ::core::convert::From<
+                    String,
+                >>::from(format!("Unable to retrieve JVM: {}", e)))?,
+        );
+        let callback_global_ref = env
+            .new_global_ref(&v)
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("Unable to global-ref callback: {}", e)))?;
+        let __invoke_class = env
+            .get_object_class(&v)
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(
+                format!("Unable to get callback class for {}: {}", "Fn(Miss)", e),
+            ))?;
+        let __invoke_id = env
+            .get_method_id(&__invoke_class, "run", "(Lio/zenoh/jni/pubsub/Miss;)V")
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("Unable to resolve run for {}: {}", "Fn(Miss)", e)))?;
+        Box::new(move |__cb_arg0: zenoh_flat::Miss| {
+            let _ = (|| -> ::core::result::Result<(), __JniErr> {
+                let mut env = java_vm
+                    .attach_current_thread_as_daemon()
+                    .map_err(|e| <__JniErr as ::core::convert::From<
+                        String,
+                    >>::from(format!("Attach thread for {}: {}", "Fn(Miss)", e)))?;
+                env.push_local_frame(16)
+                    .map_err(|e| <__JniErr as ::core::convert::From<
+                        String,
+                    >>::from(format!("push local frame for {}: {}", "Fn(Miss)", e)))?;
+                let __frame_res = (|| -> ::core::result::Result<(), __JniErr> {
+                    let __cb0_enc = Miss_to_JObject_e2758329(&mut env, __cb_arg0)?;
+                    let __cb0_obj: jni::objects::JObject = __cb0_enc;
+                    let __call_res: ::core::result::Result<(), __JniErr> = unsafe {
+                        env.call_method_unchecked(
+                            &callback_global_ref,
+                            __invoke_id,
+                            jni::signature::ReturnType::Primitive(
+                                jni::signature::Primitive::Void,
+                            ),
+                            &[
+                                jni::sys::jvalue {
+                                    l: __cb0_obj.as_raw(),
+                                },
+                            ],
+                        )
+                    }
+                        .map(|_| ())
+                        .map_err(|e| {
+                            let _ = env.exception_describe();
+                            <__JniErr as ::core::convert::From<
+                                String,
+                            >>::from(e.to_string())
+                        });
+                    __call_res?;
+                    Ok(())
+                })();
+                let _ = unsafe { env.pop_local_frame(&jni::objects::JObject::null()) };
+                __frame_res?;
+                Ok(())
+            })()
+                .map_err(|e| tracing::error!("{} callback error: {e}", "Fn(Miss)"));
         })
     })
 }
@@ -5921,100 +6074,6 @@ pub(crate) unsafe fn JObject_to_impl_Fn_Reply_Send_Sync_static_a5b82e2d<'env, 'v
     clippy::nonminimal_bool,
     clippy::eq_op
 )]
-pub(crate) unsafe fn JObject_to_impl_Fn_SampleMiss_Send_Sync_static_afb7dd87<'env, 'v>(
-    env: &mut jni::JNIEnv<'env>,
-    v: &jni::objects::JObject<'v>,
-) -> ::core::result::Result<
-    impl Fn(zenoh_flat::SampleMiss) + Send + Sync + 'static,
-    __JniErr,
-> {
-    Ok({
-        use std::sync::Arc;
-        let java_vm = Arc::new(
-            env
-                .get_java_vm()
-                .map_err(|e| <__JniErr as ::core::convert::From<
-                    String,
-                >>::from(format!("Unable to retrieve JVM: {}", e)))?,
-        );
-        let callback_global_ref = env
-            .new_global_ref(&v)
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("Unable to global-ref callback: {}", e)))?;
-        let __invoke_class = env
-            .get_object_class(&v)
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(
-                format!("Unable to get callback class for {}: {}", "Fn(SampleMiss)", e),
-            ))?;
-        let __invoke_id = env
-            .get_method_id(&__invoke_class, "run", "(Lio/zenoh/jni/pubsub/SampleMiss;)V")
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("Unable to resolve run for {}: {}", "Fn(SampleMiss)", e)))?;
-        Box::new(move |__cb_arg0: zenoh_flat::SampleMiss| {
-            let _ = (|| -> ::core::result::Result<(), __JniErr> {
-                let mut env = java_vm
-                    .attach_current_thread_as_daemon()
-                    .map_err(|e| <__JniErr as ::core::convert::From<
-                        String,
-                    >>::from(format!("Attach thread for {}: {}", "Fn(SampleMiss)", e)))?;
-                env.push_local_frame(16)
-                    .map_err(|e| <__JniErr as ::core::convert::From<
-                        String,
-                    >>::from(
-                        format!("push local frame for {}: {}", "Fn(SampleMiss)", e),
-                    ))?;
-                let __frame_res = (|| -> ::core::result::Result<(), __JniErr> {
-                    let __cb0_enc = SampleMiss_to_JObject_b8bbec5d(&mut env, __cb_arg0)?;
-                    let __cb0_obj: jni::objects::JObject = __cb0_enc;
-                    let __call_res: ::core::result::Result<(), __JniErr> = unsafe {
-                        env.call_method_unchecked(
-                            &callback_global_ref,
-                            __invoke_id,
-                            jni::signature::ReturnType::Primitive(
-                                jni::signature::Primitive::Void,
-                            ),
-                            &[
-                                jni::sys::jvalue {
-                                    l: __cb0_obj.as_raw(),
-                                },
-                            ],
-                        )
-                    }
-                        .map(|_| ())
-                        .map_err(|e| {
-                            let _ = env.exception_describe();
-                            <__JniErr as ::core::convert::From<
-                                String,
-                            >>::from(e.to_string())
-                        });
-                    __call_res?;
-                    Ok(())
-                })();
-                let _ = unsafe { env.pop_local_frame(&jni::objects::JObject::null()) };
-                __frame_res?;
-                Ok(())
-            })()
-                .map_err(|e| {
-                    tracing::error!("{} callback error: {e}", "Fn(SampleMiss)")
-                });
-        })
-    })
-}
-#[allow(
-    non_snake_case,
-    unused_mut,
-    unused_variables,
-    unused_braces,
-    dead_code,
-    clippy::needless_question_mark,
-    clippy::let_and_return,
-    clippy::nonminimal_bool,
-    clippy::eq_op
-)]
 pub(crate) unsafe fn JObject_to_impl_Fn_Sample_Send_Sync_static_a050ca1d<'env, 'v>(
     env: &mut jni::JNIEnv<'env>,
     v: &jni::objects::JObject<'v>,
@@ -6677,6 +6736,49 @@ pub(crate) unsafe fn MissDetectionConfig_to_JObject_5213dfb7<'a>(
                 &[
                     jni::objects::JValue::from(___heartbeat),
                     jni::objects::JValue::from(___sporadic),
+                ],
+            )
+            .and_then(|__v| __v.l())
+            .map_err(|e| <__JniErr as ::core::convert::From<
+                String,
+            >>::from(format!("encode struct via fromParts: {}", e)))?;
+        __obj
+    })
+}
+#[allow(
+    non_snake_case,
+    unused_mut,
+    unused_variables,
+    unused_braces,
+    dead_code,
+    clippy::needless_question_mark,
+    clippy::let_and_return,
+    clippy::nonminimal_bool,
+    clippy::eq_op
+)]
+pub(crate) unsafe fn Miss_to_JObject_e2758329<'a>(
+    env: &mut jni::JNIEnv<'a>,
+    v: zenoh_flat::Miss,
+) -> ::core::result::Result<jni::objects::JObject<'a>, __JniErr> {
+    Ok({
+        let ___source_zid: jni::objects::JObject = {
+            ZenohId_to_JByteArray_2caee6f1(env, v.source.zid.clone())?
+        }
+            .into();
+        let ___source_eid: jni::sys::jlong = u32_to_jlong_9594a230(
+            env,
+            v.source.eid.clone(),
+        )?;
+        let ___nb: jni::sys::jlong = u32_to_jlong_9594a230(env, v.nb.clone())?;
+        let __obj = env
+            .call_static_method(
+                "io/zenoh/jni/pubsub/Miss",
+                "fromParts",
+                "([BJJ)Lio/zenoh/jni/pubsub/Miss;",
+                &[
+                    jni::objects::JValue::Object(&___source_zid),
+                    jni::objects::JValue::from(___source_eid),
+                    jni::objects::JValue::from(___nb),
                 ],
             )
             .and_then(|__v| __v.l())
@@ -7503,49 +7605,6 @@ pub(crate) unsafe fn SampleMissListener_to_jlong_0301b1b4<'a>(
     v: zenoh_flat::SampleMissListener,
 ) -> ::core::result::Result<jni::sys::jlong, __JniErr> {
     Ok(std::boxed::Box::into_raw(std::boxed::Box::new(v)) as i64)
-}
-#[allow(
-    non_snake_case,
-    unused_mut,
-    unused_variables,
-    unused_braces,
-    dead_code,
-    clippy::needless_question_mark,
-    clippy::let_and_return,
-    clippy::nonminimal_bool,
-    clippy::eq_op
-)]
-pub(crate) unsafe fn SampleMiss_to_JObject_b8bbec5d<'a>(
-    env: &mut jni::JNIEnv<'a>,
-    v: zenoh_flat::SampleMiss,
-) -> ::core::result::Result<jni::objects::JObject<'a>, __JniErr> {
-    Ok({
-        let ___source_zid: jni::objects::JObject = {
-            ZenohId_to_JByteArray_2caee6f1(env, v.source_zid.clone())?
-        }
-            .into();
-        let ___source_eid: jni::sys::jlong = u32_to_jlong_9594a230(
-            env,
-            v.source_eid.clone(),
-        )?;
-        let ___nb: jni::sys::jlong = u32_to_jlong_9594a230(env, v.nb.clone())?;
-        let __obj = env
-            .call_static_method(
-                "io/zenoh/jni/pubsub/SampleMiss",
-                "fromParts",
-                "([BJJ)Lio/zenoh/jni/pubsub/SampleMiss;",
-                &[
-                    jni::objects::JValue::Object(&___source_zid),
-                    jni::objects::JValue::from(___source_eid),
-                    jni::objects::JValue::from(___nb),
-                ],
-            )
-            .and_then(|__v| __v.l())
-            .map_err(|e| <__JniErr as ::core::convert::From<
-                String,
-            >>::from(format!("encode struct via fromParts: {}", e)))?;
-        __obj
-    })
 }
 #[allow(
     non_snake_case,
@@ -10117,7 +10176,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_advancedSubscriberDeclareBa
             return ();
         }
     };
-    let callback = match JObject_to_impl_Fn_SampleMiss_Send_Sync_static_afb7dd87(
+    let callback = match JObject_to_impl_Fn_Miss_Send_Sync_static_192e5ce2(
         &mut env,
         &callback,
     ) {
@@ -10391,7 +10450,7 @@ pub unsafe extern "C" fn Java_io_zenoh_jni_JNINative_advancedSubscriberDeclareSa
             return 0 as jni::sys::jlong;
         }
     };
-    let callback = match JObject_to_impl_Fn_SampleMiss_Send_Sync_static_afb7dd87(
+    let callback = match JObject_to_impl_Fn_Miss_Send_Sync_static_192e5ce2(
         &mut env,
         &callback,
     ) {

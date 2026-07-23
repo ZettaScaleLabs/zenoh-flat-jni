@@ -167,11 +167,11 @@ Base package: `io.zenoh.jni`
 
 - `advanced_subscriber_declare_background_detect_publishers_subscriber` — `fun declareBackgroundDetectPublishersSubscriber(callback: SampleCallback, onClose: VoidCallback, history: Boolean?, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
-- `advanced_subscriber_declare_background_sample_miss_listener` — `fun declareBackgroundSampleMissListener(callback: SampleMissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
+- `advanced_subscriber_declare_background_sample_miss_listener` — `fun declareBackgroundSampleMissListener(callback: MissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<Unit>, onError: ErrorHandler<Unit>)`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
 - `advanced_subscriber_declare_detect_publishers_subscriber` — `fun declareDetectPublishersSubscriber(callback: SampleCallback, onClose: VoidCallback, history: Boolean?, onBindingError: JniErrorHandler<Subscriber>, onError: ErrorHandler<Subscriber>): Subscriber`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
-- `advanced_subscriber_declare_sample_miss_listener` — `fun declareSampleMissListener(callback: SampleMissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<SampleMissListener>, onError: ErrorHandler<SampleMissListener>): SampleMissListener`
+- `advanced_subscriber_declare_sample_miss_listener` — `fun declareSampleMissListener(callback: MissCallback, onClose: VoidCallback, onBindingError: JniErrorHandler<SampleMissListener>, onError: ErrorHandler<SampleMissListener>): SampleMissListener`
   - shaped by: domain error `Error` decomposed → onError [message] (binding failures → onBindingError)
 
 ## class `io.zenoh.jni.config.Config` (ptr_class, Rust `Config`)
@@ -388,11 +388,13 @@ Base package: `io.zenoh.jni`
 - `CongestionControl`: enum_class → `io.zenoh.jni.qos.CongestionControl` (wire `jni :: sys :: jint`)
 - `ConsolidationMode`: enum_class → `io.zenoh.jni.query.ConsolidationMode` (wire `jni :: sys :: jint`)
 - `Encoding`: ptr_class → `io.zenoh.jni.bytes.Encoding` (wire `jni :: sys :: jlong`)
+- `EntityGlobalId`: data_class → `io.zenoh.jni.pubsub.EntityGlobalId` (wire `jni :: objects :: JObject`)
 - `Hello`: ptr_class → `io.zenoh.jni.scouting.Hello` (wire `jni :: sys :: jlong`)
 - `HistoryConfig`: data_class → `io.zenoh.jni.pubsub.HistoryConfig` (wire `jni :: objects :: JObject`)
 - `KeyExpr`: ptr_class → `io.zenoh.jni.keyexpr.KeyExpr` (wire `jni :: sys :: jlong`)
 - `LivelinessToken`: ptr_class → `io.zenoh.jni.liveliness.LivelinessToken` (wire `jni :: sys :: jlong`)
 - `MatchingListener`: ptr_class → `io.zenoh.jni.pubsub.MatchingListener` (wire `jni :: sys :: jlong`)
+- `Miss`: data_class → `io.zenoh.jni.pubsub.Miss` (wire `jni :: objects :: JObject`)
 - `MissDetectionConfig`: data_class → `io.zenoh.jni.pubsub.MissDetectionConfig` (wire `jni :: objects :: JObject`)
 - `Priority`: enum_class → `io.zenoh.jni.qos.Priority` (wire `jni :: sys :: jint`)
 - `Publisher`: ptr_class → `io.zenoh.jni.pubsub.Publisher` (wire `jni :: sys :: jlong`)
@@ -408,7 +410,6 @@ Base package: `io.zenoh.jni`
 - `ReplyKeyExpr`: enum_class → `io.zenoh.jni.query.ReplyKeyExpr` (wire `jni :: sys :: jint`)
 - `Sample`: ptr_class → `io.zenoh.jni.sample.Sample` (wire `jni :: sys :: jlong`)
 - `SampleKind`: enum_class → `io.zenoh.jni.sample.SampleKind` (wire `jni :: sys :: jint`)
-- `SampleMiss`: data_class → `io.zenoh.jni.pubsub.SampleMiss` (wire `jni :: objects :: JObject`)
 - `SampleMissListener`: ptr_class → `io.zenoh.jni.pubsub.SampleMissListener` (wire `jni :: sys :: jlong`)
 - `Scout`: ptr_class → `io.zenoh.jni.scouting.Scout` (wire `jni :: sys :: jlong`)
 - `Session`: ptr_class → `io.zenoh.jni.session.Session` (wire `jni :: sys :: jlong`)

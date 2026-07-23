@@ -34,6 +34,17 @@ public data class CacheConfig(val maxSamples: ULong, val replies: RepliesConfig)
 }
 
 /**
+ * Global identifier of an entity (publisher, subscriber, …) in a Zenoh system:
+ * the node's [`ZenohId`] plus the entity's per-session id.
+ */
+public data class EntityGlobalId(val zid: ZenohId, val eid: Long) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(zid: ByteArray, eid: Long): EntityGlobalId = EntityGlobalId(ZenohId(zid), eid)
+    }
+}
+
+/**
  * Query configuration for an advanced subscriber's historical data.
  *
  * History can only be retransmitted by advanced publishers that enable a
@@ -48,6 +59,17 @@ public data class HistoryConfig(val detectLatePublishers: Boolean, val maxSample
             maxSamples: Long?,
             maxAge: Double?,
         ): HistoryConfig = HistoryConfig(detectLatePublishers, maxSamples?.toULong(), maxAge)
+    }
+}
+
+/**
+ * A report of samples missed from one source, delivered to a sample-miss
+ * listener.
+ */
+public data class Miss(val source: EntityGlobalId, val nb: Long) {
+    public companion object {
+        @JvmStatic
+        public fun fromParts(source_zid: ByteArray, source_eid: Long, nb: Long): Miss = Miss(EntityGlobalId.fromParts(source_zid, source_eid), nb)
     }
 }
 
@@ -90,17 +112,6 @@ public data class RepliesConfig(val priority: Priority, val congestionControl: C
             congestionControl: Int,
             isExpress: Boolean,
         ): RepliesConfig = RepliesConfig(Priority.fromInt(priority), CongestionControl.fromInt(congestionControl), isExpress)
-    }
-}
-
-/**
- * A report of samples missed from one source, delivered to a sample-miss
- * listener.
- */
-public data class SampleMiss(val sourceZid: ZenohId, val sourceEid: Long, val nb: Long) {
-    public companion object {
-        @JvmStatic
-        public fun fromParts(sourceZid: ByteArray, sourceEid: Long, nb: Long): SampleMiss = SampleMiss(ZenohId(sourceZid), sourceEid, nb)
     }
 }
 
@@ -320,7 +331,7 @@ public class AdvancedSubscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declareSampleMissListener(
-        callback: SampleMissCallback,
+        callback: MissCallback,
         onClose: VoidCallback,
         onBindingError: JniErrorHandler<SampleMissListener>,
         onError: ErrorHandler<SampleMissListener>,
@@ -352,7 +363,7 @@ public class AdvancedSubscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
      * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
      */
     public fun declareBackgroundSampleMissListener(
-        callback: SampleMissCallback,
+        callback: MissCallback,
         onClose: VoidCallback,
         onBindingError: JniErrorHandler<Unit>,
         onError: ErrorHandler<Unit>,
@@ -626,6 +637,6 @@ public class Subscriber(initialPtr: Long) : GcNativeHandle(initialPtr) {
     }
 }
 
-public fun interface SampleMissCallback {
-    public fun run(sampleMiss: SampleMiss)
+public fun interface MissCallback {
+    public fun run(miss: Miss)
 }
