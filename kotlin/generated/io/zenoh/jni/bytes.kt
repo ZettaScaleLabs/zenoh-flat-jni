@@ -70,10 +70,10 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            Encoding(JNINative.encodingNewClone(this_ptr, __bcap))
+            JNINative.encodingNewClone(this_ptr, __bcap)
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return Encoding(__ret)
     }
 
     public companion object {
@@ -96,38 +96,34 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
             schema: String,
             onError: JniErrorHandler<Encoding>,
         ): Encoding {
-            if (e1 != null && e1.isClosed()) return onError.run(
-                "Operation on a closed native handle.",
-            )
+            if (e1?.isClosed() == true) return onError.run("Operation on a closed native handle.")
             val __bcap = JniErrorHandlerCapture.acquire()
             val __ret = run {
                 val __locks = ArrayList<NativeHandle>()
                 e1?.let { __locks.add(it) }
                 withSortedHandleLocks(__locks) {
                     val e1_ptr = e1?.ptr ?: 0L
-                    Encoding(
-                        JNINative.encodingNewWithSchema(
-                            eSel,
-                            e00 != null,
-                            e00 ?: 0,
-                            e01,
-                            e1_ptr,
-                            schema,
-                            __bcap,
-                        ),
+                    JNINative.encodingNewWithSchema(
+                        eSel,
+                        e00 != null,
+                        e00 ?: 0,
+                        e01,
+                        e1_ptr,
+                        schema,
+                        __bcap,
                     )
                 }
             }
             if (__bcap.failed) return onError.run(__bcap.ze0)
-            return __ret
+            return Encoding(__ret)
         }
 
         /** Create an encoding from its numeric identifier and optional schema. */
         public fun newFromId(id: Int, schema: String?, onError: JniErrorHandler<Encoding>): Encoding {
             val __bcap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingNewFromId(id, schema, __bcap))
+            val __ret = JNINative.encodingNewFromId(id, schema, __bcap)
             if (__bcap.failed) return onError.run(__bcap.ze0)
-            return __ret
+            return Encoding(__ret)
         }
 
         /**
@@ -138,9 +134,9 @@ public class Encoding(initialPtr: Long) : GcNativeHandle(initialPtr) {
          */
         public fun newFromString(s: String, onError: JniErrorHandler<Encoding>): Encoding {
             val __bcap = JniErrorHandlerCapture.acquire()
-            val __ret = Encoding(JNINative.encodingNewFromString(s, __bcap))
+            val __ret = JNINative.encodingNewFromString(s, __bcap)
             if (__bcap.failed) return onError.run(__bcap.ze0)
-            return __ret
+            return Encoding(__ret)
         }
     }
 }
@@ -181,10 +177,10 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZBytes(JNINative.zbytesNewClone(this_ptr, __bcap))
+            JNINative.zbytesNewClone(this_ptr, __bcap)
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return ZBytes(__ret)
     }
 
     public companion object {
@@ -194,9 +190,9 @@ public class ZBytes(initialPtr: Long) : NativeHandle(initialPtr) {
         /** Create a payload from a byte sequence. */
         public fun newFromVec(bytes: ByteArray, onError: JniErrorHandler<ZBytes>): ZBytes {
             val __bcap = JniErrorHandlerCapture.acquire()
-            val __ret = ZBytes(JNINative.zbytesNewFromVec(bytes, __bcap))
+            val __ret = JNINative.zbytesNewFromVec(bytes, __bcap)
             if (__bcap.failed) return onError.run(__bcap.ze0)
-            return __ret
+            return ZBytes(__ret)
         }
     }
 }

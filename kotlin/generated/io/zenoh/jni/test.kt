@@ -21,15 +21,22 @@ public fun parametersGet(s: String, k: String, onError: JniErrorHandler<String?>
  * Get the `|`-separated list of values for a key; empty when the key is
  * absent.
  */
+@Suppress("UNCHECKED_CAST")
 public fun parametersValues(
     s: String,
     k: String,
     onError: JniErrorHandler<List<String>>,
 ): List<String> {
     val __bcap = JniErrorHandlerCapture.acquire()
-    val __ret = (JNINative.parametersValues(s, k, ArrayList<String>(), __StringFolderHolder.instance, __bcap) as List<String>)
+    val __ret = JNINative.parametersValues(
+        s,
+        k,
+        ArrayList<String>(),
+        __StringFolderHolder.instance,
+        __bcap,
+    )
     if (__bcap.failed) return onError.run(__bcap.ze0)
-    return __ret
+    return __ret as List<String>
 }
 
 /** Return `true` if the parameters string contains the key. */

@@ -149,6 +149,10 @@ public fun interface VoidCallback {
     public fun run()
 }
 
+public fun interface boolCallback {
+    public fun run(bool: Boolean)
+}
+
 public fun interface StringFolder<A> {
     public fun run(acc: A, element: String): A
 }
@@ -214,6 +218,84 @@ internal object JNINative {
     init {
         io.zenoh.jni.NativeLibrary.ensureLoaded()
     }
+
+    external fun advancedPublisherDeclareBackgroundMatchingListener(
+        publisher: Long,
+        callback: Any,
+        onClose: Any,
+        errorSink: Any,
+        domainSink: Any,
+    )
+
+    external fun advancedPublisherDeclareMatchingListener(
+        publisher: Long,
+        callback: Any,
+        onClose: Any,
+        errorSink: Any,
+        domainSink: Any,
+    ): Long
+
+    external fun advancedPublisherDelete(
+        publisher: Long,
+        attachment: ByteArray?,
+        errorSink: Any,
+        domainSink: Any,
+    )
+
+    external fun advancedPublisherMatchingStatus(
+        publisher: Long,
+        errorSink: Any,
+        domainSink: Any,
+    ): Boolean
+
+    external fun advancedPublisherPut(
+        publisher: Long,
+        payload: ByteArray,
+        encodingSel: Int,
+        encoding00Present: Boolean,
+        encoding00Value: Int,
+        encoding01: String?,
+        encoding1: Long,
+        attachment: ByteArray?,
+        errorSink: Any,
+        domainSink: Any,
+    )
+
+    external fun advancedSubscriberDeclareBackgroundDetectPublishersSubscriber(
+        subscriber: Long,
+        callback: Any,
+        onClose: Any,
+        historyPresent: Boolean,
+        historyValue: Boolean,
+        errorSink: Any,
+        domainSink: Any,
+    )
+
+    external fun advancedSubscriberDeclareBackgroundSampleMissListener(
+        subscriber: Long,
+        callback: Any,
+        onClose: Any,
+        errorSink: Any,
+        domainSink: Any,
+    )
+
+    external fun advancedSubscriberDeclareDetectPublishersSubscriber(
+        subscriber: Long,
+        callback: Any,
+        onClose: Any,
+        historyPresent: Boolean,
+        historyValue: Boolean,
+        errorSink: Any,
+        domainSink: Any,
+    ): Long
+
+    external fun advancedSubscriberDeclareSampleMissListener(
+        subscriber: Long,
+        callback: Any,
+        onClose: Any,
+        errorSink: Any,
+        domainSink: Any,
+    ): Long
 
     external fun configGetJson(c: Long, key: String, errorSink: Any, domainSink: Any): String
 
@@ -543,6 +625,61 @@ internal object JNINative {
         config: Long,
         callback: Any,
         onClose: Any,
+        errorSink: Any,
+        domainSink: Any,
+    ): Long
+
+    external fun sessionDeclareAdvancedPublisher(
+        session: Long,
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: Long,
+        encodingSel: Int,
+        encoding00Present: Boolean,
+        encoding00Value: Int,
+        encoding01: String?,
+        encoding1: Long,
+        congestionControlPresent: Boolean,
+        congestionControlValue: Int,
+        priorityPresent: Boolean,
+        priorityValue: Int,
+        expressPresent: Boolean,
+        expressValue: Boolean,
+        reliabilityPresent: Boolean,
+        reliabilityValue: Int,
+        sampleMissDetectionPresent: Boolean,
+        sampleMissDetectionHeartbeat: Long,
+        sampleMissDetectionSporadic: Boolean,
+        publisherDetectionPresent: Boolean,
+        publisherDetectionValue: Boolean,
+        cachePresent: Boolean,
+        cacheMaxSamples: Long,
+        cacheRepliesPriority: Int,
+        cacheRepliesCongestionControl: Int,
+        cacheRepliesIsExpress: Boolean,
+        errorSink: Any,
+        domainSink: Any,
+    ): Long
+
+    external fun sessionDeclareAdvancedSubscriber(
+        session: Long,
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: Long,
+        callback: Any,
+        onClose: Any,
+        historyPresent: Boolean,
+        historyDetectLatePublishers: Boolean,
+        historyMaxSamplesPresent: Boolean,
+        historyMaxSamplesValue: Long,
+        historyMaxAgePresent: Boolean,
+        historyMaxAgeValue: Double,
+        recoveryPresent: Boolean,
+        recoveryPeriodicQueries: Long,
+        recoveryHeartbeat: Boolean,
+        queryTimeout: Long,
+        subscriberDetectionPresent: Boolean,
+        subscriberDetectionValue: Boolean,
         errorSink: Any,
         domainSink: Any,
     ): Long

@@ -15,7 +15,13 @@ import io.zenoh.jni.config.ZenohId
 import io.zenoh.jni.config.__ZenohIdFolderRawHolder
 import io.zenoh.jni.keyexpr.KeyExpr
 import io.zenoh.jni.liveliness.LivelinessToken
+import io.zenoh.jni.pubsub.AdvancedPublisher
+import io.zenoh.jni.pubsub.AdvancedSubscriber
+import io.zenoh.jni.pubsub.CacheConfig
+import io.zenoh.jni.pubsub.HistoryConfig
+import io.zenoh.jni.pubsub.MissDetectionConfig
 import io.zenoh.jni.pubsub.Publisher
+import io.zenoh.jni.pubsub.RecoveryConfig
 import io.zenoh.jni.pubsub.Subscriber
 import io.zenoh.jni.qos.CongestionControl
 import io.zenoh.jni.qos.Priority
@@ -58,10 +64,10 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            ZenohId(JNINative.sessionGetZid(this_ptr, __bcap))
+            JNINative.sessionGetZid(this_ptr, __bcap)
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return ZenohId(__ret)
     }
 
     public fun declarePublisher(
@@ -121,10 +127,10 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Publisher>,
     ): Publisher {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
-        if (encoding1 != null && encoding1.isClosed()) return onBindingError.run(
+        if (encoding1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -139,28 +145,26 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 val encoding1_ptr = encoding1?.ptr ?: 0L
                 try {
-                    Publisher(
-                        JNINative.sessionDeclarePublisher(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            encodingSel,
-                            encoding00 != null,
-                            encoding00 ?: 0,
-                            encoding01,
-                            encoding1_ptr,
-                            congestionControl != null,
-                            congestionControl?.value ?: 0,
-                            priority != null,
-                            priority?.value ?: 0,
-                            express != null,
-                            express ?: false,
-                            reliability != null,
-                            reliability?.value ?: 0,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.sessionDeclarePublisher(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        encodingSel,
+                        encoding00 != null,
+                        encoding00 ?: 0,
+                        encoding01,
+                        encoding1_ptr,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        reliability != null,
+                        reliability?.value ?: 0,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -169,7 +173,137 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return Publisher(__ret)
+    }
+
+    public fun declareAdvancedPublisher(
+        s: String,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        sampleMissDetection: MissDetectionConfig?,
+        publisherDetection: Boolean?,
+        cache: CacheConfig?,
+        onBindingError: JniErrorHandler<AdvancedPublisher>,
+        onError: ErrorHandler<AdvancedPublisher>,
+    ): AdvancedPublisher = declareAdvancedPublisher(0, s, null, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, sampleMissDetection, publisherDetection, cache, onBindingError, onError)
+
+    public fun declareAdvancedPublisher(
+        keyExpr: KeyExpr,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        sampleMissDetection: MissDetectionConfig?,
+        publisherDetection: Boolean?,
+        cache: CacheConfig?,
+        onBindingError: JniErrorHandler<AdvancedPublisher>,
+        onError: ErrorHandler<AdvancedPublisher>,
+    ): AdvancedPublisher = declareAdvancedPublisher(1, null, keyExpr, encodingSel, encoding00, encoding01, encoding1, congestionControl, priority, express, reliability, sampleMissDetection, publisherDetection, cache, onBindingError, onError)
+
+    /**
+     * Declare an advanced publisher for the given key expression.
+     *
+     * An advanced publisher adds, on top of a regular publisher, optional sample
+     * miss detection, publisher detection so that advanced subscribers can discover
+     * it, and a retransmission cache. The standard delivery settings behave as for
+     * [`crate::session_declare_publisher`].
+     *
+     * `sample_miss_detection`, when set, enables miss detection (see
+     * [`MissDetectionConfig`]); `publisher_detection` allows advanced subscribers
+     * to discover this publisher; `cache`, when set, enables the retransmission
+     * cache (see [`CacheConfig`]). Available only when unstable features are
+     * enabled.
+     *
+     * Parameter `encoding` is the Rust `Encoding` argument, expanded: pass EITHER its `encoding_new_from_id` inputs OR an existing `Encoding` — the selector chooses the arm, `-1` = absent (crosses as `encodingSel`, `encoding00`, `encoding01`, `encoding1`).
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareAdvancedPublisher(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        encodingSel: Int,
+        encoding00: Int?,
+        encoding01: String?,
+        encoding1: Encoding?,
+        congestionControl: CongestionControl?,
+        priority: Priority?,
+        express: Boolean?,
+        reliability: Reliability?,
+        sampleMissDetection: MissDetectionConfig?,
+        publisherDetection: Boolean?,
+        cache: CacheConfig?,
+        onBindingError: JniErrorHandler<AdvancedPublisher>,
+        onError: ErrorHandler<AdvancedPublisher>,
+    ): AdvancedPublisher {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
+            "Operation on a closed native handle.",
+        )
+        if (encoding1?.isClosed() == true) return onBindingError.run(
+            "Operation on a closed native handle.",
+        )
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            encoding1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                val encoding1_ptr = encoding1?.ptr ?: 0L
+                try {
+                    JNINative.sessionDeclareAdvancedPublisher(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        encodingSel,
+                        encoding00 != null,
+                        encoding00 ?: 0,
+                        encoding01,
+                        encoding1_ptr,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        reliability != null,
+                        reliability?.value ?: 0,
+                        sampleMissDetection != null,
+                        sampleMissDetection?.heartbeat?.toLong() ?: -1L,
+                        sampleMissDetection?.sporadic ?: false,
+                        publisherDetection != null,
+                        publisherDetection ?: false,
+                        cache != null,
+                        cache?.maxSamples?.toLong() ?: 0L,
+                        cache?.replies?.priority?.value ?: 0,
+                        cache?.replies?.congestionControl?.value ?: 0,
+                        cache?.replies?.isExpress ?: false,
+                        __bcap,
+                        __dcap,
+                    )
+                } finally {
+                    keyExpr1?.markConsumed()
+                }
+            }
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return AdvancedPublisher(__ret)
     }
 
     public fun put(
@@ -235,10 +369,10 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
-        if (keyExpr1 != null && keyExpr1.isClosed()) {
+        if (keyExpr1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
-        if (encoding1 != null && encoding1.isClosed()) {
+        if (encoding1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -327,7 +461,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
-        if (keyExpr1 != null && keyExpr1.isClosed()) {
+        if (keyExpr1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -397,7 +531,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Subscriber>,
     ): Subscriber {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -410,17 +544,15 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 try {
-                    Subscriber(
-                        JNINative.sessionDeclareSubscriber(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            callback.asRaw(),
-                            onClose,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.sessionDeclareSubscriber(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        callback.asRaw(),
+                        onClose,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -429,7 +561,103 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return Subscriber(__ret)
+    }
+
+    public fun declareAdvancedSubscriber(
+        s: String,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        history: HistoryConfig?,
+        recovery: RecoveryConfig?,
+        queryTimeout: ULong?,
+        subscriberDetection: Boolean?,
+        onBindingError: JniErrorHandler<AdvancedSubscriber>,
+        onError: ErrorHandler<AdvancedSubscriber>,
+    ): AdvancedSubscriber = declareAdvancedSubscriber(0, s, null, callback, onClose, history, recovery, queryTimeout, subscriberDetection, onBindingError, onError)
+
+    public fun declareAdvancedSubscriber(
+        keyExpr: KeyExpr,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        history: HistoryConfig?,
+        recovery: RecoveryConfig?,
+        queryTimeout: ULong?,
+        subscriberDetection: Boolean?,
+        onBindingError: JniErrorHandler<AdvancedSubscriber>,
+        onError: ErrorHandler<AdvancedSubscriber>,
+    ): AdvancedSubscriber = declareAdvancedSubscriber(1, null, keyExpr, callback, onClose, history, recovery, queryTimeout, subscriberDetection, onBindingError, onError)
+
+    /**
+     * Declare an advanced subscriber for the given key expression.
+     *
+     * On top of a regular subscriber, an advanced subscriber can query historical
+     * data (see [`HistoryConfig`]), recover missed samples (see [`RecoveryConfig`]),
+     * and be discovered by advanced publishers (`subscriber_detection`). The
+     * callback is called for each sample; the close callback is called when the
+     * subscription ends. `query_timeout` bounds the history/retransmission queries.
+     * Available only when unstable features are enabled.
+     *
+     * Parameter `key_expr` is the Rust `KeyExpr` argument, expanded: pass EITHER its `keyexpr_new_try_from` inputs OR an existing `KeyExpr` — the selector chooses the arm (crosses as `keyExprSel`, `keyExpr0`, `keyExpr1`).
+     * On a domain error `onError` receives the decomposed Rust `Error` error (`message`); a binding/system failure goes to `onBindingError` instead.
+     */
+    public fun declareAdvancedSubscriber(
+        keyExprSel: Int,
+        keyExpr0: String?,
+        keyExpr1: KeyExpr?,
+        callback: SampleCallback,
+        onClose: VoidCallback,
+        history: HistoryConfig?,
+        recovery: RecoveryConfig?,
+        queryTimeout: ULong?,
+        subscriberDetection: Boolean?,
+        onBindingError: JniErrorHandler<AdvancedSubscriber>,
+        onError: ErrorHandler<AdvancedSubscriber>,
+    ): AdvancedSubscriber {
+        if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
+            "Operation on a closed native handle.",
+        )
+        val __bcap = JniErrorHandlerCapture.acquire()
+        val __dcap = ErrorHandlerCapture.acquire()
+        val __ret = run {
+            val __locks = ArrayList<NativeHandle>()
+            __locks.add(this)
+            keyExpr1?.let { __locks.add(it) }
+            withSortedHandleLocks(__locks) {
+                val this_ptr = this.ptr
+                val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
+                try {
+                    JNINative.sessionDeclareAdvancedSubscriber(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        callback.asRaw(),
+                        onClose,
+                        history != null,
+                        history?.detectLatePublishers ?: false,
+                        history?.maxSamples != null,
+                        history?.maxSamples?.toLong() ?: 0L,
+                        history?.maxAge != null,
+                        history?.maxAge ?: 0.0,
+                        recovery != null,
+                        recovery?.periodicQueries?.toLong() ?: -1L,
+                        recovery?.heartbeat ?: false,
+                        queryTimeout?.toLong() ?: -1L,
+                        subscriberDetection != null,
+                        subscriberDetection ?: false,
+                        __bcap,
+                        __dcap,
+                    )
+                } finally {
+                    keyExpr1?.markConsumed()
+                }
+            }
+        }
+        if (__bcap.failed) return onBindingError.run(__bcap.ze0)
+        if (__dcap.failed) return onError.run(__dcap.ze0!!)
+        return AdvancedSubscriber(__ret)
     }
 
     public fun declareQuerier(
@@ -482,7 +710,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Querier>,
     ): Querier {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -495,29 +723,27 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 try {
-                    Querier(
-                        JNINative.sessionDeclareQuerier(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            target != null,
-                            target?.value ?: 0,
-                            consolidation != null,
-                            consolidation?.value ?: 0,
-                            congestionControl != null,
-                            congestionControl?.value ?: 0,
-                            priority != null,
-                            priority?.value ?: 0,
-                            express != null,
-                            express ?: false,
-                            timeoutMs != null,
-                            timeoutMs ?: 0L,
-                            acceptReplies != null,
-                            acceptReplies?.value ?: 0,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.sessionDeclareQuerier(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        target != null,
+                        target?.value ?: 0,
+                        consolidation != null,
+                        consolidation?.value ?: 0,
+                        congestionControl != null,
+                        congestionControl?.value ?: 0,
+                        priority != null,
+                        priority?.value ?: 0,
+                        express != null,
+                        express ?: false,
+                        timeoutMs != null,
+                        timeoutMs ?: 0L,
+                        acceptReplies != null,
+                        acceptReplies?.value ?: 0,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -526,7 +752,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return Querier(__ret)
     }
 
     public fun declareQueryable(
@@ -568,7 +794,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Queryable>,
     ): Queryable {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -581,19 +807,17 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 try {
-                    Queryable(
-                        JNINative.sessionDeclareQueryable(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            complete != null,
-                            complete ?: false,
-                            callback.asRaw(),
-                            onClose,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.sessionDeclareQueryable(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        complete != null,
+                        complete ?: false,
+                        callback.asRaw(),
+                        onClose,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -602,7 +826,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return Queryable(__ret)
     }
 
     /**
@@ -622,11 +846,11 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         val __dcap = ErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            KeyExpr(JNINative.sessionDeclareKeyexpr(this_ptr, keyExpr, __bcap, __dcap))
+            JNINative.sessionDeclareKeyexpr(this_ptr, keyExpr, __bcap, __dcap)
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return KeyExpr(__ret)
     }
 
     /**
@@ -741,10 +965,10 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
-        if (keyExpr1 != null && keyExpr1.isClosed()) {
+        if (keyExpr1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
-        if (encoding1 != null && encoding1.isClosed()) {
+        if (encoding1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -797,27 +1021,39 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
     }
 
     /** Return the identifiers of peers currently connected to this session. */
+    @Suppress("UNCHECKED_CAST")
     public fun getPeersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.sessionGetPeersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __bcap) as List<ZenohId>)
+            JNINative.sessionGetPeersZid(
+                this_ptr,
+                ArrayList<ZenohId>(),
+                __ZenohIdFolderRawHolder.instance,
+                __bcap,
+            )
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return __ret as List<ZenohId>
     }
 
     /** Return the identifiers of routers currently connected to this session. */
+    @Suppress("UNCHECKED_CAST")
     public fun getRoutersZid(onError: JniErrorHandler<List<ZenohId>>): List<ZenohId> {
         if (this.isClosed()) return onError.run("Operation on a closed native handle.")
         val __bcap = JniErrorHandlerCapture.acquire()
         val __ret = withSortedHandleLocks(this) {
             val this_ptr = this.ptr
-            (JNINative.sessionGetRoutersZid(this_ptr, ArrayList<ZenohId>(), __ZenohIdFolderRawHolder.instance, __bcap) as List<ZenohId>)
+            JNINative.sessionGetRoutersZid(
+                this_ptr,
+                ArrayList<ZenohId>(),
+                __ZenohIdFolderRawHolder.instance,
+                __bcap,
+            )
         }
         if (__bcap.failed) return onError.run(__bcap.ze0)
-        return __ret
+        return __ret as List<ZenohId>
     }
 
     public fun livelinessDeclareToken(
@@ -849,7 +1085,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<LivelinessToken>,
     ): LivelinessToken {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -862,15 +1098,13 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 try {
-                    LivelinessToken(
-                        JNINative.livelinessDeclareToken(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.livelinessDeclareToken(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -879,7 +1113,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return LivelinessToken(__ret)
     }
 
     public fun livelinessGet(
@@ -920,7 +1154,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Unit>,
     ) {
         if (this.isClosed()) { onBindingError.run("Operation on a closed native handle."); return }
-        if (keyExpr1 != null && keyExpr1.isClosed()) {
+        if (keyExpr1?.isClosed() == true) {
             onBindingError.run("Operation on a closed native handle."); return
         }
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -988,7 +1222,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         onError: ErrorHandler<Subscriber>,
     ): Subscriber {
         if (this.isClosed()) return onBindingError.run("Operation on a closed native handle.")
-        if (keyExpr1 != null && keyExpr1.isClosed()) return onBindingError.run(
+        if (keyExpr1?.isClosed() == true) return onBindingError.run(
             "Operation on a closed native handle.",
         )
         val __bcap = JniErrorHandlerCapture.acquire()
@@ -1001,18 +1235,16 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
                 val this_ptr = this.ptr
                 val keyExpr1_ptr = keyExpr1?.ptr ?: 0L
                 try {
-                    Subscriber(
-                        JNINative.livelinessDeclareSubscriber(
-                            this_ptr,
-                            keyExprSel,
-                            keyExpr0,
-                            keyExpr1_ptr,
-                            history,
-                            callback.asRaw(),
-                            onClose,
-                            __bcap,
-                            __dcap,
-                        ),
+                    JNINative.livelinessDeclareSubscriber(
+                        this_ptr,
+                        keyExprSel,
+                        keyExpr0,
+                        keyExpr1_ptr,
+                        history,
+                        callback.asRaw(),
+                        onClose,
+                        __bcap,
+                        __dcap,
                     )
                 } finally {
                     keyExpr1?.markConsumed()
@@ -1021,7 +1253,7 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
         }
         if (__bcap.failed) return onBindingError.run(__bcap.ze0)
         if (__dcap.failed) return onError.run(__dcap.ze0!!)
-        return __ret
+        return Subscriber(__ret)
     }
 
     public companion object {
@@ -1046,14 +1278,14 @@ public class Session(initialPtr: Long) : GcNativeHandle(initialPtr) {
             val __ret = withSortedHandleLocks(config) {
                 val config_ptr = config.ptr
                 try {
-                    Session(JNINative.open(config_ptr, __bcap, __dcap))
+                    JNINative.open(config_ptr, __bcap, __dcap)
                 } finally {
                     config.markConsumed()
                 }
             }
             if (__bcap.failed) return onBindingError.run(__bcap.ze0)
             if (__dcap.failed) return onError.run(__dcap.ze0!!)
-            return __ret
+            return Session(__ret)
         }
     }
 }

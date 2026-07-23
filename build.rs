@@ -50,10 +50,11 @@
 //! names are derived from them automatically.
 
 use prebindgen::{
+    convert,
     core::Registry,
-    enum_class, expand_param, expand_return, fun,
+    data_class, enum_class, expand_param, expand_return, fun,
     lang::{ConstDecl, FunctionDecl, JniGen},
-    package, ptr_class, value_class,
+    package, ptr_class, sig, value_class,
 };
 use syn::parse_quote as pq;
 
@@ -232,6 +233,20 @@ fn main() {
         // generator's default method mangle is identity, so restore the
         // namespace-relative naming this binding's Kotlin API expects.
         .set_method_name_mangle(|_, class, n| strip_flat_class_prefix(class, n))
+        // ── Duration (advanced pub/sub option periods) ────────────────────
+        // The semantic `Duration` crosses as bounded `u64` milliseconds
+        // (see src/duration.rs). Reserving `u64::MAX` as the invalid
+        // representation gives `Option<Duration>` a niche, so it crosses as a
+        // raw `Long` (no boxed-`Long`/`JObject`); a duration exceeding `u64`
+        // milliseconds is rejected to the binding error channel.
+        .convert(
+            convert!(Duration)
+                .input(fun!(crate::duration_from_millis).sig(sig!((ms: u64) -> Duration)))
+                .output(
+                    fun!(crate::duration_to_millis).sig(sig!((d: Duration) -> Result<u64, String>)),
+                )
+                .valid_range(0u64..=u64::MAX - 1),
+        )
         // ── Errors ────────────────────────────────────────────────────────
         // `Error` is the `E` of every fallible `Result<_, Error>` — a
         // RUST-SIDE-ONLY type: no class declaration, so no Kotlin `Error`
@@ -494,7 +509,49 @@ fn main() {
                         .method(fun!(publisher_put))
                         .method(fun!(publisher_delete)),
                 )
-                .class(ptr_class!(Subscriber).gc_managed()),
+                .class(ptr_class!(Subscriber).gc_managed())
+                // ── Advanced pub/sub (unstable) ───────────────────────────
+                // Option structs as FLAT data classes: fields cross as decoupled
+                // leaves (reassembled via a generated `fromParts`). `RepliesConfig`
+                // is declared before `CacheConfig`, which nests it as a field;
+                // `Duration` fields ride the `convert!(Duration)` domain above.
+                .class(data_class!(MissDetectionConfig))
+                .class(data_class!(RepliesConfig))
+                .class(data_class!(CacheConfig))
+                .class(data_class!(HistoryConfig))
+                .class(data_class!(RecoveryConfig))
+                .class(data_class!(SampleMiss))
+                // Advanced publisher: put/delete + matching status/listeners
+                // (the matching callback delivers a plain `bool`).
+                .class(
+                    ptr_class!(AdvancedPublisher)
+                        .gc_managed()
+                        .method(fun!(advanced_publisher_put))
+                        .method(fun!(advanced_publisher_delete))
+                        .method(fun!(advanced_publisher_matching_status))
+                        .method(fun!(advanced_publisher_declare_matching_listener))
+                        .method(fun!(
+                            advanced_publisher_declare_background_matching_listener
+                        )),
+                )
+                .class(ptr_class!(MatchingListener).gc_managed())
+                // Advanced subscriber: sample-miss listeners (callback delivers a
+                // `SampleMiss` data class) + detect-publishers subscribers.
+                .class(
+                    ptr_class!(AdvancedSubscriber)
+                        .gc_managed()
+                        .method(fun!(advanced_subscriber_declare_sample_miss_listener))
+                        .method(fun!(
+                            advanced_subscriber_declare_background_sample_miss_listener
+                        ))
+                        .method(fun!(
+                            advanced_subscriber_declare_detect_publishers_subscriber
+                        ))
+                        .method(fun!(
+                            advanced_subscriber_declare_background_detect_publishers_subscriber
+                        )),
+                )
+                .class(ptr_class!(SampleMissListener).gc_managed()),
         )
         // ── Test-only correspondence oracle ───────────────────────────────
         // The zenoh-flat parameters-processing API, exposed in a dedicated
@@ -618,9 +675,11 @@ fn main() {
                     .constructor(fun!(open))
                     .method(fun!(session_get_zid))
                     .method(fun!(session_declare_publisher).split_on_param("key_expr"))
+                    .method(fun!(session_declare_advanced_publisher).split_on_param("key_expr"))
                     .method(fun!(session_put).split_on_param("key_expr"))
                     .method(fun!(session_delete).split_on_param("key_expr"))
                     .method(fun!(session_declare_subscriber).split_on_param("key_expr"))
+                    .method(fun!(session_declare_advanced_subscriber).split_on_param("key_expr"))
                     .method(fun!(session_declare_querier).split_on_param("key_expr"))
                     .method(fun!(session_declare_queryable).split_on_param("key_expr"))
                     .method(fun!(session_declare_keyexpr))
@@ -658,6 +717,14 @@ fn main() {
     // exclusions explicitly so newly added source functions remain visible as
     // generation warnings instead of being lost in a standing warning list.
     for name in [
+        // Advanced pub/sub lifecycle/metadata: the gc_managed handle's close
+        // (drop = undeclare) covers these, as for the regular pub/sub fns.
+        "advanced_publisher_get_keyexpr",
+        "advanced_publisher_undeclare",
+        "advanced_subscriber_get_keyexpr",
+        "advanced_subscriber_undeclare",
+        "matching_listener_undeclare",
+        "sample_miss_listener_undeclare",
         "liveliness_undeclare_token",
         "publisher_get_eid",
         "publisher_get_keyexpr",

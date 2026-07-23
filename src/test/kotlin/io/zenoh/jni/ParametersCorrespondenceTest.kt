@@ -79,7 +79,13 @@ class ParametersCorrespondenceTest {
                 .asString(),
             "extend for \"$s\"",
         )
-        // `remove` is deliberately NOT compared — see [nativeRemoveBugCanary].
+        for (k in keys) {
+            assertEquals(
+                parametersRemove(s, k, boom),
+                Parameters.fromString(s).also { it.remove(k) }.asString(),
+                "remove(\"$k\") for \"$s\"",
+            )
+        }
     }
 
     @Test
@@ -102,7 +108,10 @@ class ParametersCorrespondenceTest {
     }
 
     /** The shared implementation follows Rust's DOCUMENTED remove contract
-     * ("preserving the insertion order"). */
+     * ("preserving the insertion order"), and — since the upstream
+     * iterator-consumption bug was fixed — native now agrees, so `remove` is
+     * also compared in [assertCorrespondence]. These fixed vectors additionally
+     * anchor the exact spec (and `remove`'s returned value, line below). */
     @Test
     fun removeFollowsTheDocumentedContract() {
         fun removed(s: String, k: String): String =
@@ -114,18 +123,5 @@ class ParametersCorrespondenceTest {
         assertEquals("", removed("a=1", "a"))
         assertEquals("a=1", removed("flag;a=1", "flag"))
         assertEquals("1", Parameters.fromString("b=2;a=1").remove("a"))
-    }
-
-    /** CANARY: upstream zenoh's `parameters::remove` has an iterator-consumption
-     * bug — `find` advances past every entry up to and including the first match
-     * before `filter` builds the result, so entries PRECEDING the match are
-     * dropped, and removing an absent key erases the whole string. The shared
-     * implementation intentionally diverges (see [removeFollowsTheDocumentedContract]).
-     * This pins the buggy native behavior: when upstream fixes it, this fails —
-     * then delete it and fold `remove` into [assertCorrespondence]. */
-    @Test
-    fun nativeRemoveBugCanary() {
-        assertEquals("c=3", parametersRemove("b=2;a=1;c=3", "a", boom))
-        assertEquals("", parametersRemove("x=1;y=2", "missing", boom))
     }
 }
